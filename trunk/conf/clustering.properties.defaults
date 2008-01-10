@@ -1,0 +1,5 @@
+clustering.nodes=
+clustering.modules=
+
+clustering.checkNodesInterval=10000
+clustering.monitor.refreshInterval=60000
