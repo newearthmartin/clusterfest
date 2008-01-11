@@ -24,14 +24,15 @@ import com.flaptor.clustering.controlling.controller.ControllerNodeState;
 import com.flaptor.util.Execute;
 
 /**
- * RmiServer that exports the RmiMonitoredNode interface. 
+ * default implementation of the controllable interface 
+ *
+ * @author martinmassera
  */
 public class ControllableImplementation implements Controllable {
     private static Logger logger = Logger.getLogger(Execute.whoAmI());
 
     protected ControllerNodeState state = ControllerNodeState.RUNNING;
     
-	//@Override
 	public ControllerNodeState getState() {
 		return state;
 	}

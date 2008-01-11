@@ -29,6 +29,8 @@ import com.flaptor.util.ThreadUtil;
 
 /**
  * util for control ui frontend
+ *
+ * @author martinmassera
  */
 public class ControllingFrontend {
     private static final Logger logger = Logger.getLogger(com.flaptor.util.Execute.whoAmI());

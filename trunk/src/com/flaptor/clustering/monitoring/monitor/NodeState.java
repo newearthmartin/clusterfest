@@ -20,6 +20,11 @@ import java.util.Map;
 
 import com.flaptor.clustering.monitoring.SystemProperties;
 
+/**
+ * The state of a node in the monitoring module
+ *
+ * @author martinmassera
+ */
 public class NodeState {
 
 	public static enum Sanity {

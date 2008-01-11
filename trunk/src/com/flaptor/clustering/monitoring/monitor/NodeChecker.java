@@ -18,6 +18,10 @@ package com.flaptor.clustering.monitoring.monitor;
 
 import com.flaptor.clustering.monitoring.monitor.NodeState.Sanity;
 
+/**
+ * Interface for node checkers. Its basically a sanity check on the node's state
+ * @author martinmassera
+ */
 public interface NodeChecker {
 
     /**

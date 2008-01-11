@@ -29,6 +29,8 @@ import com.flaptor.util.Triad;
 /**
  * represents a controller module node
  * to be used inclustering server side
+ *
+ * @author martinmassera
  */
 public class ControllerNode implements ModuleNode{
     private static final Logger logger = Logger.getLogger(com.flaptor.util.Execute.whoAmI());
@@ -58,6 +60,9 @@ public class ControllerNode implements ModuleNode{
 		return state;
 	}
 
+	/**
+	 * execute start.sh through ssh
+	 */
 	public void start() throws IOException {
 		updateState();
 		if (state == ControllerNodeState.STOPPED) {
@@ -66,6 +71,10 @@ public class ControllerNode implements ModuleNode{
 			else throw new IOException("could not start remote host. error code: " + rv.first() + " - " + rv.second() + " - " + rv.third()); 
 		}
 	}
+	
+	/**
+	 * execute stop.sh through ssh
+	 */
 	public void kill() throws IOException {
 		updateState();
 		Triad<Integer, String, String> rv = CommandUtil.remoteSSHCommand(node.getHost(), -1, "cd "+node.getInstallDir() + "\n./stop.sh", 5000);
@@ -73,6 +82,9 @@ public class ControllerNode implements ModuleNode{
 		else throw new IOException("could not kill remote host. error code: " + rv.first() + " - " + rv.second() + " - " + rv.third()); 
 	}
 
+	/**
+	 * call pause through rpc
+	 */
 	public void pause() {
 		updateState();
 		if (state == ControllerNodeState.RUNNING) {
@@ -84,6 +96,9 @@ public class ControllerNode implements ModuleNode{
 		}
 	}
 
+	/**
+	 * call resume through rpc
+	 */
 	public void resume() {
 		updateState();
 		if (state == ControllerNodeState.PAUSED) {
@@ -95,6 +110,9 @@ public class ControllerNode implements ModuleNode{
 		}
 	}
 
+	/**
+	 * call stop through rpc
+	 */
 	public void stop() {
 		updateState();
 		if (state == ControllerNodeState.RUNNING || state == ControllerNodeState.PAUSED) {

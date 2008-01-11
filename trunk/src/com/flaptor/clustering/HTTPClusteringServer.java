@@ -24,6 +24,8 @@ import com.flaptor.util.remote.WebServer;
 
 /**
  * HTTP server for clusterfest monitor 
+ *
+ * @author martinmassera
  */
 public class HTTPClusteringServer extends WebServer {
 
@@ -33,6 +35,10 @@ public class HTTPClusteringServer extends WebServer {
 		addWebAppHandler("/clustering", webappPath);
 	}
 
+	/**
+	 * starts a webserver exporting the webapp located in web-clustering folder (in the classpath)
+	 * @param args the port
+	 */
 	public static void main(String[] args) {
         if (args.length != 1) {
             System.out.println("usage: " + HTTPClusteringServer.class.getSimpleName() + " port");

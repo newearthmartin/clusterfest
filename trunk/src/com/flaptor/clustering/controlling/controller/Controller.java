@@ -32,12 +32,13 @@ import com.flaptor.util.remote.XmlrpcSerialization;
 /**
  * this is the module that handles the controlling. It includes the methods to
  * start, stop, pasue, resume and kill nodes 
+ *
+ * @author martinmassera
  */
 public class Controller extends NodeContainerModule {
     private static final Logger logger = Logger.getLogger(com.flaptor.util.Execute.whoAmI());
 
 	public Controller() {
-//		Config config = Config.getConfig("clustering.properties");
 	}
 
 	@Override
@@ -46,30 +47,63 @@ public class Controller extends NodeContainerModule {
 		return cnode;
 	}
 
+	/**
+	 * 
+	 * @param node
+	 * @return the state of the node (for the controller framework)
+	 */
 	public ControllerNodeState getState(ControllerNode node) {
 		return node.getState();
 	}
 	
+	/**
+	 * starts a node by calling start.sh through ssh
+	 * @param node
+	 * @throws IOException
+	 */
 	public void startNode(ControllerNode node) throws IOException{
 		node.start();
 	}
 
+	/**
+	 * starts a node by calling stop.sh through ssh
+	 * @param node
+	 * @throws IOException
+	 */
 	public void killNode(ControllerNode node) throws IOException {
 		node.kill();
 	}
 	
+	/**
+	 * pauses a node through rpc
+	 * @param node
+	 */
 	public void pauseNode(ControllerNode node) {
 		node.pause();
 	}
 
+	/**
+	 * resumes a node through rpc
+	 * @param node
+	 */
 	public void resumeNode(ControllerNode node) {
 		node.resume();
 	}
 	
+	/**
+	 * stops a node through rpc
+	 * @param node
+	 */
 	public void stopNode(ControllerNode node) {
 		node.stop();
 	}
 
+	/**
+	 * updates the state of a node 
+	 * @param node
+	 * @return
+	 * TODO make return depend on success 
+	 */
 	public boolean updateNodeState(ControllerNode node) {
 //		try {
 			node.updateState();

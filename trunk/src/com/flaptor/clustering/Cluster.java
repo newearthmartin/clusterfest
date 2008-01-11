@@ -36,8 +36,11 @@ import com.flaptor.util.Config;
  * Represents a cluster of the clustering framework. Here you can register nodes
  * and all the different parts of the framework (monitoring, control, etc) 
  * will get access to them
+ *
+ * @author martinmassera
  */
 public class Cluster {
+	
     private static final Logger logger = Logger.getLogger(com.flaptor.util.Execute.whoAmI());
 	
     private static class InitializiationOnDemandHolder {

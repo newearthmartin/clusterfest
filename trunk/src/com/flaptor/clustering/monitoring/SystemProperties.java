@@ -19,7 +19,10 @@ package com.flaptor.clustering.monitoring;
 import java.io.Serializable;
 
 /**
- * Represents the system properties 
+ * Represents the system properties. Consisting of 
+ * top dump and ifconfig dump
+ *
+ * @author martinmassera
  */
 public class SystemProperties implements Serializable{
 

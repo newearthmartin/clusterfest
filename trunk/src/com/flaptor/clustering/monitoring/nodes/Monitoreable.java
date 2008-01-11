@@ -22,6 +22,8 @@ import com.flaptor.clustering.monitoring.SystemProperties;
 
 /**
  * interface for monitoring nodes
+ *
+ * @author martinmassera
  */
 public interface Monitoreable {
 	

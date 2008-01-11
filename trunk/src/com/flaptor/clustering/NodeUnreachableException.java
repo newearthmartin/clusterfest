@@ -16,9 +16,12 @@ limitations under the License.
 
 package com.flaptor.clustering;
 
+/**
+ * Exception to be thrown by rpc calls, meaning that the node is unreachable
+ *  
+ * @author martinmassera
+ */
 public class NodeUnreachableException extends Exception {
-
-    private static final long serialVersionUID = -4021562241785282968L;
 
     public NodeUnreachableException() {
         super();
