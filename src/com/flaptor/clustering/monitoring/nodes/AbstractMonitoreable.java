@@ -31,7 +31,10 @@ import com.flaptor.util.FileUtil;
 import com.flaptor.util.IOUtil;
 
 /**
- * RmiServer that exports the RmiMonitoredNode interface. 
+ * Abstract implementation for the monitoreable interface
+ * that has everything except the exported variables 
+ *
+ * @author martinmassera
  */
 abstract public class AbstractMonitoreable implements Monitoreable {
     private static Logger logger = Logger.getLogger(Execute.whoAmI());

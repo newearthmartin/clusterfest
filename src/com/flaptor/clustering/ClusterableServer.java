@@ -23,6 +23,8 @@ import com.flaptor.util.remote.XmlrpcServer;
  * Implementation of all interfaces exposed by clustering framework.
  * Implementation of these interfaces can be set or not, this node aggregates the set interfaces
  * and tells the client which are set.
+ *
+ * @author martinmassera
  */
 public class ClusterableServer {
 
@@ -54,6 +56,13 @@ public class ClusterableServer {
 		}
 	}
 	
+	/**
+	 * adds a module server to the clusterable server. Basically this means
+	 * that this node will export some service provided by moduleServer. 
+	 * 
+	 * @param context the context where the moduleServer will be exported 
+	 * @param moduleServer a handler to be exported as rpc
+	 */
 	public void addModuleServer(String context, Object moduleServer) {
 		xmlrpcServer.addHandler(context, moduleServer);
 	}

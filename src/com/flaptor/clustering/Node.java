@@ -27,6 +27,8 @@ import com.flaptor.util.remote.XmlrpcSerialization;
  * Represents a node of the cluster. Indicates the host:port of the node,
  * the type and if it's reachable. All modules of the clustering framework
  * should check and update the reachable status.
+ *
+ * @author martinmassera
  */
 public class Node {
 
@@ -39,6 +41,12 @@ public class Node {
 	
 	private XmlrpcClient xmlrpcClient;
 	
+	/**
+	 * creates a node
+	 * @param host
+	 * @param port
+	 * @param installDir the path where the node is installed (on the target machine)
+	 */
     public Node(String host, int port, String installDir) {
         this.host = host;
         this.port = port;

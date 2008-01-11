@@ -33,6 +33,13 @@ import com.flaptor.util.Pair;
 import com.flaptor.util.remote.XmlrpcClient;
 import com.flaptor.util.remote.XmlrpcSerialization;
 
+/**
+ * Monitor module for the clustering framework. It allows to retrieve variables
+ * from the nodes and write a checker to analyse these variables and determine
+ * the state of each node
+ *  
+ * @author martinmassera
+ */
 public class Monitor extends NodeContainerModule {
     public final static String MODULE_CONTEXT = "monitor";
 	
@@ -91,6 +98,13 @@ public class Monitor extends NodeContainerModule {
 		}
 	}
 
+	/**
+	 * retrieves a log from the node, may not be at the moment but an older copy 
+	 *  
+	 * @param node
+	 * @param logName out, err, or a filename
+	 * @return a pair (log, timestamp)
+	 */
 	public Pair<String, Long> retrieveLog(MonitorNode node, String logName) {
 		if (!node.getLogs().containsKey(logName)) {
 			try {
@@ -117,6 +131,13 @@ public class Monitor extends NodeContainerModule {
 		}
 	}
 
+	/**
+	 * @param type
+	 * @return the checker defined in clustering.properties for a particular node type
+	 * @throws InstantiationException
+	 * @throws IllegalAccessException
+	 * @throws ClassNotFoundException
+	 */
 	public NodeChecker getCheckerForType(String type) throws InstantiationException, IllegalAccessException, ClassNotFoundException {
 		Config config = Config.getConfig("clustering.properties");
 		try {

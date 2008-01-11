@@ -19,7 +19,9 @@ package com.flaptor.clustering.controlling.nodes;
 import com.flaptor.clustering.controlling.controller.ControllerNodeState;
 
 /**
- * interface for controlling nodes
+ * interface for controlling nodes through rpc
+ *
+ * @author martinmassera
  */
 public interface Controllable {
 

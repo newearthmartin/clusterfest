@@ -31,6 +31,8 @@ import com.flaptor.util.Pair;
 
 /**
  * represents a monitoring module node
+ *
+ * @author martinmassera
  */
 public class MonitorNode implements ModuleNode {
 
