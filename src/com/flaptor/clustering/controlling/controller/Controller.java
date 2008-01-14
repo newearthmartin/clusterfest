@@ -17,15 +17,27 @@ limitations under the License.
 package com.flaptor.clustering.controlling.controller;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 
+import sun.reflect.ReflectionFactory.GetReflectionFactoryAction;
+
+import com.flaptor.clustering.Cluster;
 import com.flaptor.clustering.ClusterableServer;
 import com.flaptor.clustering.Node;
 import com.flaptor.clustering.NodeUnreachableException;
 import com.flaptor.clustering.controlling.nodes.Controllable;
 import com.flaptor.clustering.modules.ModuleNode;
 import com.flaptor.clustering.modules.NodeContainerModule;
+import com.flaptor.clustering.modules.WebModule;
+import com.flaptor.clustering.monitoring.monitor.MonitorNode;
+import com.flaptor.clustering.monitoring.monitor.NodeState;
+import com.flaptor.clustering.monitoring.monitor.NodeState.Sanity;
+import com.flaptor.util.remote.WebServer;
 import com.flaptor.util.remote.XmlrpcClient;
 import com.flaptor.util.remote.XmlrpcSerialization;
 
@@ -35,7 +47,7 @@ import com.flaptor.util.remote.XmlrpcSerialization;
  *
  * @author martinmassera
  */
-public class Controller extends NodeContainerModule {
+public class Controller extends NodeContainerModule implements WebModule {
     private static final Logger logger = Logger.getLogger(com.flaptor.util.Execute.whoAmI());
 
 	public Controller() {
@@ -153,5 +165,71 @@ public class Controller extends NodeContainerModule {
 	 */
 	public static Controllable getControllableProxy(XmlrpcClient client) {
 		return (Controllable)XmlrpcClient.proxy(Controller.class.getName(), Controllable.class, client);
+	}
+
+	//************ WEB MODULE **************
+	public String getModuleHTML() {
+		return "<a href=\"?action=startall\"><img src=\"media/start.png\"/>ALL</a>  <a href=\"?action=killall\"><img src=\"media/stop.png\"/>ALL</a>";
+	}
+	public String getNodeHTML(Node node, int nodeNum) {
+		if (!isRegistered(node)) return null;
+		ControllerNode cnode = (ControllerNode)getNode(node);
+        ControllerNodeState state = node.isReachable() ? getState(cnode) : ControllerNodeState.STOPPED;
+        String ret = "";
+        if (state == ControllerNodeState.RUNNING) ret += "<a href=\"?action=kill&node="+nodeNum+"\"><img src=\"media/stop.png\"/></a>";
+        if (state == ControllerNodeState.PAUSED) ret += "<a href=\"?action=resume&node="+nodeNum+"\"><img src=\"media/start.png\"/></a><a href=\"?action=kill&node="+nodeNum+"\"><img src=\"media/stop.png\"/></a>";
+        if (state == ControllerNodeState.STOPPED) ret += "<a href=\"?action=start&node="+nodeNum+"\"><img src=\"media/start.png\"/></a>";
+        return ret;
+	}
+	public void setup(WebServer server) {
+	}
+
+	public String action(String action, HttpServletRequest request) {
+		Cluster cluster = Cluster.getInstance();
+		String message = null;
+		int idx = -1;
+		String nodeParam = request.getParameter("node");
+		if (nodeParam != null ) idx = Integer.parseInt(nodeParam);
+        if ("start".equals(action)) {
+            Node node = cluster.getNodes().get(idx);
+            message = ControllingFrontend.startNode(cluster, node);
+        }    
+        if ("startall".equals(action)) {
+            message = ControllingFrontend.startall(cluster);
+        }    
+        if ("killall".equals(action)) {
+            message = ControllingFrontend.killall(cluster);
+        }    
+        if ("kill".equals(action)) {
+            Node node = cluster.getNodes().get(idx);
+            message = ControllingFrontend.killNode(cluster, node);
+        }    
+        if ("pause".equals(action)) {
+            Node node = cluster.getNodes().get(idx);
+            ControllerNode cnode = (ControllerNode)getNode(node);
+            pauseNode(cnode);
+        }    
+        if ("resume".equals(action)) {
+            Node node = cluster.getNodes().get(idx);
+            ControllerNode cnode = (ControllerNode)getNode(node);
+            resumeNode(cnode);
+        }    
+        if ("stop".equals(action)) {
+            Node node = cluster.getNodes().get(idx);
+            ControllerNode cnode = (ControllerNode)getNode(node);
+            stopNode(cnode);
+        }
+        return message;
+	}
+
+	public List<String> getActions() {
+		List<String> l = new ArrayList<String>();
+		l.add("start");
+		l.add("pause");
+		l.add("stop");
+		l.add("kill");
+		l.add("startall");
+		l.add("killall");
+		return l;
 	}
 }
