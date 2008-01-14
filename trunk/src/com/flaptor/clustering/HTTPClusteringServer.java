@@ -16,10 +16,8 @@ limitations under the License.
 
 package com.flaptor.clustering;
 
-import com.flaptor.util.Config;
-import com.flaptor.util.EmbeddedWebAppHTTPServer;
-import com.flaptor.util.PortUtil;
-import com.flaptor.util.remote.AServer;
+import java.net.URL;
+
 import com.flaptor.util.remote.WebServer;
 
 /**
@@ -31,8 +29,9 @@ public class HTTPClusteringServer extends WebServer {
 
 	public HTTPClusteringServer(int port){
 		super(port);
-        String webappPath = this.getClass().getClassLoader().getResource("web-clustering").getPath();
-		addWebAppHandler("/clustering", webappPath);
+        URL webappPath = this.getClass().getClassLoader().getResource("web-clustering");
+        String path = webappPath.getPath();
+		addWebAppHandler("/clustering", path);
 	}
 
 	/**
@@ -44,6 +43,7 @@ public class HTTPClusteringServer extends WebServer {
             System.out.println("usage: " + HTTPClusteringServer.class.getSimpleName() + " port");
             System.exit(1);
         }
-        new HTTPClusteringServer(Integer.parseInt(args[0])).start();
+        HTTPClusteringServer server = new HTTPClusteringServer(Integer.parseInt(args[0]));
+        server.start();
 	}
 }

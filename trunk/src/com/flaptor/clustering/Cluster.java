@@ -29,6 +29,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.log4j.Logger;
 
 import com.flaptor.clustering.modules.NodeContainerModule;
+import com.flaptor.clustering.modules.WebModule;
 import com.flaptor.util.ClassUtil;
 import com.flaptor.util.Config;
 
@@ -48,6 +49,8 @@ public class Cluster {
     }
     
     private Map<String, NodeContainerModule> modules = new HashMap<String, NodeContainerModule>();
+    private List<WebModule> webModules = new ArrayList<WebModule>();
+    private Map<String, WebModule> moduleActionMap = new HashMap<String, WebModule>();
     
     private Cluster() {
     	//after initializing everything, register all nodes
@@ -57,7 +60,9 @@ public class Cluster {
         
     	for (String moduleDef : moduleDefs) {
     		String [] defs = moduleDef.split(":");
-    		modules.put(defs[0], (NodeContainerModule)ClassUtil.instance(defs[1]));
+    		NodeContainerModule module = (NodeContainerModule)ClassUtil.instance(defs[1]); 
+    		modules.put(defs[0], module);
+    		if (module instanceof WebModule) addWebModule((WebModule)module);
     	}
     	
     	for (int i = 0; i < hosts.length; i++) {
@@ -75,6 +80,14 @@ public class Cluster {
 		}, 0, config.getInt("clustering.checkNodesInterval"));
     }
     
+    
+	private void addWebModule(WebModule wm) {
+		for (String action : wm.getActions()) {
+			moduleActionMap.put(action, wm);
+		}
+		webModules.add(wm);
+	}
+	
     /**
      * @return the singleton instance of Cluster
      */
@@ -190,7 +203,15 @@ public class Cluster {
 	public NodeContainerModule getModule(String moduleName) {
 		return modules.get(moduleName);
 	}
-
+	
+	public List<WebModule> getWebModules() {
+		return webModules;
+	}
+	
+	public WebModule getModuleForAction(String action) {
+		return moduleActionMap.get(action);
+	}
+	
 	/**
 	 * check to see if nodes that weren't alive came to live
 	 */

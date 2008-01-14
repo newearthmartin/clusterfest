@@ -16,8 +16,12 @@ limitations under the License.
 
 package com.flaptor.clustering.monitoring.monitor;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 
@@ -26,10 +30,13 @@ import com.flaptor.clustering.Node;
 import com.flaptor.clustering.NodeUnreachableException;
 import com.flaptor.clustering.modules.ModuleNode;
 import com.flaptor.clustering.modules.NodeContainerModule;
+import com.flaptor.clustering.modules.WebModule;
+import com.flaptor.clustering.monitoring.monitor.NodeState.Sanity;
 import com.flaptor.clustering.monitoring.nodes.Monitoreable;
 import com.flaptor.util.ClassUtil;
 import com.flaptor.util.Config;
 import com.flaptor.util.Pair;
+import com.flaptor.util.remote.WebServer;
 import com.flaptor.util.remote.XmlrpcClient;
 import com.flaptor.util.remote.XmlrpcSerialization;
 
@@ -40,7 +47,7 @@ import com.flaptor.util.remote.XmlrpcSerialization;
  *  
  * @author martinmassera
  */
-public class Monitor extends NodeContainerModule {
+public class Monitor extends NodeContainerModule implements WebModule {
     public final static String MODULE_CONTEXT = "monitor";
 	
 	private static final Logger logger = Logger.getLogger(com.flaptor.util.Execute.whoAmI());
@@ -162,5 +169,31 @@ public class Monitor extends NodeContainerModule {
 	 */
 	public static Monitoreable getMonitoreableProxy(XmlrpcClient client) {
 		return (Monitoreable)XmlrpcClient.proxy(Monitor.class.getName(), Monitoreable.class, client);
+	}
+
+	
+	//************ WEB MODULE **************
+	public String getModuleHTML() {
+		return null;
+	}
+	public String getNodeHTML(Node node, int nodeNum) {
+        MonitorNode monitorNode = (MonitorNode)getNode(node);
+
+        Sanity sanity = node.isReachable() ? Sanity.UNKNOWN : Sanity.UNREACHABLE;
+    
+        if (monitorNode != null) {
+            NodeState state = monitorNode.getLastState();
+            if (state != null) sanity = state.getSanity();
+        }
+        return "<a class=\"sanity"+sanity+"\" href=\"monitorNode.jsp?node=" + nodeNum + "\">"+ sanity +"</a>";
+	}
+	public void setup(WebServer server) {
+	}
+	public String action(String action, HttpServletRequest request) {
+		return null;
+	}
+
+	public List<String> getActions() {
+		return new ArrayList<String>();
 	}
 }
