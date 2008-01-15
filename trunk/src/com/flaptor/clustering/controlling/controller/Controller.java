@@ -24,8 +24,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 
-import sun.reflect.ReflectionFactory.GetReflectionFactoryAction;
-
 import com.flaptor.clustering.Cluster;
 import com.flaptor.clustering.ClusterableServer;
 import com.flaptor.clustering.Node;
@@ -34,9 +32,6 @@ import com.flaptor.clustering.controlling.nodes.Controllable;
 import com.flaptor.clustering.modules.ModuleNode;
 import com.flaptor.clustering.modules.NodeContainerModule;
 import com.flaptor.clustering.modules.WebModule;
-import com.flaptor.clustering.monitoring.monitor.MonitorNode;
-import com.flaptor.clustering.monitoring.monitor.NodeState;
-import com.flaptor.clustering.monitoring.monitor.NodeState.Sanity;
 import com.flaptor.util.remote.WebServer;
 import com.flaptor.util.remote.XmlrpcClient;
 import com.flaptor.util.remote.XmlrpcSerialization;
@@ -154,7 +149,7 @@ public class Controller extends NodeContainerModule implements WebModule {
 	/**
 	 * adds a monitoreable implementation to a clusterable server
 	 * @param clusterableServer
-	 * @param m
+	 * @param c
 	 */
 	public static void addControllerServer(ClusterableServer clusterableServer, Controllable c) {
 		clusterableServer.addModuleServer(Controller.class.getName(), XmlrpcSerialization.handler(c));
