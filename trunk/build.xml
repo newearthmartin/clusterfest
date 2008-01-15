@@ -24,7 +24,9 @@ limitations under the License.
     <property name="lib.dir" value="${basedir}/lib"/>
     <property name="conf.dir" value="${basedir}/conf"/>
     
-    <property name="javadoc.dir" value="${basedir}/docs/javadoc"/>
+    <property name="dist.dir" value="${basedir}/dist" />
+	<property name="doc.dir" value="${basedir}/docs" />
+	<property name="javadoc.dir" value="${doc.dir}/javadoc"/>
     <property name="output.dir"  location="${basedir}/output"/>
     <property name="bin.dir" location="${basedir}/bin"/>    
     <property name="tmp.dir" location="${basedir}/tmp"/>
@@ -113,9 +115,8 @@ limitations under the License.
         </jar>
     </target>
 
-
-    <!--******************************************************************************************************-->
-    <target name="jar" depends="compile" description="builds the clusterfest jar file, including lib jars" >
+	<!--******************************************************************************************************-->
+    <target name="jar" depends="compile" description="builds the clusterfest jar file, including lib jars and webapp files" >
         <jar jarfile="${output.dir}/${project}-${version}.jar" >
             <manifest>
                 <attribute name="Built-By" value="${user.name}"/>
@@ -133,11 +134,52 @@ limitations under the License.
                 <include name="*.properties.defaults"/>
             </fileset>
             <zipgroupfileset dir="${lib.dir}">
-                 <include name="*.jar" />
+                <include name="*.jar" />
             </zipgroupfileset>
         </jar>
     </target>
 
+        <!--******************************************************************************************************-->
+        <target name="distjar" depends="compile" description="builds the clusterfest jar file, including lib jars EXCLUDING webapp files, for DIST" >
+            <jar jarfile="${output.dir}/${project}-${version}.jar" >
+                <manifest>
+                    <attribute name="Built-By" value="${user.name}"/>
+                    <attribute name="Version" value="${version}"/>
+                </manifest>
+                <fileset dir="${build.dir}" excludes="**/*Test.class">
+                    <include name="com/flaptor/**/*.class"/>
+                </fileset>
+                <fileset dir="${conf.dir}" >
+                    <include name="*.properties.defaults"/>
+                </fileset>
+                <zipgroupfileset dir="${lib.dir}">
+                     <include name="*.jar" />
+                </zipgroupfileset>
+            </jar>
+        </target>
+
+        <target name="dist" depends="clean, distjar, doc">
+            <mkdir dir="${dist.dir}"/>
+            <copy todir="${tmp.bin.dir}">
+                <fileset dir="${bin.dir}"/>
+            </copy>
+            <copy todir="${tmp.bin.dir}/web-clustering/">
+                <fileset dir="${src.dir}/web-clustering/"/>
+            </copy>
+            <copy todir="${tmp.conf.dir}">
+                <fileset dir="${conf.dir}">
+                    <include name="*.properties"/>
+                </fileset>
+            </copy>
+            <tar destfile="${dist.dir}/${project}-${version}.tgz" compression="gzip">
+                <tarfileset dir="${doc.dir}" prefix="doc"/>
+                <tarfileset dir="${output.dir}" prefix="bin">
+                    <include name="${project}-${version}.jar" />
+                </tarfileset>
+                <tarfileset dir="${tmp.bin.dir}" mode="755" prefix="bin"/>
+                <tarfileset dir="${tmp.conf.dir}" prefix="bin/conf" />
+            </tar>
+        </target>
 
     <!--******************************************************************************************************-->
     <target name="doc" description="creates the clusterfest javadoc" >
