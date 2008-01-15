@@ -69,7 +69,7 @@ public class Cluster {
             String[] host = hosts[i].split(":");
             String hostName = host[0];
             int port = Integer.parseInt(host[1].trim());
-            String installDir = host[2];
+            String installDir = (host.length > 2) ? host[2] : null;
             registerNode(hostName, port, installDir);
         }
         
