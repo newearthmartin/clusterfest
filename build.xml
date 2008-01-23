@@ -39,7 +39,7 @@ limitations under the License.
 
     <path id="classpath.jars.util">
         <fileset dir="${lib.dir}">
-            <include name="flaptor-util-trunk.jar" />
+            <include name="**/*.jar" />
         </fileset>
     </path>
 
@@ -95,7 +95,7 @@ limitations under the License.
 
 
     <!--******************************************************************************************************-->
-    <target name="libjar" depends="compile" description="builds the clusterfest jar file for use in other flaptor projects" >
+    <target name="jar" depends="compile" description="builds the clusterfest jar file for use in other flaptor projects, includes the webapp but doesnt include libraries" >
         <jar jarfile="${output.dir}/${project}-${version}.jar" >
             <manifest>
                 <attribute name="Built-By" value="${user.name}"/>
@@ -115,8 +115,7 @@ limitations under the License.
         </jar>
     </target>
 
-	<!--******************************************************************************************************-->
-    <target name="jar" depends="compile" description="builds the clusterfest jar file, including lib jars and webapp files" >
+    <target name="fatjar" depends="compile" description="builds the clusterfest jar file, including lib jars and webapp files" >
         <jar jarfile="${output.dir}/${project}-${version}.jar" >
             <manifest>
                 <attribute name="Built-By" value="${user.name}"/>
@@ -139,7 +138,6 @@ limitations under the License.
         </jar>
     </target>
 
-        <!--******************************************************************************************************-->
         <target name="distjar" depends="compile" description="builds the clusterfest jar file, including lib jars EXCLUDING webapp files, for DIST" >
             <jar jarfile="${output.dir}/${project}-${version}.jar" >
                 <manifest>
@@ -158,6 +156,7 @@ limitations under the License.
             </jar>
         </target>
 
+    <!--******************************************************************************************************-->
         <target name="dist" depends="clean, distjar, doc">
             <mkdir dir="${dist.dir}"/>
             <copy todir="${tmp.bin.dir}">
