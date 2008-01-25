@@ -23,7 +23,7 @@ import com.flaptor.util.remote.WebServer;
 /**
  * HTTP server for clusterfest monitor 
  *
- * @author martinmassera
+ * @author Martin Massera
  */
 public class HTTPClusteringServer extends WebServer {
 

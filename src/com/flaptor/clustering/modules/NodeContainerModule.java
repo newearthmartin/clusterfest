@@ -28,7 +28,7 @@ import com.flaptor.clustering.NodeUnreachableException;
 /**
  * Class for representing a module that needs nodes to be registered 
  *
- * @author martinmassera
+ * @author Martin Massera
  */
 abstract public class NodeContainerModule {
 	

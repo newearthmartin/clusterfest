@@ -24,7 +24,7 @@ import com.flaptor.util.remote.XmlrpcServer;
  * Implementation of these interfaces can be set or not, this node aggregates the set interfaces
  * and tells the client which are set.
  *
- * @author martinmassera
+ * @author Martin Massera
  */
 public class ClusterableServer {
 

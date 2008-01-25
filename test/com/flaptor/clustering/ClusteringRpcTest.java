@@ -38,7 +38,7 @@ import com.flaptor.util.remote.XmlrpcServer;
 /**
  * Test cases for testing rpcs in the clustering framework 
  *
- * @author martinmassera
+ * @author Martin Massera
  */
 public class ClusteringRpcTest extends TestCase {
 	private Node node;

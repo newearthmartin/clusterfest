@@ -29,6 +29,8 @@ import com.flaptor.util.CommandUtil;
 import com.flaptor.util.Execute;
 import com.flaptor.util.FileUtil;
 import com.flaptor.util.IOUtil;
+import com.flaptor.util.Statistics;
+import com.flaptor.util.ThreadUtil;
 
 /**
  * Abstract implementation for the monitoreable interface
@@ -36,7 +38,7 @@ import com.flaptor.util.IOUtil;
  *
  * @author Martin Massera
  */
-abstract public class AbstractMonitoreable implements Monitoreable {
+public class MonitoreableImplementation implements Monitoreable {
     private static Logger logger = Logger.getLogger(Execute.whoAmI());
 
 	protected Map<String, Object> properties = new HashMap<String, Object>();
@@ -113,11 +115,21 @@ abstract public class AbstractMonitoreable implements Monitoreable {
 	/**
 	 * Update properties before returning them
 	 */
-	abstract public void updateProperties();
+	public void updateProperties() {
+		Statistics stats = Statistics.getStatistics();
+		setProperty("threadNames", ThreadUtil.getThreadNames());
+		long mem = Runtime.getRuntime().freeMemory();
+		long total = Runtime.getRuntime().totalMemory();
+		setProperty("freeMemory", mem);
+		setProperty("usedMemory", total - mem);
+		setProperty("totalMemory", total);
+	}
 
 	/**
-	 * Update a properti before returning them
+	 * Update a property before returning them
 	 */
-	abstract public void updateProperty(String property);
+	public void updateProperty(String property) {
+		
+	}
 	
 }

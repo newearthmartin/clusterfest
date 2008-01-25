@@ -45,7 +45,7 @@ import com.flaptor.util.remote.XmlrpcSerialization;
  * from the nodes and write a checker to analyse these variables and determine
  * the state of each node
  *  
- * @author martinmassera
+ * @author Martin Massera
  */
 public class Monitor extends NodeContainerModule implements WebModule {
     public final static String MODULE_CONTEXT = "monitor";

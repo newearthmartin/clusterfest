@@ -19,7 +19,7 @@ package com.flaptor.clustering;
 /**
  * Exception to be thrown by rpc calls, meaning that the node is unreachable
  *  
- * @author martinmassera
+ * @author Martin Massera
  */
 public class NodeUnreachableException extends Exception {
 

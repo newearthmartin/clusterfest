@@ -30,7 +30,7 @@ import com.flaptor.util.Triad;
  * represents a controller module node
  * to be used inclustering server side
  *
- * @author martinmassera
+ * @author Martin Massera
  */
 public class ControllerNode implements ModuleNode{
     private static final Logger logger = Logger.getLogger(com.flaptor.util.Execute.whoAmI());

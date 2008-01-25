@@ -26,7 +26,7 @@ import com.flaptor.util.Execute;
 /**
  * default implementation of the controllable interface 
  *
- * @author martinmassera
+ * @author Martin Massera
  */
 public class ControllableImplementation implements Controllable {
     private static Logger logger = Logger.getLogger(Execute.whoAmI());

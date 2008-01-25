@@ -40,7 +40,7 @@ import com.flaptor.util.remote.XmlrpcSerialization;
  * this is the module that handles the controlling. It includes the methods to
  * start, stop, pasue, resume and kill nodes 
  *
- * @author martinmassera
+ * @author Martin Massera
  */
 public class Controller extends NodeContainerModule implements WebModule {
     private static final Logger logger = Logger.getLogger(com.flaptor.util.Execute.whoAmI());

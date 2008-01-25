@@ -32,7 +32,7 @@ import com.flaptor.util.Pair;
 /**
  * represents a monitoring module node
  *
- * @author martinmassera
+ * @author Martin Massera
  */
 public class MonitorNode implements ModuleNode {
 
