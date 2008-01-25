@@ -9,7 +9,7 @@ import com.flaptor.util.remote.WebServer;
 
 /**
  * interface for modules that have a web face
- * @author martinmassera
+ * @author Martin Massera
  */
 public interface WebModule {
 

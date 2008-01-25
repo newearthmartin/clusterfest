@@ -38,7 +38,7 @@ import com.flaptor.util.Config;
  * and all the different parts of the framework (monitoring, control, etc) 
  * will get access to them
  *
- * @author martinmassera
+ * @author Martin Massera
  */
 public class Cluster {
 	

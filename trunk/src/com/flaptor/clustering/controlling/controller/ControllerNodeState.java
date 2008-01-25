@@ -19,7 +19,7 @@ package com.flaptor.clustering.controlling.controller;
 /**
  * Represents the state of a controller module node
  *
- * @author martinmassera
+ * @author Martin Massera
  */
 public enum ControllerNodeState {
 	RUNNING,

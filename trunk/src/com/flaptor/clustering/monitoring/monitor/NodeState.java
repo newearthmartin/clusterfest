@@ -23,7 +23,7 @@ import com.flaptor.clustering.monitoring.SystemProperties;
 /**
  * The state of a node in the monitoring module
  *
- * @author martinmassera
+ * @author Martin Massera
  */
 public class NodeState {
 

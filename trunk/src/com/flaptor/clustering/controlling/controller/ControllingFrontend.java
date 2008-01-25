@@ -30,7 +30,7 @@ import com.flaptor.util.ThreadUtil;
 /**
  * util for control ui frontend
  *
- * @author martinmassera
+ * @author Martin Massera
  */
 public class ControllingFrontend {
     private static final Logger logger = Logger.getLogger(com.flaptor.util.Execute.whoAmI());

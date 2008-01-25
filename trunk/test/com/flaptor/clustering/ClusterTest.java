@@ -26,7 +26,7 @@ import com.flaptor.util.remote.XmlrpcClient;
 /**
  * test for clustering framework
  *
- * @author martinmassera
+ * @author Martin Massera
  */
 public class ClusterTest extends TestCase {
 	private static XmlrpcClient client;

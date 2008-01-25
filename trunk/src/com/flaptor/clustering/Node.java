@@ -28,7 +28,7 @@ import com.flaptor.util.remote.XmlrpcSerialization;
  * the type and if it's reachable. All modules of the clustering framework
  * should check and update the reachable status.
  *
- * @author martinmassera
+ * @author Martin Massera
  */
 public class Node {
 

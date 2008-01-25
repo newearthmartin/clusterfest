@@ -22,7 +22,7 @@ import java.io.Serializable;
  * Represents the system properties. Consisting of 
  * top dump and ifconfig dump
  *
- * @author martinmassera
+ * @author Martin Massera
  */
 public class SystemProperties implements Serializable{
 
