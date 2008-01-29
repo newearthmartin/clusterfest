@@ -78,7 +78,7 @@ public class ClusterableListener {
         } catch (IllegalStateException e) {logger.warn("clustering.node.type not set in " + cfg.getFilename());}
         
         try {
-            for (Pair<String,String> service : cfg.getPairList("clustering.node.services")) {
+            for (Pair<String,String> service : cfg.getPairList("clustering.node.listeners")) {
                 Object serviceInstance = ClassUtil.instance(service.last());
                 xmlrpcServer.addHandler(service.first(), XmlrpcSerialization.handler(serviceInstance));   
             }
