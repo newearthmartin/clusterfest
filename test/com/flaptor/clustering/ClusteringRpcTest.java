@@ -54,7 +54,7 @@ public class ClusteringRpcTest extends TestCase {
 	protected void setUp() throws Exception {
 		Config cfg = Config.getConfig("clustering.node.properties");
 		cfg.set("clustering.node.type", "searcher");
-		cfg.set("clustering.node.services",   
+		cfg.set("clustering.node.listeners",   
 		        "controller:com.flaptor.clustering.ClusteringRpcTest$ControllableImp,"+
 		        "monitor:com.flaptor.clustering.ClusteringRpcTest$MonitoreableImp");
 	    clusterableListener = new ClusterableListener(PORT);
