@@ -175,7 +175,7 @@ public class Cluster {
 		try {
 			node.updateInfo();
 		} catch (NodeUnreachableException e) {
-			logger.warn("tried to update info for unreachable node at " + node.getHost() + ":" + node.getPort(), e);
+			logger.warn("tried to update info for unreachable node at " + node.getHost() + ":" + node.getPort() + " - " +  e);
 			noErrors = false;
 		}
 		for (NodeContainerModule module: modules.values()) {

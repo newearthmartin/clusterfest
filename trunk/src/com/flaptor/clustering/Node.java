@@ -56,7 +56,7 @@ public class Node {
 		} catch (MalformedURLException e) {
 			throw new RuntimeException(e);
 		}
-        clusterableStub = (Clusterable)XmlrpcClient.proxy(ClusterableServer.CONTEXT, Clusterable.class, xmlrpcClient); 
+        clusterableStub = (Clusterable)XmlrpcClient.proxy(ClusterableListener.CONTEXT, Clusterable.class, xmlrpcClient); 
     }
     public String getHost() {
         return host;

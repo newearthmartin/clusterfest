@@ -25,7 +25,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 
-import com.flaptor.clustering.ClusterableServer;
+import com.flaptor.clustering.ClusterableListener;
 import com.flaptor.clustering.Node;
 import com.flaptor.clustering.NodeUnreachableException;
 import com.flaptor.clustering.modules.ModuleNode;
@@ -160,15 +160,15 @@ public class Monitor extends NodeContainerModule implements WebModule {
 	 * @param clusterableServer
 	 * @param m
 	 */
-	public static void addMonitorServer(ClusterableServer clusterableServer, Monitoreable m) {
-		clusterableServer.addModuleServer(Monitor.class.getName(), XmlrpcSerialization.handler(m));
+	public static void addMonitorListener(ClusterableListener clusterableServer, Monitoreable m) {
+		clusterableServer.addModuleListener(MODULE_CONTEXT, XmlrpcSerialization.handler(m));
 	}
 	/**
 	 * @param client
 	 * @return a proxy for monitoreable xmlrpc calls
 	 */
 	public static Monitoreable getMonitoreableProxy(XmlrpcClient client) {
-		return (Monitoreable)XmlrpcClient.proxy(Monitor.class.getName(), Monitoreable.class, client);
+		return (Monitoreable)XmlrpcClient.proxy(MODULE_CONTEXT, Monitoreable.class, client);
 	}
 
 	

@@ -31,7 +31,9 @@ import com.flaptor.clustering.monitoring.monitor.Monitor;
 import com.flaptor.clustering.monitoring.monitor.MonitorNode;
 import com.flaptor.clustering.monitoring.monitor.NodeState;
 import com.flaptor.clustering.monitoring.nodes.Monitoreable;
+import com.flaptor.util.Config;
 import com.flaptor.util.TestCase;
+import com.flaptor.util.TestInfo;
 import com.flaptor.util.remote.XmlrpcClient;
 import com.flaptor.util.remote.XmlrpcServer;
 
@@ -43,34 +45,43 @@ import com.flaptor.util.remote.XmlrpcServer;
 public class ClusteringRpcTest extends TestCase {
 	private Node node;
 	private XmlrpcClient client;
-	private ClusterableServer clusterableServer;
+	private ClusterableListener clusterableListener;
 	private Monitoreable monitoreableProxy;
 	private Controllable controllableProxy;
+	
+	private static final int PORT = 50001;
 
 	protected void setUp() throws Exception {
-		clusterableServer = new ClusterableServer(50001, "searcher");
-		Monitor.addMonitorServer(clusterableServer, new MonitoreableImp());
-		Controller.addControllerServer(clusterableServer, new ControllableImp());
-		node = new Node("localhost", 50001, "/tmp/search4j");
-		client = new XmlrpcClient(new URL("http://localhost:50001"));
+		Config cfg = Config.getConfig("clustering.node.properties");
+		cfg.set("clustering.node.type", "searcher");
+		cfg.set("clustering.node.services",   
+		        "controller:com.flaptor.clustering.ClusteringRpcTest$ControllableImp,"+
+		        "monitor:com.flaptor.clustering.ClusteringRpcTest$MonitoreableImp");
+	    clusterableListener = new ClusterableListener(PORT);
+		
+		node = new Node("localhost", PORT, "/tmp/search4j");
+		client = new XmlrpcClient(new URL("http://localhost:"+PORT));
 		monitoreableProxy = Monitor.getMonitoreableProxy(node.getXmlrpcClient());
 		controllableProxy = Controller.getControllableProxy(node.getXmlrpcClient());
 	}
 
 	protected void tearDown() throws Exception {
-		clusterableServer.stop();
+		clusterableListener.stop();
 	}
 
+    @TestInfo(testType = TestInfo.TestType.INTEGRATION, requiresPort = {PORT})
 	public void testClusterable() throws Exception {
 		node.updateInfo();
 		assertEquals("searcher", node.getType());
 	}
 
+    @TestInfo(testType = TestInfo.TestType.INTEGRATION, requiresPort = {PORT})
 	public void testPing() throws Exception {
 		assertTrue(monitoreableProxy.ping());
 		assertTrue(controllableProxy.ping());
 	}
 
+    @TestInfo(testType = TestInfo.TestType.INTEGRATION, requiresPort = {PORT})
 	public void testMonitoreable() throws Exception {
 		MonitorNode mnode = new MonitorNode(node);
 		mnode.updateState();

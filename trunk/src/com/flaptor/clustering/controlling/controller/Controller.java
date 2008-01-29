@@ -25,7 +25,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 
 import com.flaptor.clustering.Cluster;
-import com.flaptor.clustering.ClusterableServer;
+import com.flaptor.clustering.ClusterableListener;
 import com.flaptor.clustering.Node;
 import com.flaptor.clustering.NodeUnreachableException;
 import com.flaptor.clustering.controlling.nodes.Controllable;
@@ -151,15 +151,15 @@ public class Controller extends NodeContainerModule implements WebModule {
 	 * @param clusterableServer
 	 * @param c
 	 */
-	public static void addControllerServer(ClusterableServer clusterableServer, Controllable c) {
-		clusterableServer.addModuleServer(Controller.class.getName(), XmlrpcSerialization.handler(c));
+	public static void addControllerListener(ClusterableListener clusterableServer, Controllable c) {
+		clusterableServer.addModuleListener("controller", XmlrpcSerialization.handler(c));
 	}
 	/**
 	 * @param client
 	 * @return a proxy for monitoreable xmlrpc calls
 	 */
 	public static Controllable getControllableProxy(XmlrpcClient client) {
-		return (Controllable)XmlrpcClient.proxy(Controller.class.getName(), Controllable.class, client);
+		return (Controllable)XmlrpcClient.proxy("controller", Controllable.class, client);
 	}
 
 	//************ WEB MODULE **************
