@@ -21,6 +21,7 @@ import java.util.List;
 import com.flaptor.util.Config;
 import com.flaptor.util.FileUtil;
 import com.flaptor.util.TestCase;
+import com.flaptor.util.TestInfo;
 import com.flaptor.util.remote.XmlrpcClient;
 
 /**
@@ -29,35 +30,38 @@ import com.flaptor.util.remote.XmlrpcClient;
  * @author Martin Massera
  */
 public class ClusterTest extends TestCase {
-	private static XmlrpcClient client;
-	private static List<ClusterableServer> clusterableServers = new ArrayList<ClusterableServer>();
+	private static final int NUM_NODES = 3;
+    
+	private XmlrpcClient client;
+    private Cluster cluster;
+    private List<ClusterableListener> clusterableListeners;
 	
-	private static Cluster cluster;
-	private static final int NUM_NODES = 10;
-	static {
-		String dir = FileUtil.createTempDir("clustertest", "").getAbsolutePath();
-		String nodes = "";  
-		for (int i = 0; i < NUM_NODES; i++) {
-			clusterableServers.add(new ClusterableServer(50000+i, "searcher"));
-			if (i != 0) nodes +=",";
-			nodes += "localhost:"+(50000+i)+":"+dir;
-		}
-		Config.getConfig("clustering.properties").set("clustering.modules", "");
-		Config.getConfig("clustering.properties").set("clustering.nodes", nodes);
-		cluster = Cluster.getInstance();
-	}
-	
-	protected void setUp() throws Exception {
-		for (ClusterableServer s : clusterableServers) {
+	public void setUp() throws Exception {
+	    clusterableListeners = new ArrayList<ClusterableListener>();
+        String dir = FileUtil.createTempDir("clustertest", "").getAbsolutePath();
+        String nodes = "";
+        for (int i = 0; i < NUM_NODES; i++) {
+            ClusterableListener s = new ClusterableListener(50000+i);
+            s.setNodeType("searcher");
+            clusterableListeners.add(s);
+            if (i != 0) nodes +=",";
+            nodes += "localhost:"+(50000+i)+":"+dir;
+        }
+        Config.getConfig("clustering.properties").set("clustering.modules", "");
+        Config.getConfig("clustering.properties").set("clustering.nodes", nodes);
+        cluster = Cluster.getInstance();
+		for (ClusterableListener s : clusterableListeners) {
 			s.start();
 		}
 	}
-	protected void tearDown() throws Exception {
-		for (ClusterableServer s : clusterableServers) {
+	public void tearDown() throws Exception {
+		for (ClusterableListener s : clusterableListeners) {
 			s.stop();
 		}
 	}
 
+	@TestInfo(testType = TestInfo.TestType.SYSTEM,
+            requiresPort = {50000,50001,50002})
 	public void testNodeRegistration() {
 		filterOutputRegex("Avoiding.*");
 		assertEquals(NUM_NODES, cluster.getNodes().size());
