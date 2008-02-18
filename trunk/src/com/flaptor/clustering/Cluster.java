@@ -16,6 +16,7 @@ limitations under the License.
 
 package com.flaptor.clustering;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -96,6 +97,21 @@ public class Cluster {
     }
 
 	private List<Node> nodes = new ArrayList<Node>();
+
+	/**
+	 * persists the node list to the config file on disk
+	 * @throws IOException 
+	 */
+	public void persistNodeList() throws IOException {
+        String nodeList = "";
+        for (Node node : nodes) {
+            if (nodeList.length() > 0) nodeList += ",\\\n\t";
+            nodeList += node.getHost() +":"+node.getPort()+":"+node.getInstallDir();
+        }
+        Config config = Config.getConfig("clustering.properties");
+        config.set("clustering.nodes", nodeList);
+        config.saveToDisk();
+    }
 
 	/**
 	 * Registers a node in the clustering framework and all its modules
@@ -221,5 +237,5 @@ public class Cluster {
 				updateClusterNodeInfo(node);
 			}
 		}
-	}
+	}	
 }

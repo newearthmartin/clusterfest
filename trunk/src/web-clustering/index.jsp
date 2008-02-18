@@ -45,15 +45,17 @@ limitations under the License.
         } else {
             message += "WARNING : " + host + ":" + port + " registered but unreachable.";
         }
-    }
-    if ("updateall".equals(action)) {
-        cluster.updateAllInfoAllNodes();
+        try {cluster.persistNodeList();} catch(IOException e) {message+="\nWARNING: couldn't persist node list";}
     }
     if ("remove".equals(action)) {
         int idx = Integer.parseInt(request.getParameter("node"));
         Node node = cluster.getNodes().get(idx);
         cluster.unregisterNode(node);
         message += "OK : " + node.getHost() + ":" + node.getPort() + " unregistered.";
+        try {cluster.persistNodeList();} catch(IOException e) {message+="\nWARNING: couldn't persist node list";}
+    }
+    if ("updateall".equals(action)) {
+        cluster.updateAllInfoAllNodes();
     }
     if ("update".equals(action)) { //this action updates all states of the node: cluster, monitor,etc.
         int idx = Integer.parseInt(request.getParameter("node"));
