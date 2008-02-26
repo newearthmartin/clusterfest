@@ -54,15 +54,20 @@ limitations under the License.
 <%  
 }
 else {
-    NodeState lastState = node.getLastState();
-    if (lastState != null) {
+    NodeState nodeState;
+    String stateNum =request.getParameter("stateNum"); 
+    if (stateNum != null) {
+        nodeState = node.getNodeState(Integer.parseInt(stateNum));
+    } else {
+        nodeState = node.getLastState();        
+    }
+    if (nodeState != null) {
 %>
         <div id="monitorSideBar">
             <a href="?action=update&node=<%= idx %>">update node</a></br>
             <table>
                 <tr><th>logs</th></tr>
-<%              for (Map.Entry<String, Pair<String, Long>> e : node.getLogs().entrySet()) {
-%>          
+<%              for (Map.Entry<String, Pair<String, Long>> e : node.getLogs().entrySet()) {%>
                     <tr><td><a href="monitorLog.jsp?log=<%=e.getKey()%>&node=<%= idx %>"><%=e.getKey()%></a> <span class="fuzzy">at <%= new Date(e.getValue().last()).toString() %></span></td></tr>
 <%              } %>            
                 <tr><td>
@@ -75,19 +80,20 @@ else {
             </table>
 
             <table>
-                <tr><th>Saved states</th></tr>
-<%              for (NodeState state : node.getStates()) { 
-%>
-                    <tr><td><%= state.getSanity() %> at <%= new Date(state.getTimestamp()).toString() %></td></tr>
-<%              } 
+                <tr><th>Saved states</th></tr>                
+<%              int num = 0;
+				for (NodeState state : node.getStates()) {
+%>                  <tr><td><%= state.getSanity() %> at <a href="monitorNode.jsp?node=<%=idx%>&stateNum=<%=num%>"><%= new Date(state.getTimestamp()).toString() %></a></td></tr>
+<%              	num++;
+				} 
 %>
             </table>
         </div>
 
-        <h2>State: <%= lastState.getSanity() %> <span class="fuzzy">at <%= new Date(lastState.getTimestamp()).toString() %></span></h2>
+        <h2>State: <%= nodeState.getSanity() %> <span class="fuzzy">at <%= new Date(nodeState.getTimestamp()).toString() %></span></h2>
 
         <div id="monitorNodeProperties">
-<%          Map<String, Object> properties = lastState.getProperties();
+<%          Map<String, Object> properties = nodeState.getProperties();
             if (properties != null) {%>
                 <table>
                     <th colspan="2">Properties</th>
@@ -102,7 +108,7 @@ else {
         </div>
         
         <div id="monitorNodeSystenProperties">
-<%          SystemProperties systemProperties = lastState.getSystemProperties();
+<%          SystemProperties systemProperties = nodeState.getSystemProperties();
             if (systemProperties != null) {%>
                 <h2>System properties</h2>
                 <h3>Top</h3>

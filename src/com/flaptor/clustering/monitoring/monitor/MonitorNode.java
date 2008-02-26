@@ -58,9 +58,15 @@ public class MonitorNode implements ModuleNode {
     public List<NodeState> getStates() {
         return Collections.unmodifiableList(states);
     }
+
     public NodeState getLastState() {
         return states.size() > 0 ? states.getLast() : null;
     }
+    public NodeState getNodeState(int stateNumber) {
+        if (states.size() > stateNumber) return states.get(stateNumber);
+        else return null;
+    }
+    
     public Node getClusterNode() {
     	return node;
     }
