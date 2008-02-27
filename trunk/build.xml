@@ -16,7 +16,7 @@ limitations under the License.
 
 <project name="clusterfest" default="jar" basedir=".">
     <property name="project" value="clusterfest"/>
-    <property name="version" value="trunk"/>
+    <property name="version" value="0.2"/>
 
     <property name="src.dir" value="${basedir}/src"/>
     <property name="test.dir" value="${basedir}/test"/>
@@ -24,6 +24,7 @@ limitations under the License.
     <property name="lib.dir" value="${basedir}/lib"/>
     <property name="conf.dir" value="${basedir}/conf"/>
     
+    <property name="tools.dir" value="${basedir}/tools" />
     <property name="dist.dir" value="${basedir}/dist" />
 	<property name="doc.dir" value="${basedir}/docs" />
 	<property name="javadoc.dir" value="${doc.dir}/javadoc"/>
@@ -171,15 +172,29 @@ limitations under the License.
                 </fileset>
             </copy>
             <tar destfile="${dist.dir}/${project}-${version}.tgz" compression="gzip">
+                <tarfileset file="${doc.dir}/LICENSE"/>
                 <tarfileset dir="${doc.dir}" prefix="doc"/>
-                <tarfileset dir="${output.dir}" prefix="bin">
+                <tarfileset dir="${output.dir}">
                     <include name="${project}-${version}.jar" />
                 </tarfileset>
-                <tarfileset dir="${tmp.bin.dir}" mode="755" prefix="bin"/>
-                <tarfileset dir="${tmp.conf.dir}" prefix="bin/conf" />
+                <tarfileset dir="${tmp.bin.dir}" mode="755"/>
+                <tarfileset dir="${conf.dir}" prefix="conf" />
             </tar>
         </target>
 
+	    <target name="distsrc" depends="dist">
+            <tar destfile="${dist.dir}/${project}-${version}-src.tgz" compression="gzip">
+                <tarfileset file="${doc.dir}/LICENSE"/>
+                <tarfileset dir="${doc.dir}" prefix="doc"/>
+                <tarfileset dir="${conf.dir}" prefix="conf" />
+               	<tarfileset file="build.xml"/>
+                <tarfileset dir="${src.dir}" prefix="src"/>
+                <tarfileset dir="${bin.dir}" mode="755" prefix="bin"/>
+                <tarfileset dir="${test.dir}" prefix="test"/>
+                <tarfileset dir="${tools.dir}" prefix="tools"/>
+                <tarfileset dir="${lib.dir}" prefix="lib"/>            
+            </tar>
+	    </target>
     <!--******************************************************************************************************-->
     <target name="doc" description="creates the clusterfest javadoc" >
         <delete dir="${javadoc.dir}" />
@@ -200,9 +215,6 @@ limitations under the License.
               <path refid="classpath.jars.tools" />
               <path refid="classpath.jars.util" />
             </classpath>
-            <link href="http://lucene.zones.apache.org:8080/hudson/job/Lucene-Nightly/javadoc/" />
-            <link href="http://s1/javadocs/log4j/1.2.11/" />
-            <link href="http://junit.sourceforge.net/javadoc/" />
             <taglet name="ToDo" path="tools/taglets.jar" />
             <taglet name="FixMe" path="tools/taglets.jar" />
         </javadoc>
