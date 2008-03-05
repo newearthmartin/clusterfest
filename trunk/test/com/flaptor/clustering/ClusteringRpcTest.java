@@ -16,26 +16,20 @@ limitations under the License.
 
 package com.flaptor.clustering;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.xmlrpc.XmlRpcException;
-
-import com.flaptor.clustering.controlling.controller.Controller;
+import com.flaptor.clustering.controlling.controller.ControllerModule;
 import com.flaptor.clustering.controlling.controller.ControllerNodeState;
 import com.flaptor.clustering.controlling.nodes.Controllable;
 import com.flaptor.clustering.monitoring.SystemProperties;
-import com.flaptor.clustering.monitoring.monitor.Monitor;
-import com.flaptor.clustering.monitoring.monitor.MonitorNode;
+import com.flaptor.clustering.monitoring.monitor.MonitorModule;
+import com.flaptor.clustering.monitoring.monitor.MonitorNodeDescriptor;
 import com.flaptor.clustering.monitoring.monitor.NodeState;
 import com.flaptor.clustering.monitoring.nodes.Monitoreable;
 import com.flaptor.util.Config;
 import com.flaptor.util.TestCase;
 import com.flaptor.util.TestInfo;
-import com.flaptor.util.remote.XmlrpcClient;
-import com.flaptor.util.remote.XmlrpcServer;
 
 /**
  * Test cases for testing rpcs in the clustering framework 
@@ -43,8 +37,7 @@ import com.flaptor.util.remote.XmlrpcServer;
  * @author Martin Massera
  */
 public class ClusteringRpcTest extends TestCase {
-	private Node node;
-	private XmlrpcClient client;
+	private NodeDescriptor node;
 	private ClusterableListener clusterableListener;
 	private Monitoreable monitoreableProxy;
 	private Controllable controllableProxy;
@@ -59,31 +52,31 @@ public class ClusteringRpcTest extends TestCase {
 		        "monitor:com.flaptor.clustering.ClusteringRpcTest$MonitoreableImp");
 	    clusterableListener = new ClusterableListener(PORT);
 		
-		node = new Node("localhost", PORT, "/tmp/search4j");
-		client = new XmlrpcClient(new URL("http://localhost:"+PORT));
-		monitoreableProxy = Monitor.getMonitoreableProxy(node.getXmlrpcClient());
-		controllableProxy = Controller.getControllableProxy(node.getXmlrpcClient());
+		node = new NodeDescriptor("localhost", PORT, "/tmp/search4j");
+		monitoreableProxy = MonitorModule.getMonitoreableProxy(node.getXmlrpcClient());
+		controllableProxy = ControllerModule.getControllableProxy(node.getXmlrpcClient());
 	}
 
 	protected void tearDown() throws Exception {
-		clusterableListener.stop();
+	    // TODO: wait until it's actually stopped or a timeout is reached
+		clusterableListener.requestStop();
 	}
 
-    @TestInfo(testType = TestInfo.TestType.INTEGRATION, requiresPort = {PORT})
+    @TestInfo(testType = TestInfo.TestType.INTEGRATION)//, requiresPort = {PORT})
 	public void testClusterable() throws Exception {
 		node.updateInfo();
 		assertEquals("searcher", node.getType());
 	}
 
-    @TestInfo(testType = TestInfo.TestType.INTEGRATION, requiresPort = {PORT})
+    @TestInfo(testType = TestInfo.TestType.INTEGRATION)//, requiresPort = {PORT})
 	public void testPing() throws Exception {
 		assertTrue(monitoreableProxy.ping());
 		assertTrue(controllableProxy.ping());
 	}
 
-    @TestInfo(testType = TestInfo.TestType.INTEGRATION, requiresPort = {PORT})
+    @TestInfo(testType = TestInfo.TestType.INTEGRATION)//, requiresPort = {PORT})
 	public void testMonitoreable() throws Exception {
-		MonitorNode mnode = new MonitorNode(node);
+		MonitorNodeDescriptor mnode = new MonitorNodeDescriptor(node);
 		mnode.updateState();
 		
 		NodeState nodeState = mnode.getLastState();

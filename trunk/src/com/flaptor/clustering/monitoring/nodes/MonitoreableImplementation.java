@@ -29,7 +29,6 @@ import com.flaptor.util.CommandUtil;
 import com.flaptor.util.Execute;
 import com.flaptor.util.FileUtil;
 import com.flaptor.util.IOUtil;
-import com.flaptor.util.Statistics;
 import com.flaptor.util.ThreadUtil;
 
 /**
@@ -116,7 +115,6 @@ public class MonitoreableImplementation implements Monitoreable {
 	 * Update properties before returning them
 	 */
 	public void updateProperties() {
-		Statistics stats = Statistics.getStatistics();
 		setProperty("threadNames", ThreadUtil.getThreadNames());
 		long mem = Runtime.getRuntime().freeMemory();
 		long total = Runtime.getRuntime().totalMemory();

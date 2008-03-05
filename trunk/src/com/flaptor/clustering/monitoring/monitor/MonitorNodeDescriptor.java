@@ -22,9 +22,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import com.flaptor.clustering.Node;
+import com.flaptor.clustering.ModuleNodeDescriptor;
+import com.flaptor.clustering.NodeDescriptor;
 import com.flaptor.clustering.NodeUnreachableException;
-import com.flaptor.clustering.modules.ModuleNode;
 import com.flaptor.clustering.monitoring.SystemProperties;
 import com.flaptor.clustering.monitoring.nodes.Monitoreable;
 import com.flaptor.util.Pair;
@@ -34,20 +34,19 @@ import com.flaptor.util.Pair;
  *
  * @author Martin Massera
  */
-public class MonitorNode implements ModuleNode {
+public class MonitorNodeDescriptor extends ModuleNodeDescriptor {
 
-	private Node node;
 	private LinkedList<NodeState> states;
 	private Map<String, Pair<String, Long>> logs;
     private NodeChecker checker;
     private Monitoreable monitoreable;
 	
-    public MonitorNode(Node node) {
-    	this.node = node;
+    public MonitorNodeDescriptor(NodeDescriptor node) {
+    	super(node);
     	
         this.states = new LinkedList<NodeState>();
         this.logs = new HashMap<String, Pair<String,Long>>();
-        this.monitoreable = Monitor.getMonitoreableProxy(node.getXmlrpcClient());
+        this.monitoreable = MonitorModule.getMonitoreableProxy(node.getXmlrpcClient());
         // TODO set default checker
         
         //TODO hardcoded logs
@@ -67,10 +66,6 @@ public class MonitorNode implements ModuleNode {
         else return null;
     }
     
-    public Node getClusterNode() {
-    	return node;
-    }
-
     public Map<String, Pair<String, Long>> getLogs() {
     	return logs;
     }
@@ -110,11 +105,11 @@ public class MonitorNode implements ModuleNode {
     public void updateLog(String logName) throws NodeUnreachableException {
     	try {
             String log = monitoreable.getLog(logName);
-            node.setReachable(true);
+            getNodeDescriptor().setReachable(true);
             logs.put(logName, new Pair<String, Long>(log, System.currentTimeMillis()));
             
         } catch (Exception e) {
-        	node.setUnreachable(e);
+        	getNodeDescriptor().setUnreachable(e);
         }
     }
     
@@ -138,10 +133,10 @@ public class MonitorNode implements ModuleNode {
     private Map<String, Object> retrieveProperties() throws NodeUnreachableException {
     	try {
             Map<String, Object> properties = monitoreable.getProperties();
-            node.setReachable(true);
+            getNodeDescriptor().setReachable(true);
             return properties;
         } catch (Exception e) {
-        	node.setUnreachable(e);
+        	getNodeDescriptor().setUnreachable(e);
         	return null; //never called
         }
     }
@@ -149,10 +144,10 @@ public class MonitorNode implements ModuleNode {
     private SystemProperties retrieveSystemProperties() throws NodeUnreachableException {
         try {
             SystemProperties systemProperties = monitoreable.getSystemProperties();
-            node.setReachable(true);
+            getNodeDescriptor().setReachable(true);
             return systemProperties;
         } catch (Exception e) {
-        	node.setUnreachable(e);
+            getNodeDescriptor().setUnreachable(e);
         	return null; //never called
         }
     }

@@ -20,9 +20,9 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 
-import com.flaptor.clustering.Node;
+import com.flaptor.clustering.ModuleNodeDescriptor;
+import com.flaptor.clustering.NodeDescriptor;
 import com.flaptor.clustering.controlling.nodes.Controllable;
-import com.flaptor.clustering.modules.ModuleNode;
 import com.flaptor.util.CommandUtil;
 import com.flaptor.util.Triad;
 
@@ -32,16 +32,16 @@ import com.flaptor.util.Triad;
  *
  * @author Martin Massera
  */
-public class ControllerNode implements ModuleNode{
+public class ControllerNodeDescriptor extends ModuleNodeDescriptor {
+    @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(com.flaptor.util.Execute.whoAmI());
 
-	private Node node;
 	private ControllerNodeState state;
 	private Controllable controllable;
 	
-    public ControllerNode(Node node) {
-    	this.node = node;
-    	controllable = Controller.getControllableProxy(node.getXmlrpcClient());
+    public ControllerNodeDescriptor(NodeDescriptor node) {
+    	super(node);
+    	controllable = ControllerModule.getControllableProxy(node.getXmlrpcClient());
     }
 
 	public void updateState() {
@@ -50,7 +50,7 @@ public class ControllerNode implements ModuleNode{
 		} catch (Exception e) {
 			//TODO if the node doesnt respond, set it as STOPPED
     		state = ControllerNodeState.STOPPED;
-    		node.setReachable(false);
+    		getNodeDescriptor().setReachable(false);
         }
 		//TODO if there is another error, log it
 	}
@@ -66,7 +66,7 @@ public class ControllerNode implements ModuleNode{
 	public void start() throws IOException {
 		updateState();
 		if (state == ControllerNodeState.STOPPED) {
-			Triad<Integer, String, String> rv = CommandUtil.remoteSSHCommand(node.getHost(), -1, "cd "+node.getInstallDir() + "\n./start.sh", 5000);
+			Triad<Integer, String, String> rv = CommandUtil.remoteSSHCommand(getNodeDescriptor().getHost(), -1, "cd "+getNodeDescriptor().getInstallDir() + "\n./start.sh", 5000);
 			if (rv.first() == 0) return;
 			else throw new IOException("could not start remote host. error code: " + rv.first() + " - " + rv.second() + " - " + rv.third()); 
 		}
@@ -77,7 +77,7 @@ public class ControllerNode implements ModuleNode{
 	 */
 	public void kill() throws IOException {
 		updateState();
-		Triad<Integer, String, String> rv = CommandUtil.remoteSSHCommand(node.getHost(), -1, "cd "+node.getInstallDir() + "\n./stop.sh", 5000);
+		Triad<Integer, String, String> rv = CommandUtil.remoteSSHCommand(getNodeDescriptor().getHost(), -1, "cd "+getNodeDescriptor().getInstallDir() + "\n./stop.sh", 5000);
 		if (rv.first() == 0) return;
 		else throw new IOException("could not kill remote host. error code: " + rv.first() + " - " + rv.second() + " - " + rv.third()); 
 	}
@@ -91,7 +91,7 @@ public class ControllerNode implements ModuleNode{
 			try{
 				controllable.pause();
 			} catch (Exception e) {
-	    		node.setReachable(false);
+			    getNodeDescriptor().setReachable(false);
 	        }
 		}
 	}
@@ -105,7 +105,7 @@ public class ControllerNode implements ModuleNode{
 			try{
 				controllable.resume();
 			} catch (Exception e) {
-	    		node.setReachable(false);
+			    getNodeDescriptor().setReachable(false);
 	        }
 		}
 	}
@@ -119,7 +119,7 @@ public class ControllerNode implements ModuleNode{
 			try{
 				controllable.stop();
 			} catch (Exception e) {
-	    		node.setReachable(false);
+			    getNodeDescriptor().setReachable(false);
 	        }
 		}
 		throw new UnsupportedOperationException("not yet implemented");

@@ -20,7 +20,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import com.flaptor.util.remote.XmlrpcClient;
-import com.flaptor.util.remote.XmlrpcSerialization;
 
 
 /**
@@ -30,7 +29,7 @@ import com.flaptor.util.remote.XmlrpcSerialization;
  *
  * @author Martin Massera
  */
-public class Node {
+public class NodeDescriptor {
 
 	private String host;
 	private int port;
@@ -47,7 +46,7 @@ public class Node {
 	 * @param port
 	 * @param installDir the path where the node is installed (on the target machine)
 	 */
-    public Node(String host, int port, String installDir) {
+    public NodeDescriptor(String host, int port, String installDir) {
         this.host = host;
         this.port = port;
         this.installDir = installDir;

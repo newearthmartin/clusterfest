@@ -223,103 +223,28 @@ limitations under the License.
 
     <!--******************************************************************************************************-->
     <!--TESTING-->
-    
-    <taskdef name="cobertura-instrument" classname="net.sourceforge.cobertura.ant.InstrumentTask">
-        <classpath>
-            <path refid="classpath.jars.tools"/>
-            <path refid="classpath.jars.util" />
-        </classpath>
-    </taskdef>
-    <taskdef name="cobertura-report" classname="net.sourceforge.cobertura.ant.ReportTask">
-        <classpath>
-            <path refid="classpath.jars.tools"/>
-            <path refid="classpath.jars.util" />
-        </classpath>
-    </taskdef>
-    
-    <taskdef name="junit" classname="org.apache.tools.ant.taskdefs.optional.junit.JUnitTask">
-        <classpath>
-            <path refid="classpath.jars.tools"/>
-        </classpath>
-    </taskdef>
-
-    <target name="instrument" if="cobertura">
-        <cobertura-instrument>
-            <fileset dir="${build.dir}">
-                <include name="**/*.class"/>
-                <exclude name="**/*Test.class"/>
-            </fileset>
-        </cobertura-instrument>
+    <target name="test" description="Runs all tests." depends="compile" >
+        <ant antfile="build-test.xml" target="test" inheritAll="false" >
+            <property name="src.dir" value="${src.dir}" />
+            <property name="test.dir" value="${test.dir}" />
+            <property name="lib.dir" value="${lib.dir}" />
+            <property name="tools.dir" value="${tools.dir}" />
+            <property name="build.dir" value="${build.dir}" />
+            <property name="conf.dir" value="${conf.dir}" />
+        </ant>
     </target>
-
-    <target name="report" if="cobertura">
-        <cobertura-report format="html" destdir="reports" srcdir="${src.dir}"/>
-    </target>
-
-    <target name="test" description="runs the JUnit tests" depends="compile" >
-        <antcall target="instrument"/>
-        <junit printsummary="on" showoutput="true" haltonfailure="true" fork="on">
-            <sysproperty key="net.sourceforge.cobertura.datafile" file="${basedir}/cobertura.ser" />
-            <jvmarg value="-Xms256M"/>
-            <jvmarg value="-Xmx256M"/>
-            <classpath>
-              <pathelement path="${conf.dir}" />
-              <path refid="classpath.jars.util" />
-              <path refid="classpath.jars.tools" />
-              <pathelement path="${basedir}" />
-            </classpath>
-            <formatter type="plain" />
-            <batchtest fork="yes" haltonfailure="false" haltonerror="false" failureproperty="ERROR">
-                <fileset dir="${src.dir}">
-                    <include name="**/*Test.java"/>
-                </fileset>
-                <fileset dir="${test.dir}">
-                    <include name="**/*Test.java"/>
-                </fileset>
-            </batchtest>
-        </junit>
-        <antcall target="report"/>
-
-        <fail message="Some tests have failed" if="ERROR"/>
-        <delete dir="${basedir}/directoryTestOrigin.tmp" />
-        <delete dir="${basedir}/directoryTestDestination.tmp" />
-        <delete dir="${basedir}/tmp.test.directory" />
-        <delete dir="${basedir}/tmp" />
-        <delete file="${basedir}/fileTest.tmp" />
-        <delete file="${basedir}/test_category*" />
-    </target>
-
 
     <target name="onetest" description="runs one JUnit test, specified by -Dtestfile= parameter" depends="compile" >
-        <antcall target="instrument"/>
-        <junit printsummary="on" showoutput="true" haltonerror="false" haltonfailure="false" fork="true" dir="${basedir}">
-            <classpath>
-              <pathelement path="${conf.dir}" />
-              <path refid="classpath.jars.util" />
-              <path refid="classpath.jars.tools" />
-              <pathelement path="${basedir}" />
-            </classpath>
-            <formatter type="plain" />
-            <jvmarg value="-Xms256M"/>
-            <jvmarg value="-Xmx256M"/>
-            <batchtest fork="yes" failureproperty="ERROR">
-                <fileset dir="${src.dir}">
-                    <include name="**/${testfile}.java"/>
-                </fileset>
-                <fileset dir="${test.dir}">
-                    <include name="**/${testfile}.java"/>
-                </fileset>
-            </batchtest>
-        </junit>
-        <antcall target="report"/>
-        <fail message="Some tests have failed" if="ERROR"/>
-
-        <delete dir="${basedir}/directoryTestOrigin.tmp" />
-        <delete dir="${basedir}/directoryTestDestination.tmp" />
-        <delete dir="${basedir}/tmp.test.directory" />
-        <delete dir="${basedir}/tmp" />
-        <delete file="${basedir}/fileTest.tmp" />
+        <ant antfile="build-test.xml" target="onetest" inheritAll="false">
+            <property name="src.dir" value="${src.dir}" />
+            <property name="test.dir" value="${test.dir}" />
+            <property name="lib.dir" value="${lib.dir}" />
+            <property name="tools.dir" value="${tools.dir}" />
+            <property name="build.dir" value="${build.dir}" />
+            <property name="conf.dir" value="${conf.dir}" />
+        </ant>
     </target>
+
 </project>
 
     

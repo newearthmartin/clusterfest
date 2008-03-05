@@ -22,7 +22,6 @@ import com.flaptor.util.Config;
 import com.flaptor.util.FileUtil;
 import com.flaptor.util.TestCase;
 import com.flaptor.util.TestInfo;
-import com.flaptor.util.remote.XmlrpcClient;
 
 /**
  * test for clustering framework
@@ -32,8 +31,7 @@ import com.flaptor.util.remote.XmlrpcClient;
 public class ClusterTest extends TestCase {
 	private static final int NUM_NODES = 3;
     
-	private XmlrpcClient client;
-    private Cluster cluster;
+    private ClusterManager cluster;
     private List<ClusterableListener> clusterableListeners;
 	
 	public void setUp() throws Exception {
@@ -49,28 +47,28 @@ public class ClusterTest extends TestCase {
         }
         Config.getConfig("clustering.properties").set("clustering.modules", "");
         Config.getConfig("clustering.properties").set("clustering.nodes", nodes);
-        cluster = Cluster.getInstance();
+        cluster = ClusterManager.getInstance();
 		for (ClusterableListener s : clusterableListeners) {
 			s.start();
 		}
 	}
 	public void tearDown() throws Exception {
+	    // TODO: wait until they're actually stopped or a timeout is reached
 		for (ClusterableListener s : clusterableListeners) {
-			s.stop();
+	        s.requestStop();
 		}
 	}
 
-	@TestInfo(testType = TestInfo.TestType.SYSTEM,
-            requiresPort = {50000,50001,50002})
+	@TestInfo(testType = TestInfo.TestType.SYSTEM)//, requiresPort = {50000,50001,50002})
 	public void testNodeRegistration() {
 		filterOutputRegex("Avoiding.*");
 		assertEquals(NUM_NODES, cluster.getNodes().size());
-		for (Node node : cluster.getNodes()) {
+		for (NodeDescriptor node : cluster.getNodes()) {
 			cluster.updateAllInfo(node);
 			assertEquals("searcher", node.getType());
 			assertTrue(node.isReachable());
 		}
-		Node n2 = cluster.registerNode("localhost", 12345, "lalalal");
+		NodeDescriptor n2 = cluster.registerNode("localhost", 12345, "lalalal");
 		assertFalse(n2.isReachable());
 		assertEquals(NUM_NODES + 1, cluster.getNodes().size());
 		cluster.unregisterNode(n2);

@@ -16,14 +16,13 @@ limitations under the License.
 
 package com.flaptor.clustering;
 
-import java.util.List;
-
 import org.apache.log4j.Logger;
 
 import com.flaptor.util.ClassUtil;
 import com.flaptor.util.Config;
 import com.flaptor.util.Execute;
 import com.flaptor.util.Pair;
+import com.flaptor.util.Stoppable;
 import com.flaptor.util.remote.XmlrpcSerialization;
 import com.flaptor.util.remote.XmlrpcServer;
 
@@ -34,7 +33,7 @@ import com.flaptor.util.remote.XmlrpcServer;
  *
  * @author Martin Massera
  */
-public class ClusterableListener {
+public class ClusterableListener implements Stoppable {
     private static final Logger logger = Logger.getLogger(Execute.whoAmI());
 
 	private String nodeType = "generic-node";
@@ -107,20 +106,19 @@ public class ClusterableListener {
 		xmlrpcServer.start();
 	}
 	
-	/**
-	 * stops the server
-	 */
-	public void stop() {
-		xmlrpcServer.requestStop();
-		while(!xmlrpcServer.isStopped()) {
-		    Execute.sleep(100, logger);
-		}
-	}
-
 	//needs to be public for xmlrpc
     public class ClusterableImpl implements Clusterable {
         public String getNodeType() {
             return nodeType;
         }
     }
+
+    public boolean isStopped() {
+        return xmlrpcServer.isStopped();
+    }
+
+    public void requestStop() {
+        xmlrpcServer.requestStop();
+    }
+    
 }

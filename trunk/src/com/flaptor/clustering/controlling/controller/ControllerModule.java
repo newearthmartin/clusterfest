@@ -24,14 +24,13 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 
-import com.flaptor.clustering.Cluster;
+import com.flaptor.clustering.AbstractModule;
+import com.flaptor.clustering.ClusterManager;
 import com.flaptor.clustering.ClusterableListener;
-import com.flaptor.clustering.Node;
+import com.flaptor.clustering.NodeDescriptor;
 import com.flaptor.clustering.NodeUnreachableException;
+import com.flaptor.clustering.WebModule;
 import com.flaptor.clustering.controlling.nodes.Controllable;
-import com.flaptor.clustering.modules.ModuleNode;
-import com.flaptor.clustering.modules.NodeContainerModule;
-import com.flaptor.clustering.modules.WebModule;
 import com.flaptor.util.remote.WebServer;
 import com.flaptor.util.remote.XmlrpcClient;
 import com.flaptor.util.remote.XmlrpcSerialization;
@@ -42,25 +41,47 @@ import com.flaptor.util.remote.XmlrpcSerialization;
  *
  * @author Martin Massera
  */
-public class Controller extends NodeContainerModule implements WebModule {
+public class ControllerModule extends AbstractModule<ControllerNodeDescriptor> implements WebModule {
+
+    /**
+     * adds a monitoreable implementation to a clusterable server
+     * @param listener
+     * @param c
+     */
+    public static void addControllerListener(ClusterableListener listener, Controllable c) {
+        listener.addModuleListener("controller", XmlrpcSerialization.handler(c));
+    }
+    /**
+     * @param client
+     * @return a proxy for monitoreable xmlrpc calls
+     */
+    public static Controllable getControllableProxy(XmlrpcClient client) {
+        return (Controllable)XmlrpcClient.proxy("controller", Controllable.class, client);
+    }
+
+    @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(com.flaptor.util.Execute.whoAmI());
 
-	public Controller() {
+	public ControllerModule() {
 	}
 
 	@Override
-	protected ModuleNode createModuleNode(Node node){
-		ControllerNode cnode = new ControllerNode(node);
-		return cnode;
+	protected ControllerNodeDescriptor createModuleNode(NodeDescriptor node){
+		return new ControllerNodeDescriptor(node);
 	}
+
+	@Override
+    protected void notifyModuleNode(ControllerNodeDescriptor node) {
+        //does nothing
+    }
 
 	/**
 	 * 
 	 * @param node
 	 * @return the state of the node (for the controller framework)
 	 */
-	public ControllerNodeState getState(ControllerNode node) {
-		return node.getState();
+	public ControllerNodeState getState(NodeDescriptor node) {
+		return getModuleNode(node).getState();
 	}
 	
 	/**
@@ -68,8 +89,8 @@ public class Controller extends NodeContainerModule implements WebModule {
 	 * @param node
 	 * @throws IOException
 	 */
-	public void startNode(ControllerNode node) throws IOException{
-		node.start();
+	public void startNode(NodeDescriptor node) throws IOException{
+	    getModuleNode(node).start();
 	}
 
 	/**
@@ -77,62 +98,38 @@ public class Controller extends NodeContainerModule implements WebModule {
 	 * @param node
 	 * @throws IOException
 	 */
-	public void killNode(ControllerNode node) throws IOException {
-		node.kill();
+	public void killNode(NodeDescriptor node) throws IOException {
+	    getModuleNode(node).kill();
 	}
 	
 	/**
 	 * pauses a node through rpc
 	 * @param node
 	 */
-	public void pauseNode(ControllerNode node) {
-		node.pause();
+	public void pauseNode(NodeDescriptor node) {
+	    getModuleNode(node).pause();
 	}
 
 	/**
 	 * resumes a node through rpc
 	 * @param node
 	 */
-	public void resumeNode(ControllerNode node) {
-		node.resume();
+	public void resumeNode(NodeDescriptor node) {
+	    getModuleNode(node).resume();
 	}
 	
 	/**
 	 * stops a node through rpc
 	 * @param node
 	 */
-	public void stopNode(ControllerNode node) {
-		node.stop();
+	public void stopNode(NodeDescriptor node) {
+	    getModuleNode(node).stop();
 	}
 
-	/**
-	 * updates the state of a node 
-	 * @param node
-	 * @return
-	 * TODO make return depend on success 
-	 */
-	public boolean updateNodeState(ControllerNode node) {
-//		try {
-			node.updateState();
-			return true;
-//		} catch (NodeUnreachableException e) {
-//			logger.warn(e);
-//			return false;
-//		}
-	}
-
-	private void updateNodes() {
-    	//update states of all the monitored nodes
-    	for (ModuleNode node : nodes) {
-			updateNodeState((ControllerNode) node);
-    	}
-    }
-
-	@Override
-	public boolean nodeBelongs(Node node) throws NodeUnreachableException {
+	protected boolean shouldRegister(NodeDescriptor node) throws NodeUnreachableException {
 		try {
-			boolean ret = getControllableProxy(node.getXmlrpcClient()).ping();
-			return ret;
+			getControllableProxy(node.getXmlrpcClient()).ping();
+			return true;
 		} catch (NoSuchMethodException e) {
 			return false;
 		} catch (Exception e) {
@@ -140,36 +137,13 @@ public class Controller extends NodeContainerModule implements WebModule {
 		}
 	}
 
-	@Override
-	public boolean updateNode(ModuleNode node) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-	
-	/**
-	 * adds a monitoreable implementation to a clusterable server
-	 * @param clusterableServer
-	 * @param c
-	 */
-	public static void addControllerListener(ClusterableListener clusterableServer, Controllable c) {
-		clusterableServer.addModuleListener("controller", XmlrpcSerialization.handler(c));
-	}
-	/**
-	 * @param client
-	 * @return a proxy for monitoreable xmlrpc calls
-	 */
-	public static Controllable getControllableProxy(XmlrpcClient client) {
-		return (Controllable)XmlrpcClient.proxy("controller", Controllable.class, client);
-	}
-
 	//************ WEB MODULE **************
 	public String getModuleHTML() {
 		return "<a href=\"?action=startall\"><img src=\"media/start.png\"/>ALL</a>  <a href=\"?action=killall\"><img src=\"media/stop.png\"/>ALL</a>";
 	}
-	public String getNodeHTML(Node node, int nodeNum) {
+	public String getNodeHTML(NodeDescriptor node, int nodeNum) {
 		if (!isRegistered(node)) return null;
-		ControllerNode cnode = (ControllerNode)getNode(node);
-        ControllerNodeState state = node.isReachable() ? getState(cnode) : ControllerNodeState.STOPPED;
+        ControllerNodeState state = node.isReachable() ? getState(node) : ControllerNodeState.STOPPED;
         String ret = "";
         if (state == ControllerNodeState.RUNNING) ret += "<a href=\"?action=kill&node="+nodeNum+"\"><img src=\"media/stop.png\"/></a>";
         if (state == ControllerNodeState.PAUSED) ret += "<a href=\"?action=resume&node="+nodeNum+"\"><img src=\"media/start.png\"/></a><a href=\"?action=kill&node="+nodeNum+"\"><img src=\"media/stop.png\"/></a>";
@@ -180,13 +154,13 @@ public class Controller extends NodeContainerModule implements WebModule {
 	}
 
 	public String action(String action, HttpServletRequest request) {
-		Cluster cluster = Cluster.getInstance();
+		ClusterManager cluster = ClusterManager.getInstance();
 		String message = null;
 		int idx = -1;
 		String nodeParam = request.getParameter("node");
 		if (nodeParam != null ) idx = Integer.parseInt(nodeParam);
         if ("start".equals(action)) {
-            Node node = cluster.getNodes().get(idx);
+            NodeDescriptor node = cluster.getNodes().get(idx);
             message = ControllingFrontend.startNode(cluster, node);
         }    
         if ("startall".equals(action)) {
@@ -196,23 +170,20 @@ public class Controller extends NodeContainerModule implements WebModule {
             message = ControllingFrontend.killall(cluster);
         }    
         if ("kill".equals(action)) {
-            Node node = cluster.getNodes().get(idx);
+            NodeDescriptor node = cluster.getNodes().get(idx);
             message = ControllingFrontend.killNode(cluster, node);
         }    
         if ("pause".equals(action)) {
-            Node node = cluster.getNodes().get(idx);
-            ControllerNode cnode = (ControllerNode)getNode(node);
-            pauseNode(cnode);
+            NodeDescriptor node = cluster.getNodes().get(idx);
+            pauseNode(node);
         }    
         if ("resume".equals(action)) {
-            Node node = cluster.getNodes().get(idx);
-            ControllerNode cnode = (ControllerNode)getNode(node);
-            resumeNode(cnode);
+            NodeDescriptor node = cluster.getNodes().get(idx);
+            resumeNode(node);
         }    
         if ("stop".equals(action)) {
-            Node node = cluster.getNodes().get(idx);
-            ControllerNode cnode = (ControllerNode)getNode(node);
-            stopNode(cnode);
+            NodeDescriptor node = cluster.getNodes().get(idx);
+            stopNode(node);
         }
         return message;
 	}
@@ -227,4 +198,6 @@ public class Controller extends NodeContainerModule implements WebModule {
 		l.add("killall");
 		return l;
 	}
+
+    
 }

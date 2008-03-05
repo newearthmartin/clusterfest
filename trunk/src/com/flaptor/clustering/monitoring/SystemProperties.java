@@ -24,9 +24,11 @@ import java.io.Serializable;
  *
  * @author Martin Massera
  */
-public class SystemProperties implements Serializable{
+public class SystemProperties implements Serializable {
 
-	private String topDump;
+    private static final long serialVersionUID = 1L;
+    
+    private String topDump;
 	private String ifconfigDump;
 
 	public String getTopDump() {

@@ -29,8 +29,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 
-import com.flaptor.clustering.modules.NodeContainerModule;
-import com.flaptor.clustering.modules.WebModule;
 import com.flaptor.util.ClassUtil;
 import com.flaptor.util.Config;
 
@@ -41,19 +39,19 @@ import com.flaptor.util.Config;
  *
  * @author Martin Massera
  */
-public class Cluster {
+public class ClusterManager {
 	
     private static final Logger logger = Logger.getLogger(com.flaptor.util.Execute.whoAmI());
 	
     private static class InitializiationOnDemandHolder {
-        private static Cluster instance = new Cluster();    
+        private static ClusterManager instance = new ClusterManager();    
     }
     
-    private Map<String, NodeContainerModule> modules = new HashMap<String, NodeContainerModule>();
+    private Map<String, Module> modules = new HashMap<String, Module>();
     private List<WebModule> webModules = new ArrayList<WebModule>();
     private Map<String, WebModule> moduleActionMap = new HashMap<String, WebModule>();
     
-    private Cluster() {
+    private ClusterManager() {
     	//after initializing everything, register all nodes
     	Config config = Config.getConfig("clustering.properties");
     	String[] hosts = config.getStringArray("clustering.nodes");
@@ -61,7 +59,7 @@ public class Cluster {
         
     	for (String moduleDef : moduleDefs) {
     		String [] defs = moduleDef.split(":");
-    		NodeContainerModule module = (NodeContainerModule)ClassUtil.instance(defs[1]); 
+    		Module module = (Module)ClassUtil.instance(defs[1]); 
     		modules.put(defs[0], module);
     		if (module instanceof WebModule) addWebModule((WebModule)module);
     	}
@@ -92,11 +90,11 @@ public class Cluster {
     /**
      * @return the singleton instance of Cluster
      */
-    public static Cluster getInstance() {
+    public static ClusterManager getInstance() {
         return InitializiationOnDemandHolder.instance;
     }
 
-	private List<Node> nodes = new ArrayList<Node>();
+	private List<NodeDescriptor> nodes = new ArrayList<NodeDescriptor>();
 
 	/**
 	 * persists the node list to the config file on disk
@@ -104,7 +102,7 @@ public class Cluster {
 	 */
 	public void persistNodeList() throws IOException {
         String nodeList = "";
-        for (Node node : nodes) {
+        for (NodeDescriptor node : nodes) {
             if (nodeList.length() > 0) nodeList += ",\\\n\t";
             nodeList += node.getHost() +":"+node.getPort()+":"+node.getInstallDir();
         }
@@ -120,11 +118,11 @@ public class Cluster {
 	 * @param installDir the directory where it is installed in that host (not the baseDir, should be something like baseDir/searcher)
 	 * @return the registered node
 	 */
-	public Node registerNode(String host, int port, String installDir) {
+	public NodeDescriptor registerNode(String host, int port, String installDir) {
 		synchronized (nodes) {
-			Node node = new Node(host, port, installDir);
+			NodeDescriptor node = new NodeDescriptor(host, port, installDir);
 	        nodes.add(node);
-	       	updateClusterNodeInfo(node);
+	       	updateAllInfo(node);
 			return node;
 		}
 	}
@@ -132,11 +130,11 @@ public class Cluster {
 	/**
 	 * removes a node from the cluster and all the modules of the clustering framework
 	 */
-	public void unregisterNode(Node node) {
+	public void unregisterNode(NodeDescriptor node) {
 		synchronized (nodes) {
 			nodes.remove(node);
-			for (NodeContainerModule module: modules.values()) {
-				module.unregisterNode(node);
+			for (Module module: modules.values()) {
+				module.nodeUnregistered(node);
 			}
 		}
 	}
@@ -147,7 +145,7 @@ public class Cluster {
 	public void updateAllInfoAllNodes() {
 		synchronized (nodes) {
 			ExecutorService threadPool = Executors.newFixedThreadPool(nodes.size());
-			for(final Node node: nodes) {
+			for(final NodeDescriptor node: nodes) {
 				threadPool.submit(new Runnable() {
 					public void run() {
 						updateAllInfo(node);
@@ -162,31 +160,12 @@ public class Cluster {
 	}
 
 	/**
-	 * updates the node info in the cluster and in all the modules where it s registered
-	 * @throws NodeUnreachableException 
-	 * @return true if all states where updated correctly
-	 */
-	public boolean updateAllInfo(Node node) {
-		updateClusterNodeInfo(node);
-		
-		//TODO analyse taking this method out
-		
-		for (NodeContainerModule module: modules.values()) {
-			if (module.isRegistered(node)) {
-				module.updateNode(module.getNode(node));
-			}
-		}
-
-		return node.isReachable();
-	}
-	
-	/**
 	 * updates the info of the node related to the cluster 
 	 * and registers in the modules it belongs if it hasnt already been registered 
 	 * @param node
 	 * @return true if the state was updated correctly
 	 */
-	public boolean updateClusterNodeInfo(Node node) {
+	public boolean updateAllInfo(NodeDescriptor node) {
 		boolean noErrors = true;
 		try {
 			node.updateInfo();
@@ -194,13 +173,9 @@ public class Cluster {
 			logger.warn("tried to update info for unreachable node at " + node.getHost() + ":" + node.getPort() + " - " +  e);
 			noErrors = false;
 		}
-		for (NodeContainerModule module: modules.values()) {
+		for (Module module: modules.values()) {
 			try {
-				if (module.nodeBelongs(node)){
-					if (!module.isRegistered(node)) module.registerNode(node);
-				} else {
-					if (module.isRegistered(node)) module.unregisterNode(node);
-				}
+			    module.notifyNode(node);
 			} catch (NodeUnreachableException e) {
 				logger.warn("tried to update info for unreachable node at " + node.getHost() + ":" + node.getPort(), e);
 				noErrors = false;
@@ -212,11 +187,11 @@ public class Cluster {
 	/**
 	 * @return the list of registered nodes
 	 */
-	public List<Node> getNodes() {
+	public List<NodeDescriptor> getNodes() {
 		return nodes;
 	}
 	
-	public NodeContainerModule getModule(String moduleName) {
+	public Module getModule(String moduleName) {
 		return modules.get(moduleName);
 	}
 	
@@ -233,8 +208,8 @@ public class Cluster {
 	 */
 	private void updateNodes() {
 		synchronized (nodes) {
-			for (Node node: nodes) {
-				updateClusterNodeInfo(node);
+			for (NodeDescriptor node: nodes) {
+				updateAllInfo(node);
 			}
 		}
 	}	
