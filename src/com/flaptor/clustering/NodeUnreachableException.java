@@ -23,6 +23,8 @@ package com.flaptor.clustering;
  */
 public class NodeUnreachableException extends Exception {
 
+    private static final long serialVersionUID = 1L;
+
     public NodeUnreachableException() {
         super();
     }

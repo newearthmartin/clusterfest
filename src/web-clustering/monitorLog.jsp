@@ -17,39 +17,35 @@ limitations under the License.
 
 <%@page import="java.util.Calendar"%>
 <%@page import="com.flaptor.util.Pair"%>
-<%@page import="com.flaptor.clustering.monitoring.SystemProperties"%>
-<%@page import="com.flaptor.clustering.Node"%>
-<%@page import="com.flaptor.clustering.Cluster"%>
-<%@page import="com.flaptor.clustering.monitoring.monitor.Monitor"%>
-<%@page import="com.flaptor.clustering.monitoring.monitor.MonitorNode"%>
-<%@page import="com.flaptor.clustering.monitoring.monitor.NodeState"%>
+<%@page import="com.flaptor.clustering.monitoring.*"%>
+<%@page import="com.flaptor.clustering.*"%>
+<%@page import="com.flaptor.clustering.monitoring.monitor.*"%>
 <%@page import="java.util.Date"%>
 <%@page import="java.util.Map"%>
 <%@page import="java.io.Serializable"%>
 
 <%
-    Cluster cluster = Cluster.getInstance();
+    ClusterManager cluster = ClusterManager.getInstance();
     int idx = Integer.parseInt(request.getParameter("node"));
-    Node clusterNode = cluster.getNodes().get(idx);
-    Monitor monitor = (Monitor)cluster.getModule("monitor");
-    MonitorNode node = (MonitorNode)monitor.getNode(clusterNode);
-
+    NodeDescriptor node = cluster.getNodes().get(idx);
+    MonitorModule monitor = (MonitorModule)cluster.getModule("monitor");
+    
     String logName = request.getParameter("log");
 
     String action = request.getParameter("action");
     if ("update".equals(action)) {
-        node.updateLogs();
+        monitor.updateLogs(node);
     }
     
     request.setAttribute("node", idx);
-    request.setAttribute("pageTitle", "monitor - " + clusterNode.getType() + " @ " + clusterNode.getHost()+":"+clusterNode.getPort() + " - log: " + logName);
+    request.setAttribute("pageTitle", "monitor - " + node.getType() + " @ " + node.getHost()+":"+node.getPort() + " - log: " + logName);
     
     Pair<String, Long> log = monitor.retrieveLog(node, logName);
 %>
 
 <%@include file="include.top.jsp" %>
 
-    <div id="monitorSideBar">
+<div id="monitorSideBar">
         <a href="?action=update&node=<%= idx %>&log=<%=logName%>">update logs</a></br>
         <table>
             <tr><th>logs</th></tr>

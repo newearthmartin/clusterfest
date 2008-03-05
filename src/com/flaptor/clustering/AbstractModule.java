@@ -14,47 +14,59 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package com.flaptor.clustering.modules;
+package com.flaptor.clustering;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-import com.flaptor.clustering.Node;
-import com.flaptor.clustering.NodeUnreachableException;
 
 /**
- * Class for representing a module that needs nodes to be registered 
+ * Class for representing a module 
+ * it manages the node registration 
  *
  * @author Martin Massera
  */
-abstract public class NodeContainerModule {
+abstract public class AbstractModule<T extends ModuleNodeDescriptor> implements Module {
 	
-	protected List<ModuleNode> nodes = new ArrayList<ModuleNode>();
-	protected Map<Node, ModuleNode> nodesMap = new HashMap<Node, ModuleNode >();
+	protected List<T> nodes = new ArrayList<T>();
+	protected Map<NodeDescriptor, T> nodesMap = new HashMap<NodeDescriptor, T>();
 	
 	/**
 	 * Create a module node from a clustering node 
 	 * @param node
 	 * @return the created module node
 	 */
-	abstract protected ModuleNode createModuleNode(Node node);
+	abstract protected T createModuleNode(NodeDescriptor node);
 	
 	/**
 	 * @param node
 	 * @return true iff the node should be registered in this module
 	 * @throws NodeUnreachableException if the node is unreachable 
 	 */
-	abstract public boolean nodeBelongs(Node node) throws NodeUnreachableException; 
+	abstract protected boolean shouldRegister(NodeDescriptor node) throws NodeUnreachableException; 
 
 	/**
 	 * updates the info of the node 
 	 * @param node should be registered
-	 * @return true iff update finished ok
 	 */
-	abstract public boolean updateNode(ModuleNode node);
+	abstract protected void notifyModuleNode(T node);
+	
+	public final void notifyNode(NodeDescriptor node) throws NodeUnreachableException {
+	    if (shouldRegister(node)){
+	        if (!isRegistered(node)) registerNode(node);
+	    } else {
+	        if (isRegistered(node)) unregisterNode(node);
+	    }
+	    if (isRegistered(node)) notifyModuleNode(getModuleNode(node));
+	}
+	
+	public final void nodeUnregistered(NodeDescriptor node) {
+	    unregisterNode(node);
+	}
 	
 	/**
 	 * registers a node, creating a module node for this node
@@ -62,8 +74,8 @@ abstract public class NodeContainerModule {
 	 * @return the created module node
 	 * @throws NodeUnreachableException if the node is unreachable
 	 */
-	public ModuleNode registerNode(Node node) {
-		ModuleNode moduleNode = createModuleNode(node);
+	protected T registerNode(NodeDescriptor node) {
+		T moduleNode = createModuleNode(node);
     	synchronized (nodes) {
     		nodes.add(moduleNode);
     		nodesMap.put(node, moduleNode);
@@ -74,7 +86,7 @@ abstract public class NodeContainerModule {
 	/**
 	 * @return true iff the node is registered
 	 */
-	public boolean isRegistered(Node node) {
+	public boolean isRegistered(NodeDescriptor node) {
     	synchronized (nodes) {
     		return nodesMap.containsKey(node);
     	}
@@ -84,9 +96,9 @@ abstract public class NodeContainerModule {
 	 * unregisters the node
 	 * @param node
 	 */
-	public void unregisterNode(Node node) {
+	protected void unregisterNode(NodeDescriptor node) {
     	synchronized (nodes) {
-    		ModuleNode moduleNode = getNode(node);
+    		ModuleNodeDescriptor moduleNode = getModuleNode(node);
     		nodes.remove(moduleNode);
     		nodesMap.remove(node);
     	}
@@ -95,15 +107,22 @@ abstract public class NodeContainerModule {
 	/**
 	 * @return the list of registered nodes
 	 */
-	public List<ModuleNode> getNodes() {
+	public List<T> getModuleNodeDescriptors() {
    		return Collections.unmodifiableList(nodes);
+	}
+	
+	/**
+	 * @return the list of registered nodes
+	 */
+	public Set<NodeDescriptor> getNodeDescriptors() {
+	    return Collections.unmodifiableSet(nodesMap.keySet());
 	}
 	
 	/**
 	 * @param node a clustering node
 	 * @return the module node corresponding to the clustering node 
 	 */
-	public ModuleNode getNode(Node node) {
+	public T getModuleNode(NodeDescriptor node) {
     	synchronized (nodes) {
     		return nodesMap.get(node);
     	}

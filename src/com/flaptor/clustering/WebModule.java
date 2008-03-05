@@ -1,10 +1,9 @@
-package com.flaptor.clustering.modules;
+package com.flaptor.clustering;
 
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
-import com.flaptor.clustering.Node;
 import com.flaptor.util.remote.WebServer;
 
 /**
@@ -30,7 +29,7 @@ public interface WebModule {
 	 * @param nodeNum the number of the node in the list (for request parameters)
 	 * @return html to be displayed in the node list for this node, or null if there isnt
 	 */
-	String getNodeHTML(Node node, int nodeNum);
+	String getNodeHTML(NodeDescriptor node, int nodeNum);
 	
 	/**
 	 * some modules register actions for clusterfest home page. If the parameter 

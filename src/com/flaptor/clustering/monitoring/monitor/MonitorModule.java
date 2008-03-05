@@ -25,12 +25,11 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 
+import com.flaptor.clustering.AbstractModule;
 import com.flaptor.clustering.ClusterableListener;
-import com.flaptor.clustering.Node;
+import com.flaptor.clustering.NodeDescriptor;
 import com.flaptor.clustering.NodeUnreachableException;
-import com.flaptor.clustering.modules.ModuleNode;
-import com.flaptor.clustering.modules.NodeContainerModule;
-import com.flaptor.clustering.modules.WebModule;
+import com.flaptor.clustering.WebModule;
 import com.flaptor.clustering.monitoring.monitor.NodeState.Sanity;
 import com.flaptor.clustering.monitoring.nodes.Monitoreable;
 import com.flaptor.util.ClassUtil;
@@ -47,12 +46,12 @@ import com.flaptor.util.remote.XmlrpcSerialization;
  *  
  * @author Martin Massera
  */
-public class Monitor extends NodeContainerModule implements WebModule {
+public class MonitorModule extends AbstractModule<MonitorNodeDescriptor> implements WebModule {
     public final static String MODULE_CONTEXT = "monitor";
 	
 	private static final Logger logger = Logger.getLogger(com.flaptor.util.Execute.whoAmI());
 
-	public Monitor() {
+	public MonitorModule() {
 		Config config = Config.getConfig("clustering.properties");
 		new Timer().scheduleAtFixedRate(new TimerTask(){
 			public void run() {
@@ -62,29 +61,34 @@ public class Monitor extends NodeContainerModule implements WebModule {
 	}
 
 	@Override
-	protected ModuleNode createModuleNode(Node node) {
-		MonitorNode mnode = new MonitorNode(node);
+	protected MonitorNodeDescriptor createModuleNode(NodeDescriptor node) {
+		MonitorNodeDescriptor monitorNode = new MonitorNodeDescriptor(node);
 		try {
-			mnode.setChecker(getCheckerForType(node.getType()));
+			monitorNode.setChecker(getCheckerForType(node.getType()));
 		} catch (Exception e) {
 			logger.error(e);
 			throw new RuntimeException(e);
 		}
-		updateNode(mnode);
-		return mnode;
+		updateNodeInfo(monitorNode);
+		return monitorNode;
 	}
+
+    protected void notifyModuleNode(MonitorNodeDescriptor node) {
+        // we update the node info every time notify gets invoked
+        updateNodeInfo(node);
+    }
 
     private void updateNodes() {
     	//update states of all the monitored nodes
     	synchronized (nodes) {
-	    	for (ModuleNode node : nodes) {
-				updateNode((MonitorNode)node);
+	    	for (MonitorNodeDescriptor node : nodes) {
+				updateNodeInfo(node);
 	    	}
     	}
     }
     
 	@Override
-	public boolean nodeBelongs(Node node) throws NodeUnreachableException {
+	public boolean shouldRegister(NodeDescriptor node) throws NodeUnreachableException {
 		try {
 			boolean ret = getMonitoreableProxy(node.getXmlrpcClient()).ping();
 			return ret;
@@ -95,9 +99,9 @@ public class Monitor extends NodeContainerModule implements WebModule {
 		}
 	}
 
-	public boolean updateNode(ModuleNode node) {
+	private boolean updateNodeInfo(MonitorNodeDescriptor node) {
 		try {
-			((MonitorNode)node).updateState();
+			node.updateState();
 			return true;
 		} catch (NodeUnreachableException e) {
 			logger.warn(e);
@@ -112,24 +116,32 @@ public class Monitor extends NodeContainerModule implements WebModule {
 	 * @param logName out, err, or a filename
 	 * @return a pair (log, timestamp)
 	 */
-	public Pair<String, Long> retrieveLog(MonitorNode node, String logName) {
-		if (!node.getLogs().containsKey(logName)) {
+	public Pair<String, Long> retrieveLog(NodeDescriptor node, String logName) {
+	    MonitorNodeDescriptor moduleNode = getModuleNode(node);
+		if (!moduleNode.getLogs().containsKey(logName)) {
 			try {
-				node.updateLog(logName);
+                moduleNode.updateLog(logName);
 			} catch (NodeUnreachableException e) {
 				logger.warn(e);
 			}
 		}
-		return node.retrieveLog(logName);
+		return moduleNode.retrieveLog(logName);
+	}
+	
+	public void updateLogs(NodeDescriptor node) {
+	    try {
+	        getModuleNode(node).updateLogs();
+	    } catch (NodeUnreachableException e) {
+	        logger.warn(e);
+	    }
 	}
 
-	public void setChecker(MonitorNode node, NodeChecker checker) {
+	public void setChecker(MonitorNodeDescriptor node, NodeChecker checker) {
 		node.setChecker(checker);
 	}
 
 	
 	public NodeChecker getChecker(String checkerClassName) {
-		
 		try {
 			return (NodeChecker) ClassUtil.instance(checkerClassName);
 		} catch (Throwable t) {
@@ -170,14 +182,13 @@ public class Monitor extends NodeContainerModule implements WebModule {
 	public static Monitoreable getMonitoreableProxy(XmlrpcClient client) {
 		return (Monitoreable)XmlrpcClient.proxy(MODULE_CONTEXT, Monitoreable.class, client);
 	}
-
 	
 	//************ WEB MODULE **************
 	public String getModuleHTML() {
 		return null;
 	}
-	public String getNodeHTML(Node node, int nodeNum) {
-        MonitorNode monitorNode = (MonitorNode)getNode(node);
+	public String getNodeHTML(NodeDescriptor node, int nodeNum) {
+        MonitorNodeDescriptor monitorNode = (MonitorNodeDescriptor)getModuleNode(node);
 
         Sanity sanity = node.isReachable() ? Sanity.UNKNOWN : Sanity.UNREACHABLE;
     

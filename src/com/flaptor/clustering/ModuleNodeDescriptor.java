@@ -14,14 +14,25 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package com.flaptor.clustering.modules;
+package com.flaptor.clustering;
+
 
 
 /**
- * Interface to mark a node as a module node, so registering node code 
- * can be reused for different modules
+ * Basic implementation of a module node descriptor.
  *
  * @author Martin Massera
  */
-public interface ModuleNode {
+public abstract class ModuleNodeDescriptor {
+    
+    private NodeDescriptor nodeDescriptor;
+
+    protected ModuleNodeDescriptor(NodeDescriptor nodeDescriptor) {
+        this.nodeDescriptor = nodeDescriptor;
+    }
+
+    protected NodeDescriptor getNodeDescriptor() {
+        return nodeDescriptor;
+    }
+    
 }

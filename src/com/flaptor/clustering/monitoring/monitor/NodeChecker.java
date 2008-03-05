@@ -32,5 +32,5 @@ public interface NodeChecker {
      * @param state the state in which the node should be checked
      * @return the sanity value
      */
-    public Sanity checkNode(MonitorNode node, NodeState state);
+    public Sanity checkNode(MonitorNodeDescriptor node, NodeState state);
 }

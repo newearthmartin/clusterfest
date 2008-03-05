@@ -17,39 +17,37 @@ limitations under the License.
 
 <%@page import="com.flaptor.util.Pair"%>
 <%@page import="com.flaptor.clustering.monitoring.SystemProperties"%>
-<%@page import="com.flaptor.clustering.Node"%>
-<%@page import="com.flaptor.clustering.Cluster"%>
-<%@page import="com.flaptor.clustering.monitoring.monitor.Monitor"%>
-<%@page import="com.flaptor.clustering.monitoring.monitor.MonitorNode"%>
-<%@page import="com.flaptor.clustering.monitoring.monitor.NodeState"%>
+<%@page import="com.flaptor.clustering.*"%>
+<%@page import="com.flaptor.clustering.monitoring.*"%>
+<%@page import="com.flaptor.clustering.monitoring.monitor.*"%>
 <%@page import="java.util.Date"%>
 <%@page import="java.util.Map"%>
 
 <%
-    Cluster cluster = Cluster.getInstance();
+    ClusterManager cluster = ClusterManager.getInstance();
     int idx = Integer.parseInt(request.getParameter("node"));
-    Node clusterNode = cluster.getNodes().get(idx);
+    NodeDescriptor node = cluster.getNodes().get(idx);
+
+    MonitorModule monitor = (MonitorModule)cluster.getModule("monitor");
+    MonitorNodeDescriptor monitorNode = monitor.getModuleNode(node);
 
     String action = request.getParameter("action");
     if ("update".equals(action)) {
-        cluster.updateAllInfo(clusterNode);
+        monitorNode.updateState();
     }
 
-    Monitor monitor = (Monitor)cluster.getModule("monitor");
-    MonitorNode node = (MonitorNode)monitor.getNode(clusterNode);
-
-    request.setAttribute("pageTitle", "monitor - " + clusterNode.getType() + " @ " + clusterNode.getHost()+":"+clusterNode.getPort());
+    request.setAttribute("pageTitle", "monitor - " + node.getType() + " @ " + node.getHost()+":"+node.getPort());
 %>
 
 <%@include file="include.top.jsp" %>
 
 
-<%if (!clusterNode.isReachable()) { %>
+<%if (!node.isReachable()) { %>
     <h2>Node unreachable!</h2>
 <%
 }%>
 
-<%if (node == null) {%>
+<%if (!monitor.isRegistered(node)) {%>
     <h2>This node is not monitoreable.</h2>
 <%  
 }
@@ -57,9 +55,9 @@ else {
     NodeState nodeState;
     String stateNum =request.getParameter("stateNum"); 
     if (stateNum != null) {
-        nodeState = node.getNodeState(Integer.parseInt(stateNum));
+        nodeState = monitorNode.getNodeState(Integer.parseInt(stateNum));
     } else {
-        nodeState = node.getLastState();        
+        nodeState = monitorNode.getLastState();        
     }
     if (nodeState != null) {
 %>
@@ -67,7 +65,7 @@ else {
             <a href="?action=update&node=<%= idx %>">update node</a></br>
             <table>
                 <tr><th>logs</th></tr>
-<%              for (Map.Entry<String, Pair<String, Long>> e : node.getLogs().entrySet()) {%>
+<%              for (Map.Entry<String, Pair<String, Long>> e : monitorNode.getLogs().entrySet()) {%>
                     <tr><td><a href="monitorLog.jsp?log=<%=e.getKey()%>&node=<%= idx %>"><%=e.getKey()%></a> <span class="fuzzy">at <%= new Date(e.getValue().last()).toString() %></span></td></tr>
 <%              } %>            
                 <tr><td>
@@ -82,7 +80,7 @@ else {
             <table>
                 <tr><th>Saved states</th></tr>                
 <%              int num = 0;
-				for (NodeState state : node.getStates()) {
+				for (NodeState state : monitorNode.getStates()) {
 %>                  <tr><td><%= state.getSanity() %> at <a href="monitorNode.jsp?node=<%=idx%>&stateNum=<%=num%>"><%= new Date(state.getTimestamp()).toString() %></a></td></tr>
 <%              	num++;
 				} 

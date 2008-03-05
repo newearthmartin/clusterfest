@@ -38,19 +38,18 @@ public class ControllableImplementation implements Controllable {
 	}
 
 	public void stop() {
-		logger.error("exiting from Clustering controlling request");
-		state = ControllerNodeState.STOPPED;
+		logger.warn("exiting from Clustering controlling request");
 		System.exit(0);
 	}
 
 	public void pause() throws RemoteException {
 //		state = NodeState.PAUSED;
-		throw new RemoteException("pause not yet implemented");
+		throw new RemoteException("pause not implemented");
 	}
 
 	public void resume() throws RemoteException {
 //		state = NodeState.RUNNING;
-		throw new RemoteException("resume not yet implemented");
+		throw new RemoteException("resume not implemented");
 	}
 
 	public boolean ping() throws Exception {

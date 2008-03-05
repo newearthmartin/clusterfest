@@ -29,9 +29,9 @@ limitations under the License.
 <%@include file="include.top.jsp" %>
 
 <%
-    Cluster cluster = Cluster.getInstance();
-    Monitor monitor = (Monitor)cluster.getModule("monitor");
-    Controller control = (Controller)cluster.getModule("controller");  
+    ClusterManager cluster = ClusterManager.getInstance();
+    MonitorModule monitor = (MonitorModule)cluster.getModule("monitor");
+    ControllerModule control = (ControllerModule)cluster.getModule("controller");  
 
     String action = request.getParameter("action");
     String message = "";
@@ -39,7 +39,7 @@ limitations under the License.
         String host = request.getParameter("host");
         int port = Integer.parseInt(request.getParameter("port"));
         String installDir = request.getParameter("dir");
-        Node node = cluster.registerNode(host, port, installDir);
+        NodeDescriptor node = cluster.registerNode(host, port, installDir);
         if (node.isReachable()) {
             message += "OK : " + host + ":" + port + " registered.";
         } else {
@@ -49,7 +49,7 @@ limitations under the License.
     }
     if ("remove".equals(action)) {
         int idx = Integer.parseInt(request.getParameter("node"));
-        Node node = cluster.getNodes().get(idx);
+        NodeDescriptor node = cluster.getNodes().get(idx);
         cluster.unregisterNode(node);
         message += "OK : " + node.getHost() + ":" + node.getPort() + " unregistered.";
         try {cluster.persistNodeList();} catch(IOException e) {message+="\nWARNING: couldn't persist node list";}
@@ -59,7 +59,7 @@ limitations under the License.
     }
     if ("update".equals(action)) { //this action updates all states of the node: cluster, monitor,etc.
         int idx = Integer.parseInt(request.getParameter("node"));
-        Node node = cluster.getNodes().get(idx); //update node info
+        NodeDescriptor node = cluster.getNodes().get(idx); //update node info
         cluster.updateAllInfo(node);
         if (node.isReachable()) {
             message += "OK : " + node.getHost() + ":" + node.getPort() + " updated.";
@@ -93,7 +93,7 @@ limitations under the License.
         <ul>
 <%
         int i = 0;
-        for (Node node : cluster.getNodes()) {
+        for (NodeDescriptor node : cluster.getNodes()) {
 %>
             <li> 
             <strong><%= node.getHost() %>:<%= node.getPort() %></strong>:<%= node.getInstallDir() %>

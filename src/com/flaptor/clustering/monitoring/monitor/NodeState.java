@@ -34,7 +34,7 @@ public class NodeState {
 		BAD
 	}
 	
-	public static NodeState createUnreachableState(MonitorNode node) {
+	public static NodeState createUnreachableState(MonitorNodeDescriptor node) {
 		NodeState state = new NodeState(node, null, null);
 		state.sanity = Sanity.UNREACHABLE; 
 		return state;
@@ -44,9 +44,9 @@ public class NodeState {
 	private Map<String, Object> properties;
 	private SystemProperties systemProperties;
 	private long timestamp;
-    private MonitorNode node;
+    private MonitorNodeDescriptor node;
 	
-    public NodeState(MonitorNode node, Map<String, Object> properties, SystemProperties systemProperties) {
+    public NodeState(MonitorNodeDescriptor node, Map<String, Object> properties, SystemProperties systemProperties) {
         super();
         // should be updated later by a NodeChecker
         this.sanity = Sanity.UNKNOWN; 
