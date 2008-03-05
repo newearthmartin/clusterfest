@@ -16,7 +16,6 @@ limitations under the License.
 <%-- author Martin Massera --%>
 
 <%@page import="com.flaptor.clustering.*"%>
-<%@page import="com.flaptor.clustering.modules.*"%>
 <%@page import="com.flaptor.clustering.monitoring.monitor.*"%>
 <%@page import="com.flaptor.clustering.monitoring.monitor.NodeState.*"%>
 <%@page import="com.flaptor.clustering.controlling.nodes.*"%>

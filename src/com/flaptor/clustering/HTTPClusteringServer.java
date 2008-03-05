@@ -31,7 +31,7 @@ public class HTTPClusteringServer extends WebServer {
 		super(port);
         URL webappPath = this.getClass().getClassLoader().getResource("web-clustering");
         String path = webappPath.getPath();
-		addWebAppHandler("/clustering", path);
+		addWebAppHandler("/", path);
 	}
 
 	/**
