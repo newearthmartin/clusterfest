@@ -14,19 +14,21 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package com.flaptor.clustering;
+package com.flaptor.clusterfest;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import com.flaptor.clustering.controlling.controller.ControllerModule;
-import com.flaptor.clustering.controlling.controller.ControllerNodeState;
-import com.flaptor.clustering.controlling.nodes.Controllable;
-import com.flaptor.clustering.monitoring.SystemProperties;
-import com.flaptor.clustering.monitoring.monitor.MonitorModule;
-import com.flaptor.clustering.monitoring.monitor.MonitorNodeDescriptor;
-import com.flaptor.clustering.monitoring.monitor.NodeState;
-import com.flaptor.clustering.monitoring.nodes.Monitoreable;
+import com.flaptor.clusterfest.ClusterableListener;
+import com.flaptor.clusterfest.NodeDescriptor;
+import com.flaptor.clusterfest.controlling.ControllerModule;
+import com.flaptor.clusterfest.controlling.ControllerNodeState;
+import com.flaptor.clusterfest.controlling.node.Controllable;
+import com.flaptor.clusterfest.monitoring.MonitorModule;
+import com.flaptor.clusterfest.monitoring.MonitorNodeDescriptor;
+import com.flaptor.clusterfest.monitoring.NodeState;
+import com.flaptor.clusterfest.monitoring.SystemProperties;
+import com.flaptor.clusterfest.monitoring.node.Monitoreable;
 import com.flaptor.util.Config;
 import com.flaptor.util.TestCase;
 import com.flaptor.util.TestInfo;

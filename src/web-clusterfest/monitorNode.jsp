@@ -16,10 +16,8 @@ limitations under the License.
 <%-- author Martin Massera --%>
 
 <%@page import="com.flaptor.util.Pair"%>
-<%@page import="com.flaptor.clustering.monitoring.SystemProperties"%>
-<%@page import="com.flaptor.clustering.*"%>
-<%@page import="com.flaptor.clustering.monitoring.*"%>
-<%@page import="com.flaptor.clustering.monitoring.monitor.*"%>
+<%@page import="com.flaptor.clusterfest.*"%>
+<%@page import="com.flaptor.clusterfest.monitoring.*"%>
 <%@page import="java.util.Date"%>
 <%@page import="java.util.Map"%>
 

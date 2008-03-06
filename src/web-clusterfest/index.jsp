@@ -15,11 +15,10 @@ limitations under the License.
 --%>
 <%-- author Martin Massera --%>
 
-<%@page import="com.flaptor.clustering.*"%>
-<%@page import="com.flaptor.clustering.monitoring.monitor.*"%>
-<%@page import="com.flaptor.clustering.monitoring.monitor.NodeState.*"%>
-<%@page import="com.flaptor.clustering.controlling.nodes.*"%>
-<%@page import="com.flaptor.clustering.controlling.controller.*"%>
+<%@page import="com.flaptor.clusterfest.*"%>
+<%@page import="com.flaptor.clusterfest.monitoring.*"%>
+<%@page import="com.flaptor.clusterfest.controlling.*"%>
+<%@page import="com.flaptor.clusterfest.controlling.node.*"%>
 <%@page import="java.util.Date"%>
 <%@page import="java.io.IOException"%>
 <%@page import="com.flaptor.util.ThreadUtil"%>
@@ -40,9 +39,9 @@ limitations under the License.
         String installDir = request.getParameter("dir");
         NodeDescriptor node = cluster.registerNode(host, port, installDir);
         if (node.isReachable()) {
-            message += "OK : " + host + ":" + port + " registered.";
+    message += "OK : " + host + ":" + port + " registered.";
         } else {
-            message += "WARNING : " + host + ":" + port + " registered but unreachable.";
+    message += "WARNING : " + host + ":" + port + " registered but unreachable.";
         }
         try {cluster.persistNodeList();} catch(IOException e) {message+="\nWARNING: couldn't persist node list";}
     }
@@ -61,9 +60,9 @@ limitations under the License.
         NodeDescriptor node = cluster.getNodes().get(idx); //update node info
         cluster.updateAllInfo(node);
         if (node.isReachable()) {
-            message += "OK : " + node.getHost() + ":" + node.getPort() + " updated.";
+    message += "OK : " + node.getHost() + ":" + node.getPort() + " updated.";
         } else {
-            message += "WARNING : host unreachable";
+    message += "WARNING : host unreachable";
         }
     }
     if (action != null) {
@@ -73,7 +72,6 @@ limitations under the License.
     		if (msg != null) message += msg;
     	}
     }
-    
 %>
 
 <%
