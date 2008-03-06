@@ -17,9 +17,9 @@ limitations under the License.
 
 <%@page import="java.util.Calendar"%>
 <%@page import="com.flaptor.util.Pair"%>
-<%@page import="com.flaptor.clustering.monitoring.*"%>
-<%@page import="com.flaptor.clustering.*"%>
-<%@page import="com.flaptor.clustering.monitoring.monitor.*"%>
+<%@page import="com.flaptor.clusterfest.*"%>
+<%@page import="com.flaptor.clusterfest.monitoring.*"%>
+<%@page import="com.flaptor.clusterfest.monitoring.node.*"%>
 <%@page import="java.util.Date"%>
 <%@page import="java.util.Map"%>
 <%@page import="java.io.Serializable"%>

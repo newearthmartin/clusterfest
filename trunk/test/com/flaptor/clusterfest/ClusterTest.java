@@ -13,11 +13,14 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and 
 limitations under the License.
 */
-package com.flaptor.clustering;
+package com.flaptor.clusterfest;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import com.flaptor.clusterfest.ClusterManager;
+import com.flaptor.clusterfest.ClusterableListener;
+import com.flaptor.clusterfest.NodeDescriptor;
 import com.flaptor.util.Config;
 import com.flaptor.util.FileUtil;
 import com.flaptor.util.TestCase;
