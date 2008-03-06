@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package com.flaptor.clustering.controlling.controller;
+package com.flaptor.clusterfest.controlling;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -24,13 +24,13 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 
-import com.flaptor.clustering.AbstractModule;
-import com.flaptor.clustering.ClusterManager;
-import com.flaptor.clustering.ClusterableListener;
-import com.flaptor.clustering.NodeDescriptor;
-import com.flaptor.clustering.NodeUnreachableException;
-import com.flaptor.clustering.WebModule;
-import com.flaptor.clustering.controlling.nodes.Controllable;
+import com.flaptor.clusterfest.AbstractModule;
+import com.flaptor.clusterfest.ClusterManager;
+import com.flaptor.clusterfest.ClusterableListener;
+import com.flaptor.clusterfest.NodeDescriptor;
+import com.flaptor.clusterfest.NodeUnreachableException;
+import com.flaptor.clusterfest.WebModule;
+import com.flaptor.clusterfest.controlling.node.Controllable;
 import com.flaptor.util.remote.NoSuchRpcMethodException;
 import com.flaptor.util.remote.WebServer;
 import com.flaptor.util.remote.XmlrpcClient;
@@ -45,7 +45,7 @@ import com.flaptor.util.remote.XmlrpcSerialization;
 public class ControllerModule extends AbstractModule<ControllerNodeDescriptor> implements WebModule {
 
     /**
-     * adds a monitoreable implementation to a clusterable server
+     * adds a controller implementation to a clusterableListener
      * @param listener
      * @param c
      */
@@ -54,7 +54,7 @@ public class ControllerModule extends AbstractModule<ControllerNodeDescriptor> i
     }
     /**
      * @param client
-     * @return a proxy for monitoreable xmlrpc calls
+     * @return a proxy for Controllable xmlrpc calls
      */
     public static Controllable getControllableProxy(XmlrpcClient client) {
         return (Controllable)XmlrpcClient.proxy("controller", Controllable.class, client);

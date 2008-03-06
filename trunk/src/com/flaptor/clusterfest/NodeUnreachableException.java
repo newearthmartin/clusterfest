@@ -14,36 +14,31 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package com.flaptor.clustering.monitoring;
-
-import java.io.Serializable;
+package com.flaptor.clusterfest;
 
 /**
- * Represents the system properties. Consisting of 
- * top dump and ifconfig dump
- *
+ * Exception to be thrown by rpc calls, meaning that the node is unreachable
+ *  
  * @author Martin Massera
  */
-public class SystemProperties implements Serializable {
+public class NodeUnreachableException extends Exception {
 
     private static final long serialVersionUID = 1L;
+
+    public NodeUnreachableException() {
+        super();
+    }
+
+    public NodeUnreachableException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public NodeUnreachableException(String message) {
+        super(message);
+    }
+
+    public NodeUnreachableException(Throwable cause) {
+        super(cause);
+    }
     
-    private String topDump;
-	private String ifconfigDump;
-
-	public String getTopDump() {
-		return topDump;
-	}
-
-	public void setTopDump(String topDump) {
-		this.topDump = topDump;
-	}
-
-	public String getIfconfigDump() {
-		return ifconfigDump;
-	}
-
-	public void setIfconfigDump(String ifconfigDump) {
-		this.ifconfigDump = ifconfigDump;
-	}
 }

@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package com.flaptor.clustering;
+package com.flaptor.clusterfest;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -25,7 +25,7 @@ import com.flaptor.util.remote.XmlrpcClient;
 /**
  * Represents a node of the cluster. Indicates the host:port of the node,
  * the type and if it's reachable. All modules of the clustering framework
- * should check and update the reachable status.
+ * should check and update the reachable status. 
  *
  * @author Martin Massera
  */

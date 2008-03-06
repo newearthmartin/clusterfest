@@ -14,13 +14,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package com.flaptor.clustering;
+package com.flaptor.clusterfest;
 
 
 
 /**
- * Basic implementation of a module node descriptor.
- *
+ * Basic implementation of a node descriptor for modules. Maintains a reference to the original NodeDescriptor
  * @author Martin Massera
  */
 public abstract class ModuleNodeDescriptor {

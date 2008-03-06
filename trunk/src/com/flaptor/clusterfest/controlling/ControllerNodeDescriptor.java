@@ -14,15 +14,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package com.flaptor.clustering.controlling.controller;
+package com.flaptor.clusterfest.controlling;
 
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
 
-import com.flaptor.clustering.ModuleNodeDescriptor;
-import com.flaptor.clustering.NodeDescriptor;
-import com.flaptor.clustering.controlling.nodes.Controllable;
+import com.flaptor.clusterfest.ModuleNodeDescriptor;
+import com.flaptor.clusterfest.NodeDescriptor;
+import com.flaptor.clusterfest.controlling.node.Controllable;
 import com.flaptor.util.CommandUtil;
 import com.flaptor.util.Triad;
 

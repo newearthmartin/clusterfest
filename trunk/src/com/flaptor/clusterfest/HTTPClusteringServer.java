@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package com.flaptor.clustering;
+package com.flaptor.clusterfest;
 
 import java.net.URL;
 
@@ -29,13 +29,13 @@ public class HTTPClusteringServer extends WebServer {
 
 	public HTTPClusteringServer(int port){
 		super(port);
-        URL webappPath = this.getClass().getClassLoader().getResource("web-clustering");
+        URL webappPath = this.getClass().getClassLoader().getResource("web-clusterfest");
         String path = webappPath.getPath();
 		addWebAppHandler("/", path);
 	}
 
 	/**
-	 * starts a webserver exporting the webapp located in web-clustering folder (in the classpath)
+	 * starts a webserver exporting the webapp located in web-clusterfest folder (in the classpath)
 	 * @param args the port
 	 */
 	public static void main(String[] args) {
