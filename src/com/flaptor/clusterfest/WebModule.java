@@ -1,4 +1,4 @@
-package com.flaptor.clustering;
+package com.flaptor.clusterfest;
 
 import java.util.List;
 

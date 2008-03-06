@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package com.flaptor.clustering.controlling.controller;
+package com.flaptor.clusterfest.controlling;
 
 /**
  * Represents the state of a controller module node

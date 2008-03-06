@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package com.flaptor.clustering;
+package com.flaptor.clusterfest;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -33,9 +33,9 @@ import com.flaptor.util.ClassUtil;
 import com.flaptor.util.Config;
 
 /**
- * Represents a cluster of the clustering framework. Here you can register nodes
- * and all the different parts of the framework (monitoring, control, etc) 
- * will get access to them
+ * Manages a cluster. Contains the representation of a cluster as a list of nodes. 
+ * Here you can register nodes and all the different modules of the framework (monitoring, control, etc) 
+ * will get access to them. Also contains the list of modules that access the nodes.  
  *
  * @author Martin Massera
  */

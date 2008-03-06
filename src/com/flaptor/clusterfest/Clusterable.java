@@ -14,31 +14,20 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package com.flaptor.clustering;
+package com.flaptor.clusterfest;
+
+import java.rmi.Remote;
 
 /**
- * Exception to be thrown by rpc calls, meaning that the node is unreachable
- *  
+ * interface for all nodes of the clustering framework 
+ * For marking nodes as clusterable and tells what type the node is   
+ *
  * @author Martin Massera
  */
-public class NodeUnreachableException extends Exception {
+public interface Clusterable extends Remote{
 
-    private static final long serialVersionUID = 1L;
-
-    public NodeUnreachableException() {
-        super();
-    }
-
-    public NodeUnreachableException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public NodeUnreachableException(String message) {
-        super(message);
-    }
-
-    public NodeUnreachableException(Throwable cause) {
-        super(cause);
-    }
-    
+	/**
+	 * @return the type of node
+	 */
+	String getNodeType() throws Exception;
 }

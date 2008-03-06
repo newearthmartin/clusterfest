@@ -14,20 +14,36 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package com.flaptor.clustering;
+package com.flaptor.clusterfest.monitoring;
 
-import java.rmi.Remote;
+import java.io.Serializable;
 
 /**
- * interface for all nodes of the clustering framework 
- * For marking nodes as clusterable and tells what type the node is   
+ * Represents the system properties. Consisting of 
+ * top dump and ifconfig dump
  *
  * @author Martin Massera
  */
-public interface Clusterable extends Remote{
+public class SystemProperties implements Serializable {
 
-	/**
-	 * @return the type of node
-	 */
-	String getNodeType() throws Exception;
+    private static final long serialVersionUID = 1L;
+    
+    private String topDump;
+	private String ifconfigDump;
+
+	public String getTopDump() {
+		return topDump;
+	}
+
+	public void setTopDump(String topDump) {
+		this.topDump = topDump;
+	}
+
+	public String getIfconfigDump() {
+		return ifconfigDump;
+	}
+
+	public void setIfconfigDump(String ifconfigDump) {
+		this.ifconfigDump = ifconfigDump;
+	}
 }
