@@ -104,7 +104,7 @@ limitations under the License.
             </manifest>
 
         	<fileset dir="${src.dir}">
-                <include name="web-clustering/**"/>
+                <include name="web-clusterfest/**"/>
             </fileset>
 
             <fileset dir="${build.dir}" excludes="**/*Test.class">
@@ -124,7 +124,7 @@ limitations under the License.
             </manifest>
 
             <fileset dir="${src.dir}">
-                <include name="web-clustering/**"/>
+                <include name="web-clusterfest/**"/>
             </fileset>
 
         	<fileset dir="${build.dir}" excludes="**/*Test.class">
@@ -163,8 +163,8 @@ limitations under the License.
             <copy todir="${tmp.bin.dir}">
                 <fileset dir="${bin.dir}"/>
             </copy>
-            <copy todir="${tmp.bin.dir}/web-clustering/">
-                <fileset dir="${src.dir}/web-clustering/"/>
+            <copy todir="${tmp.bin.dir}/web-clusterfest/">
+                <fileset dir="${src.dir}/web-clusterfest/"/>
             </copy>
             <copy todir="${tmp.conf.dir}">
                 <fileset dir="${conf.dir}">
