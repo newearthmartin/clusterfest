@@ -33,7 +33,7 @@ limitations under the License.
 
     String action = request.getParameter("action");
     if ("update".equals(action)) {
-        monitorNode.updateState();
+        monitor.updateNodeInfo(monitorNode);
     }
 
     request.setAttribute("pageTitle", "monitor - " + node.getType() + " @ " + node.getHost()+":"+node.getPort());

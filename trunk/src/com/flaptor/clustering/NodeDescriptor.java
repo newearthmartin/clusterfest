@@ -83,13 +83,11 @@ public class NodeDescriptor {
      * updates the info of the node
      */
     void updateInfo() throws NodeUnreachableException {
-        if (type == null) {
-            try {
-                type = clusterableStub.getNodeType();
-                reachable = true;
-            } catch (Exception e) {
-            	setUnreachable(e);
-            }
+        try {
+            type = clusterableStub.getNodeType();
+            reachable = true;
+        } catch (Exception e) {
+        	setUnreachable(e);
         }
     }
 
@@ -97,8 +95,8 @@ public class NodeDescriptor {
      * marks the node as unreachable and throws a NodeUnreachableException
      * @throws NodeUnreachableException always!!!
      */
-    public void setUnreachable(Exception e) throws NodeUnreachableException {
+    public void setUnreachable(Throwable t) throws NodeUnreachableException {
     	reachable = false;
-    	throw new NodeUnreachableException(e);
+    	throw new NodeUnreachableException(t);
     }
 }

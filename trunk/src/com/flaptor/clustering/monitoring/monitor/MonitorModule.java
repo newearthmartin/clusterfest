@@ -35,6 +35,7 @@ import com.flaptor.clustering.monitoring.nodes.Monitoreable;
 import com.flaptor.util.ClassUtil;
 import com.flaptor.util.Config;
 import com.flaptor.util.Pair;
+import com.flaptor.util.remote.NoSuchRpcMethodException;
 import com.flaptor.util.remote.WebServer;
 import com.flaptor.util.remote.XmlrpcClient;
 import com.flaptor.util.remote.XmlrpcSerialization;
@@ -92,14 +93,14 @@ public class MonitorModule extends AbstractModule<MonitorNodeDescriptor> impleme
 		try {
 			boolean ret = getMonitoreableProxy(node.getXmlrpcClient()).ping();
 			return ret;
-		} catch (NoSuchMethodException e) {
+		} catch (NoSuchRpcMethodException e) {
 			return false;
 		} catch (Exception e) {
 			throw new NodeUnreachableException(e);
 		}
 	}
 
-	private boolean updateNodeInfo(MonitorNodeDescriptor node) {
+	public boolean updateNodeInfo(MonitorNodeDescriptor node) {
 		try {
 			node.updateState();
 			return true;
