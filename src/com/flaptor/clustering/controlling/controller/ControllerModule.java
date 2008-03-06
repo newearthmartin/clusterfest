@@ -31,6 +31,7 @@ import com.flaptor.clustering.NodeDescriptor;
 import com.flaptor.clustering.NodeUnreachableException;
 import com.flaptor.clustering.WebModule;
 import com.flaptor.clustering.controlling.nodes.Controllable;
+import com.flaptor.util.remote.NoSuchRpcMethodException;
 import com.flaptor.util.remote.WebServer;
 import com.flaptor.util.remote.XmlrpcClient;
 import com.flaptor.util.remote.XmlrpcSerialization;
@@ -74,6 +75,17 @@ public class ControllerModule extends AbstractModule<ControllerNodeDescriptor> i
     protected void notifyModuleNode(ControllerNodeDescriptor node) {
         //does nothing
     }
+
+	protected boolean shouldRegister(NodeDescriptor node) throws NodeUnreachableException {
+	    try {
+	        getControllableProxy(node.getXmlrpcClient()).ping();
+	        return true;
+	    } catch (NoSuchRpcMethodException e) {
+	        return false;
+	    } catch (Exception e) {
+	        return true; //return true by default
+	    }
+	}
 
 	/**
 	 * 
@@ -126,16 +138,6 @@ public class ControllerModule extends AbstractModule<ControllerNodeDescriptor> i
 	    getModuleNode(node).stop();
 	}
 
-	protected boolean shouldRegister(NodeDescriptor node) throws NodeUnreachableException {
-		try {
-			getControllableProxy(node.getXmlrpcClient()).ping();
-			return true;
-		} catch (NoSuchMethodException e) {
-			return false;
-		} catch (Exception e) {
-			return true; //return true by default
-		}
-	}
 
 	//************ WEB MODULE **************
 	public String getModuleHTML() {

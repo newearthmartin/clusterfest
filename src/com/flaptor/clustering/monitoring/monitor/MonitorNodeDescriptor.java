@@ -119,7 +119,6 @@ public class MonitorNodeDescriptor extends ModuleNodeDescriptor {
 		try {
 			state = retrieveCurrentState();
 	        state.updateSanity(checker);
-
 	        updateLogs();
 		} finally {
 	        states.add(state);
@@ -135,8 +134,8 @@ public class MonitorNodeDescriptor extends ModuleNodeDescriptor {
             Map<String, Object> properties = monitoreable.getProperties();
             getNodeDescriptor().setReachable(true);
             return properties;
-        } catch (Exception e) {
-        	getNodeDescriptor().setUnreachable(e);
+        } catch (Throwable t) {
+        	getNodeDescriptor().setUnreachable(t);
         	return null; //never called
         }
     }
@@ -146,8 +145,8 @@ public class MonitorNodeDescriptor extends ModuleNodeDescriptor {
             SystemProperties systemProperties = monitoreable.getSystemProperties();
             getNodeDescriptor().setReachable(true);
             return systemProperties;
-        } catch (Exception e) {
-            getNodeDescriptor().setUnreachable(e);
+        } catch (Throwable t) {
+            getNodeDescriptor().setUnreachable(t);
         	return null; //never called
         }
     }

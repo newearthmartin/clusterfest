@@ -29,6 +29,7 @@ limitations under the License.
     int idx = Integer.parseInt(request.getParameter("node"));
     NodeDescriptor node = cluster.getNodes().get(idx);
     MonitorModule monitor = (MonitorModule)cluster.getModule("monitor");
+    MonitorNodeDescriptor monitorNode = monitor.getModuleNode(node);
     
     String logName = request.getParameter("log");
 
@@ -49,7 +50,7 @@ limitations under the License.
         <a href="?action=update&node=<%= idx %>&log=<%=logName%>">update logs</a></br>
         <table>
             <tr><th>logs</th></tr>
-<%          for (Map.Entry<String, Pair<String, Long>> e : node.getLogs().entrySet()) {
+<%          for (Map.Entry<String, Pair<String, Long>> e : monitorNode.getLogs().entrySet()) {
 %>          
                 <tr><td><a href="monitorLog.jsp?log=<%=e.getKey()%>&node=<%= idx %>"><%=e.getKey()%></a> <span class="fuzzy">at <%= new Date(e.getValue().last()).toString() %></span></td></tr>
 <%          } %>            
@@ -63,8 +64,7 @@ limitations under the License.
         </table>
     </div>
 
-<%
-    if (log == null) { %>
+<%    if (log == null) { %>
         <h2>This log is unavailable</h2>
 <%  }else{ %>
         <h2>Log: <%=logName %> <span class="fuzzy">at <%= new Date(log.last()).toString() %></span></h2>
