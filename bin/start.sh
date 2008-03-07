@@ -2,7 +2,7 @@
 
 if ./status.sh | grep -q "is running"
 then
-    echo the clustering web is already running
+    echo Clusterfest webapp is already running
     exit 1
 fi
 
@@ -15,7 +15,7 @@ if [ ! -d ${LOG_DIR} ]; then
     mkdir -p ${LOG_DIR}
 fi
 
-nohup java -server -cp .:${CONF_DIR}:${PROJECT_JAR} com.flaptor.clustering.HTTPClusteringServer ${PORT} > ${LOG_DIR}/clustering-web.out 2>${LOG_DIR}/clustering-web.err &
+nohup java -server -cp .:${CONF_DIR}:${PROJECT_JAR} com.flaptor.clusterfest.HTTPClusterfestServer ${PORT} > ${LOG_DIR}/clusterfest.out 2>${LOG_DIR}/clusterfest.err &
 
 echo $! >pid
 

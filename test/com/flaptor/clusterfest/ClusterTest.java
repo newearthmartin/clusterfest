@@ -27,7 +27,7 @@ import com.flaptor.util.TestCase;
 import com.flaptor.util.TestInfo;
 
 /**
- * test for clustering framework
+ * test for Clusterfest
  *
  * @author Martin Massera
  */

@@ -24,7 +24,7 @@ import com.flaptor.util.remote.XmlrpcClient;
 
 /**
  * Represents a node of the cluster. Indicates the host:port of the node,
- * the type and if it's reachable. All modules of the clustering framework
+ * the type and if it's reachable. All modules of the Clusterfest
  * should check and update the reachable status. 
  *
  * @author Martin Massera

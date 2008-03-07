@@ -19,7 +19,7 @@ package com.flaptor.clusterfest;
 import java.rmi.Remote;
 
 /**
- * interface for all nodes of the clustering framework 
+ * interface for all nodes of Clusterfest 
  * For marking nodes as clusterable and tells what type the node is   
  *
  * @author Martin Massera

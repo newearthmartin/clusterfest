@@ -38,7 +38,7 @@ import com.flaptor.util.TestInfo;
  *
  * @author Martin Massera
  */
-public class ClusteringRpcTest extends TestCase {
+public class ClusterfestRpcTest extends TestCase {
 	private NodeDescriptor node;
 	private ClusterableListener clusterableListener;
 	private Monitoreable monitoreableProxy;
@@ -50,8 +50,8 @@ public class ClusteringRpcTest extends TestCase {
 		Config cfg = Config.getConfig("clustering.node.properties");
 		cfg.set("clustering.node.type", "searcher");
 		cfg.set("clustering.node.listeners",   
-		        "controller:com.flaptor.clustering.ClusteringRpcTest$ControllableImp,"+
-		        "monitor:com.flaptor.clustering.ClusteringRpcTest$MonitoreableImp");
+		        "controller:com.flaptor.clusterfest.ClusteringRpcTest$ControllableImp,"+
+		        "monitor:com.flaptor.clusterfest.ClusteringRpcTest$MonitoreableImp");
 	    clusterableListener = new ClusterableListener(PORT);
 		
 		node = new NodeDescriptor("localhost", PORT, "/tmp/search4j");

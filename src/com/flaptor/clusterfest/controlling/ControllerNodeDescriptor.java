@@ -28,7 +28,7 @@ import com.flaptor.util.Triad;
 
 /**
  * represents a controller module node
- * to be used inclustering server side
+ * to be used in Clusterfest server side
  *
  * @author Martin Massera
  */

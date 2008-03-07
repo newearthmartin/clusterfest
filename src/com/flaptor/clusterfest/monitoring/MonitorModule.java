@@ -41,7 +41,7 @@ import com.flaptor.util.remote.XmlrpcClient;
 import com.flaptor.util.remote.XmlrpcSerialization;
 
 /**
- * Monitor module for the clustering framework. It allows to retrieve variables
+ * Monitor module for Clusterfest. It allows to retrieve variables
  * from the nodes and write a checker to analyse these variables and determine
  * the state of each node
  *  
