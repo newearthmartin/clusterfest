@@ -1,8 +1,8 @@
 pid=`cat pid`
 if [ -z "$pid" ]; then
-  echo Clustering-web is not running.
+  echo Clusterfest webapp is not running.
 else
   kill $pid
-  echo Clustering-web has stopped.
+  echo Clusterfest webapp has stopped.
   rm pid  
 fi

@@ -112,7 +112,7 @@ public class ClusterManager {
     }
 
 	/**
-	 * Registers a node in the clustering framework and all its modules
+	 * Registers a node in Clusterfest and notifies it to all its modules
 	 * @param host the host where the node is
 	 * @param port the port where that node is listening for clusterfest 
 	 * @param installDir the directory where it is installed in that host (not the baseDir, should be something like baseDir/searcher)

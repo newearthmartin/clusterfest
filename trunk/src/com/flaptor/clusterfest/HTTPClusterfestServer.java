@@ -25,9 +25,9 @@ import com.flaptor.util.remote.WebServer;
  *
  * @author Martin Massera
  */
-public class HTTPClusteringServer extends WebServer {
+public class HTTPClusterfestServer extends WebServer {
 
-	public HTTPClusteringServer(int port){
+	public HTTPClusterfestServer(int port){
 		super(port);
         URL webappPath = this.getClass().getClassLoader().getResource("web-clusterfest");
         String path = webappPath.getPath();
@@ -40,10 +40,10 @@ public class HTTPClusteringServer extends WebServer {
 	 */
 	public static void main(String[] args) {
         if (args.length != 1) {
-            System.out.println("usage: " + HTTPClusteringServer.class.getSimpleName() + " port");
+            System.out.println("usage: " + HTTPClusterfestServer.class.getSimpleName() + " port");
             System.exit(1);
         }
-        HTTPClusteringServer server = new HTTPClusteringServer(Integer.parseInt(args[0]));
+        HTTPClusterfestServer server = new HTTPClusterfestServer(Integer.parseInt(args[0]));
         server.start();
 	}
 }

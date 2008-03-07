@@ -47,7 +47,7 @@ abstract public class AbstractModule<T extends ModuleNodeDescriptor> implements 
     abstract protected boolean shouldRegister(NodeDescriptor node) throws NodeUnreachableException; 
 
 	/**
-	 * Create a module node from a clustering node. Nodes that should be registered
+	 * Create a module node from a NodeDescriptor. Nodes that should be registered
 	 * are registered using the ModuleNodeDescriptor returned by this method  
 	 * 
 	 * @param node
@@ -125,7 +125,7 @@ abstract public class AbstractModule<T extends ModuleNodeDescriptor> implements 
 	}
 	
 	/**
-	 * @param node a clustering node
+	 * @param node 
 	 * @return the module node corresponding to the clustering node 
 	 */
 	public T getModuleNode(NodeDescriptor node) {

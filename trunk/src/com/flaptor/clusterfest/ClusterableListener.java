@@ -27,7 +27,7 @@ import com.flaptor.util.remote.XmlrpcSerialization;
 import com.flaptor.util.remote.XmlrpcServer;
 
 /**
- * Implementation of all interfaces exposed by clustering framework.
+ * Implementation of all interfaces exposed by Clusterfest.
  * Implementation of these interfaces can be set or not, this node aggregates the set interfaces
  * and tells the client which are set.
  *

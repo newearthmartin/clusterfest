@@ -38,7 +38,7 @@ public class ControllableImplementation implements Controllable {
 	}
 
 	public void stop() {
-		logger.warn("exiting from Clustering controlling request");
+		logger.warn("exiting from Clusterfest controlling request");
 		System.exit(0);
 	}
 
