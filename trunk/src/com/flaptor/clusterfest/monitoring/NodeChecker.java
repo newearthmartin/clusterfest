@@ -16,7 +16,7 @@ limitations under the License.
 
 package com.flaptor.clusterfest.monitoring;
 
-import com.flaptor.clusterfest.monitoring.NodeState.Sanity;
+import java.util.List;
 
 /**
  * Interface for node checkers. Its basically a sanity check on the node's state
@@ -30,7 +30,35 @@ public interface NodeChecker {
      * 
      * @param node the node to check
      * @param state the state in which the node should be checked
-     * @return the sanity value
+     * @return a Result object
      */
-    public Sanity checkNode(MonitorNodeDescriptor node, NodeState state);
+    public Result checkNode(MonitorNodeDescriptor node, NodeState state);
+
+    public static enum Sanity {
+        UNREACHABLE,
+        UNKNOWN,
+        GOOD,
+        BAD
+    }
+    
+    /**
+     * For expressing the result of the checker, contains a sanity value
+     * and a list of (human readable) remarks that express what's wrong
+     */
+    public static class Result {
+        private Sanity sanity;
+        private List<String> remarks;
+
+        public Result(Sanity sanity, List<String> remarks) {
+            super();
+            this.sanity = sanity;
+            this.remarks = remarks;
+        }
+        public Sanity getSanity() {
+            return sanity;
+        }
+        public List<String> getRemarks() {
+            return remarks;
+        }
+    }
 }

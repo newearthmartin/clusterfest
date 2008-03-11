@@ -30,7 +30,7 @@ import com.flaptor.clusterfest.ClusterableListener;
 import com.flaptor.clusterfest.NodeDescriptor;
 import com.flaptor.clusterfest.NodeUnreachableException;
 import com.flaptor.clusterfest.WebModule;
-import com.flaptor.clusterfest.monitoring.NodeState.Sanity;
+import com.flaptor.clusterfest.monitoring.NodeChecker.Sanity;
 import com.flaptor.clusterfest.monitoring.node.Monitoreable;
 import com.flaptor.util.ClassUtil;
 import com.flaptor.util.Config;
@@ -195,7 +195,7 @@ public class MonitorModule extends AbstractModule<MonitorNodeDescriptor> impleme
     
         if (monitorNode != null) {
             NodeState state = monitorNode.getLastState();
-            if (state != null) sanity = state.getSanity();
+            if (state != null) sanity = state.getSanity().getSanity();
         }
         return "<a class=\"sanity"+sanity+"\" href=\"monitorNode.jsp?node=" + nodeNum + "\">"+ sanity +"</a>";
 	}
