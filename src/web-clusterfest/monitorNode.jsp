@@ -15,11 +15,10 @@ limitations under the License.
 --%>
 <%-- author Martin Massera --%>
 
-<%@page import="com.flaptor.util.Pair"%>
+<%@page import="java.util.*"%>
+<%@page import="com.flaptor.util.*"%>
 <%@page import="com.flaptor.clusterfest.*"%>
 <%@page import="com.flaptor.clusterfest.monitoring.*"%>
-<%@page import="java.util.Date"%>
-<%@page import="java.util.Map"%>
 
 <%
     ClusterManager cluster = ClusterManager.getInstance();
@@ -41,7 +40,7 @@ limitations under the License.
 
 
 <%if (!node.isReachable()) { %>
-    <h2>Node unreachable!</h2>
+<h2>Node unreachable!</h2>
 <%
 }%>
 
@@ -77,16 +76,21 @@ else {
 
             <table>
                 <tr><th>Saved states</th></tr>                
-<%              int num = 0;
-				for (NodeState state : monitorNode.getStates()) {
-%>                  <tr><td><%= state.getSanity() %> at <a href="monitorNode.jsp?node=<%=idx%>&stateNum=<%=num%>"><%= new Date(state.getTimestamp()).toString() %></a></td></tr>
-<%              	num++;
-				} 
-%>
+<%              
+                List<NodeState> states = monitorNode.getStates();
+                for (int num = states.size() -1; num >= 0; num--) { 
+				    NodeState state = states.get(num);
+%>                  <tr><td><%= state.getSanity().getSanity() %> at <a href="monitorNode.jsp?node=<%=idx%>&stateNum=<%=num%>"><%= new Date(state.getTimestamp()).toString() %></a></td></tr>
+<%              }%>
             </table>
         </div>
 
-        <h2>State: <%= nodeState.getSanity() %> <span class="fuzzy">at <%= new Date(nodeState.getTimestamp()).toString() %></span></h2>
+        <h2>State: <%= nodeState.getSanity().getSanity() %> <span class="fuzzy">at <%= new Date(nodeState.getTimestamp()).toString() %></span></h2>
+        <ul>
+            <% for (String remark: nodeState.getSanity().getRemarks()) {%>
+                <li><%=remark%></li>
+            <%} %>
+        </ul>
 
         <div id="monitorNodeProperties">
 <%          Map<String, Object> properties = nodeState.getProperties();
@@ -96,7 +100,7 @@ else {
 <%              for (Map.Entry<String, Object> entry : properties.entrySet()) {
 %> 
                     <tr>
-                        <td><%= entry.getKey() %></td><td><%= entry.getValue() %></td>
+                        <td><%= entry.getKey() %></td><td><%= entry.getValue() != null ? StringUtil.whitespaceToHtml(entry.getValue().toString()) : null%></td>
                     </tr>
 <%              }%>
                 </table>

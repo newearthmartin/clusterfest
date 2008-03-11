@@ -16,6 +16,7 @@ limitations under the License.
 
 package com.flaptor.clusterfest.monitoring;
 
+import java.util.Arrays;
 import java.util.Map;
 
 /**
@@ -25,20 +26,22 @@ import java.util.Map;
  */
 public class NodeState {
 
-	public static enum Sanity {
-		UNREACHABLE,
-		UNKNOWN,
-		GOOD,
-		BAD
-	}
-	
-	public static NodeState createUnreachableState(MonitorNodeDescriptor node) {
+    public static final NodeChecker.Result UNCHECKED_RESULT = new NodeChecker.Result(NodeChecker.Sanity.UNKNOWN, Arrays.asList(new String[]{"Node not checked"})); 
+    public static final NodeChecker.Result UNREACHABLE_RESULT = new NodeChecker.Result(NodeChecker.Sanity.UNREACHABLE, Arrays.asList(new String[]{"Node unreachable"})); 
+    
+    public static NodeState createUncheckedState(MonitorNodeDescriptor node) {
+        NodeState state = new NodeState(node, null, null);
+        state.sanity = UNREACHABLE_RESULT; 
+        return state;
+    }
+
+    public static NodeState createUnreachableState(MonitorNodeDescriptor node) {
 		NodeState state = new NodeState(node, null, null);
-		state.sanity = Sanity.UNREACHABLE; 
+		state.sanity = UNREACHABLE_RESULT; 
 		return state;
 	}
 	
-    private Sanity sanity;
+    private NodeChecker.Result sanity;
 	private Map<String, Object> properties;
 	private SystemProperties systemProperties;
 	private long timestamp;
@@ -47,7 +50,7 @@ public class NodeState {
     public NodeState(MonitorNodeDescriptor node, Map<String, Object> properties, SystemProperties systemProperties) {
         super();
         // should be updated later by a NodeChecker
-        this.sanity = Sanity.UNKNOWN; 
+        this.sanity = UNCHECKED_RESULT; 
         
         this.node = node;
         this.properties = properties;
@@ -55,7 +58,7 @@ public class NodeState {
         this.timestamp = System.currentTimeMillis();
     }
     
-    public Sanity getSanity() {
+    public NodeChecker.Result getSanity() {
         return sanity;
     }
     public Map<String, Object> getProperties() {
@@ -69,10 +72,10 @@ public class NodeState {
     }
 
     public void updateSanity(NodeChecker checker) {
-        if (checker != null) { 
+        if (checker != null) {
         	this.sanity = checker.checkNode(node, this);
         } else {
-        	this.sanity = Sanity.UNKNOWN;
+            this.sanity = UNCHECKED_RESULT;
         }
     }
 }

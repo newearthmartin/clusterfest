@@ -30,7 +30,7 @@ public abstract class ModuleNodeDescriptor {
         this.nodeDescriptor = nodeDescriptor;
     }
 
-    protected NodeDescriptor getNodeDescriptor() {
+    public NodeDescriptor getNodeDescriptor() {
         return nodeDescriptor;
     }
     

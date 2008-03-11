@@ -26,6 +26,7 @@ import com.flaptor.clusterfest.ModuleNodeDescriptor;
 import com.flaptor.clusterfest.NodeDescriptor;
 import com.flaptor.clusterfest.NodeUnreachableException;
 import com.flaptor.clusterfest.monitoring.node.Monitoreable;
+import com.flaptor.util.DateUtil;
 import com.flaptor.util.Pair;
 
 /**
@@ -114,16 +115,60 @@ public class MonitorNodeDescriptor extends ModuleNodeDescriptor {
     
     public void updateState() throws NodeUnreachableException {
 		
-    	NodeState state = NodeState.createUnreachableState(this); 
+    	NodeState state = null; 
 		try {
 			state = retrieveCurrentState();
 	        state.updateSanity(checker);
 	        updateLogs();
+		} catch (NodeUnreachableException e) {
+		    state = NodeState.createUnreachableState(this);
+		    throw e;
 		} finally {
 	        states.add(state);
+	        cleanupStateList();
 		}
     }
     
+    private void cleanupStateList() {
+        long now = System.currentTimeMillis();
+        NodeState lastState = null;
+        for (NodeState state: states) {
+            if (lastState == null || 
+                now - state.getTimestamp() < DateUtil.MILLIS_IN_HOUR ||
+                states.indexOf(state) == states.size() -1) {
+                lastState = state;
+                continue;
+            }
+            
+            
+            if (state.getSanity().getSanity() == lastState.getSanity().getSanity()) {
+                if (now - state.getTimestamp() >  7 * DateUtil.MILLIS_IN_DAY) {
+                    if (state.getTimestamp() - lastState.getTimestamp() < DateUtil.MILLIS_IN_DAY) {
+                        states.remove(state);
+                        continue;
+                    }
+                } else if (now - state.getTimestamp() >  DateUtil.MILLIS_IN_DAY) {
+                    if (state.getTimestamp() - lastState.getTimestamp() < DateUtil.MILLIS_IN_HOUR) {
+                        states.remove(state);
+                        continue;
+                    }
+                } else if (now - state.getTimestamp() >  DateUtil.MILLIS_IN_HOUR * 12) {
+                    if (state.getTimestamp() - lastState.getTimestamp() < 30 * DateUtil.MILLIS_IN_MINUTE) {
+                        states.remove(state);
+                        continue;
+                    }
+                } else {
+                    if (state.getTimestamp() - lastState.getTimestamp() < 10 * DateUtil.MILLIS_IN_MINUTE) {
+                        states.remove(state);
+                        continue;
+                    }
+                }
+            }
+            lastState = state;
+        }
+        
+    }
+
     private NodeState retrieveCurrentState() throws NodeUnreachableException {
         return new NodeState(this, retrieveProperties(), retrieveSystemProperties());
     }
