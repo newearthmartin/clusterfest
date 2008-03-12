@@ -17,7 +17,9 @@ limitations under the License.
 package com.flaptor.clusterfest.monitoring;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -39,6 +41,7 @@ import com.flaptor.util.remote.NoSuchRpcMethodException;
 import com.flaptor.util.remote.WebServer;
 import com.flaptor.util.remote.XmlrpcClient;
 import com.flaptor.util.remote.XmlrpcSerialization;
+import com.sun.org.apache.xml.internal.security.signature.NodeFilter;
 
 /**
  * Monitor module for Clusterfest. It allows to retrieve variables
@@ -52,6 +55,8 @@ public class MonitorModule extends AbstractModule<MonitorNodeDescriptor> impleme
 	
 	private static final Logger logger = Logger.getLogger(com.flaptor.util.Execute.whoAmI());
 
+	private final Map<String, PropertyFormatter> formatters = new HashMap<String, PropertyFormatter>();
+	
 	public MonitorModule() {
 		Config config = Config.getConfig("clustering.properties");
 		new Timer().scheduleAtFixedRate(new TimerTask(){
@@ -141,16 +146,6 @@ public class MonitorModule extends AbstractModule<MonitorNodeDescriptor> impleme
 		node.setChecker(checker);
 	}
 
-	
-	public NodeChecker getChecker(String checkerClassName) {
-		try {
-			return (NodeChecker) ClassUtil.instance(checkerClassName);
-		} catch (Throwable t) {
-			logger.error(t);
-			return null;
-		}
-	}
-
 	/**
 	 * @param type
 	 * @return the checker defined in clustering.properties for a particular node type
@@ -158,16 +153,44 @@ public class MonitorModule extends AbstractModule<MonitorNodeDescriptor> impleme
 	 * @throws IllegalAccessException
 	 * @throws ClassNotFoundException
 	 */
-	public NodeChecker getCheckerForType(String type) throws InstantiationException, IllegalAccessException, ClassNotFoundException {
+	private NodeChecker getCheckerForType(String type) {
 		Config config = Config.getConfig("clustering.properties");
 		try {
 			String clazz = config.getString("clustering.monitor.checker."+type);
-			return getChecker(clazz);
-		}catch (IllegalStateException e) {
-			logger.error(e);
+			if (clazz == null) clazz = config.getString("clustering.monitor.checker");
+            return (NodeChecker) ClassUtil.instance(clazz);
+		}catch (Throwable t) {
+			logger.error(t);
 			return null;
 		}
     }
+
+    /**
+     * @param type
+     * @return the checker defined in clustering.properties for a particular node type
+     * @throws InstantiationException
+     * @throws IllegalAccessException
+     * @throws ClassNotFoundException
+     */
+    private PropertyFormatter getFormatterForType(String type) {
+        PropertyFormatter formatter = formatters.get(type);
+        if (formatter == null) {
+            Config config = Config.getConfig("clustering.properties");
+            try {
+                String clazz = config.getString("clustering.monitor.formatter."+type);
+                if (clazz == null) {
+                    clazz = config.getString("clustering.monitor.formatter");
+                }
+                formatter = (PropertyFormatter) ClassUtil.instance(clazz);
+                formatters.put(type, formatter);
+            }catch (Throwable t) {
+                logger.error(t);
+                return new DefaultPropertyFormatter();
+            }
+        }
+        return formatter;
+    }
+	
 	/**
 	 * adds a monitoreable implementation to a clusterable server
 	 * @param clusterableServer
@@ -207,5 +230,15 @@ public class MonitorModule extends AbstractModule<MonitorNodeDescriptor> impleme
 
 	public List<String> getActions() {
 		return new ArrayList<String>();
+	}
+	
+	/**
+	 * formats properties so that they can be displayed in HTML 
+	 * @param name
+	 * @param value
+	 * @return
+	 */
+	public String format(String nodeType, String name, Object value) {
+	    return getFormatterForType(nodeType).format(name, value); 
 	}
 }
