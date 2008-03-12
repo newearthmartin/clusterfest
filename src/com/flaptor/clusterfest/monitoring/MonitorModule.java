@@ -41,7 +41,6 @@ import com.flaptor.util.remote.NoSuchRpcMethodException;
 import com.flaptor.util.remote.WebServer;
 import com.flaptor.util.remote.XmlrpcClient;
 import com.flaptor.util.remote.XmlrpcSerialization;
-import com.sun.org.apache.xml.internal.security.signature.NodeFilter;
 
 /**
  * Monitor module for Clusterfest. It allows to retrieve variables
