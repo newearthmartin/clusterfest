@@ -100,7 +100,8 @@ else {
 <%              for (Map.Entry<String, Object> entry : properties.entrySet()) {
 %> 
                     <tr>
-                        <td><%= entry.getKey() %></td><td><%= entry.getValue() != null ? StringUtil.whitespaceToHtml(entry.getValue().toString()) : null%></td>
+                        <td><%= entry.getKey() %></td>
+                        <td><%= entry.getValue() != null ? monitor.format(node.getType(), entry.getKey(), entry.getValue()) : null%></td>
                     </tr>
 <%              }%>
                 </table>
