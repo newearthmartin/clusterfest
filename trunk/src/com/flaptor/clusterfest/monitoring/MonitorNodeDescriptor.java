@@ -22,12 +22,15 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
 import com.flaptor.clusterfest.ModuleNodeDescriptor;
 import com.flaptor.clusterfest.NodeDescriptor;
 import com.flaptor.clusterfest.NodeUnreachableException;
 import com.flaptor.clusterfest.monitoring.node.Monitoreable;
 import com.flaptor.util.DateUtil;
 import com.flaptor.util.Pair;
+import com.flaptor.util.remote.RpcConnectionException;
 
 /**
  * represents a monitoring module node
@@ -36,6 +39,8 @@ import com.flaptor.util.Pair;
  */
 public class MonitorNodeDescriptor extends ModuleNodeDescriptor {
 
+	private static final Logger logger = Logger.getLogger(com.flaptor.util.Execute.whoAmI());
+	
 	private LinkedList<NodeState> states;
 	private Map<String, Pair<String, Long>> logs;
     private NodeChecker checker;
@@ -121,11 +126,17 @@ public class MonitorNodeDescriptor extends ModuleNodeDescriptor {
 	        state.updateSanity(checker);
 	        updateLogs();
 		} catch (NodeUnreachableException e) {
+			if (e.getCause() == null || !(e.getCause() instanceof RpcConnectionException)) {
+				logger.error("node unreachable but not because of RpcConnectionException, cause: "+ e.getMessage(), e);
+				System.out.println("node unreachable but not because of RpcConnectionException, cause: "+ e.getMessage());
+			}
 		    state = NodeState.createUnreachableState(this);
 		    throw e;
 		} finally {
-	        states.add(state);
-	        cleanupStateList();
+			synchronized (states) {
+		        states.add(state);
+		        cleanupStateList();
+			}
 		}
     }
     
@@ -133,9 +144,7 @@ public class MonitorNodeDescriptor extends ModuleNodeDescriptor {
         long now = System.currentTimeMillis();
         NodeState lastState = null;
         for (NodeState state: states) {
-            if (lastState == null || 
-                now - state.getTimestamp() < DateUtil.MILLIS_IN_HOUR ||
-                states.indexOf(state) == states.size() -1) {
+            if (lastState == null || now - state.getTimestamp() < DateUtil.MILLIS_IN_HOUR || states.indexOf(state) == states.size() -1) {
                 lastState = state;
                 continue;
             }
