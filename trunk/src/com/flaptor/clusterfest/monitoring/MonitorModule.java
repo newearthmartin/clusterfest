@@ -240,4 +240,12 @@ public class MonitorModule extends AbstractModule<MonitorNodeDescriptor> impleme
 	public String format(String nodeType, String name, Object value) {
 	    return getFormatterForType(nodeType).format(name, value); 
 	}
+
+    public List<Pair<String, String>> getSelectedNodesActions() {
+        return new ArrayList<Pair<String,String>>();
+    }
+
+    public String selectedNodesAction(String action, List<NodeDescriptor> nodes, HttpServletRequest request) {
+        return null;
+    }
 }

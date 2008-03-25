@@ -31,6 +31,7 @@ import com.flaptor.clusterfest.NodeDescriptor;
 import com.flaptor.clusterfest.NodeUnreachableException;
 import com.flaptor.clusterfest.WebModule;
 import com.flaptor.clusterfest.controlling.node.Controllable;
+import com.flaptor.util.Pair;
 import com.flaptor.util.remote.NoSuchRpcMethodException;
 import com.flaptor.util.remote.WebServer;
 import com.flaptor.util.remote.XmlrpcClient;
@@ -103,6 +104,7 @@ public class ControllerModule extends AbstractModule<ControllerNodeDescriptor> i
 	 */
 	public void startNode(NodeDescriptor node) throws IOException{
 	    getModuleNode(node).start();
+        ClusterManager.getInstance().updateAllInfo(node);
 	}
 
 	/**
@@ -112,6 +114,7 @@ public class ControllerModule extends AbstractModule<ControllerNodeDescriptor> i
 	 */
 	public void killNode(NodeDescriptor node) throws IOException {
 	    getModuleNode(node).kill();
+        ClusterManager.getInstance().updateAllInfo(node);
 	}
 	
 	/**
@@ -120,6 +123,7 @@ public class ControllerModule extends AbstractModule<ControllerNodeDescriptor> i
 	 */
 	public void pauseNode(NodeDescriptor node) {
 	    getModuleNode(node).pause();
+        ClusterManager.getInstance().updateAllInfo(node);
 	}
 
 	/**
@@ -128,6 +132,7 @@ public class ControllerModule extends AbstractModule<ControllerNodeDescriptor> i
 	 */
 	public void resumeNode(NodeDescriptor node) {
 	    getModuleNode(node).resume();
+        ClusterManager.getInstance().updateAllInfo(node);
 	}
 	
 	/**
@@ -136,12 +141,13 @@ public class ControllerModule extends AbstractModule<ControllerNodeDescriptor> i
 	 */
 	public void stopNode(NodeDescriptor node) {
 	    getModuleNode(node).stop();
+        ClusterManager.getInstance().updateAllInfo(node);
 	}
 
 
 	//************ WEB MODULE **************
 	public String getModuleHTML() {
-		return "<a href=\"?action=startall\"><img src=\"media/start.png\"/>ALL</a>  <a href=\"?action=killall\"><img src=\"media/stop.png\"/>ALL</a>";
+		return null;
 	}
 	public String getNodeHTML(NodeDescriptor node, int nodeNum) {
 		if (!isRegistered(node)) return null;
@@ -164,12 +170,6 @@ public class ControllerModule extends AbstractModule<ControllerNodeDescriptor> i
         if ("start".equals(action)) {
             NodeDescriptor node = cluster.getNodes().get(idx);
             message = ControllingFrontend.startNode(cluster, node);
-        }    
-        if ("startall".equals(action)) {
-            message = ControllingFrontend.startall(cluster);
-        }    
-        if ("killall".equals(action)) {
-            message = ControllingFrontend.killall(cluster);
         }    
         if ("kill".equals(action)) {
             NodeDescriptor node = cluster.getNodes().get(idx);
@@ -201,5 +201,22 @@ public class ControllerModule extends AbstractModule<ControllerNodeDescriptor> i
 		return l;
 	}
 
-    
+	public List<Pair<String, String>> getSelectedNodesActions() {
+        List<Pair<String, String>> ret = new ArrayList<Pair<String,String>>();
+        ret.add(new Pair<String, String>("controller.start", "<img src=\"media/start.png\"/>selected"));
+        ret.add(new Pair<String, String>("controller.kill", "<img src=\"media/stop.png\"/>selected"));
+        return ret;
+    }
+	
+    @Override
+    public String selectedNodesAction(String action, List<NodeDescriptor> nodes, HttpServletRequest request) {
+        ClusterManager cluster = ClusterManager.getInstance();
+        String message = null;
+        if ("controller.start".equals(action)) {
+            message = ControllingFrontend.startAll(cluster, nodes);
+        } else if ("controller.kill".equals(action)) {
+            message = ControllingFrontend.killAll(cluster, nodes);
+        }
+        return message;
+    }
 }

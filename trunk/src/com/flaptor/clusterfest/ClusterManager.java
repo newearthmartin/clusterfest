@@ -21,8 +21,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.TreeSet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -31,6 +33,7 @@ import org.apache.log4j.Logger;
 
 import com.flaptor.util.ClassUtil;
 import com.flaptor.util.Config;
+import com.flaptor.util.Pair;
 
 /**
  * Manages a cluster. Contains the representation of a cluster as a list of nodes. 
@@ -50,6 +53,7 @@ public class ClusterManager {
     private Map<String, Module> modules = new HashMap<String, Module>();
     private List<WebModule> webModules = new ArrayList<WebModule>();
     private Map<String, WebModule> moduleActionMap = new HashMap<String, WebModule>();
+    private Map<String, WebModule> moduleSelectNodeActionMap = new HashMap<String, WebModule>();
     
     private ClusterManager() {
     	//after initializing everything, register all nodes
@@ -81,9 +85,12 @@ public class ClusterManager {
     
     
 	private void addWebModule(WebModule wm) {
-		for (String action : wm.getActions()) {
-			moduleActionMap.put(action, wm);
-		}
+        for (String action : wm.getActions()) {
+            moduleActionMap.put(action, wm);
+        }
+        for (Pair<String,String> action : wm.getSelectedNodesActions()) {
+            moduleSelectNodeActionMap.put(action.first(), wm);
+        }
 		webModules.add(wm);
 	}
 	
@@ -184,6 +191,25 @@ public class ClusterManager {
 		return noErrors;
 	}
 
+    public List<String> getNodeTypes() {
+        List<String> nodeTypes = new ArrayList<String>();
+        for (NodeDescriptor node: nodes) {
+            String type = node.getType(); 
+            if (type != null && !nodeTypes.contains(type)) nodeTypes.add(type);
+        }
+        return nodeTypes;
+    }
+
+    public List<NodeDescriptor> getNodeForType(String type) {
+        List<NodeDescriptor> nodes = new ArrayList<NodeDescriptor>();
+        for (NodeDescriptor node: nodes) {
+            String ntype = node.getType(); 
+            if (type.equals(ntype)) nodes.add(node);
+        }
+        return nodes;
+    }
+    
+    
 	/**
 	 * @return the list of registered nodes
 	 */
@@ -199,9 +225,12 @@ public class ClusterManager {
 		return webModules;
 	}
 	
-	public WebModule getModuleForAction(String action) {
-		return moduleActionMap.get(action);
-	}
+    public WebModule getModuleForAction(String action) {
+        return moduleActionMap.get(action);
+    }
+    public WebModule getModuleForSelectNodeAction(String action) {
+        return moduleSelectNodeActionMap.get(action);
+    }
 	
 	/**
 	 * check to see if nodes that weren't alive came to live

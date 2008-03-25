@@ -20,6 +20,7 @@ limitations under the License.
 	<meta HTTP-Equiv="Cache-Control" content="no-cache">
 	<link rel="stylesheet" type="text/css" href="style.css" />
 <head>
+
 <title>ClusterFest - <%=request.getAttribute("pageTitle")%></title>
 </head>
 <body>
