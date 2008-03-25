@@ -17,6 +17,7 @@ limitations under the License.
 package com.flaptor.clusterfest.controlling;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -106,32 +107,49 @@ public class ControllingFrontend {
         }
 	}
 
-	public static String killall(ClusterManager cluster) {
+    public static String killAll(ClusterManager cluster, List<NodeDescriptor> nodes) {
         ControllerModule control = (ControllerModule)cluster.getModule("controller");
-		for (final ModuleNodeDescriptor n: control.getModuleNodeDescriptors()) {
-			threadPool.submit(new Runnable() {
-				public void run() {
-					try {
-						((ControllerNodeDescriptor)n).kill();
-					} catch (IOException e) {logger.error(e);}
-				}
-			});
-		}
+        for (NodeDescriptor node: nodes) {
+            final ControllerNodeDescriptor cnode = control.getModuleNode(node); 
+            if (cnode!= null) {
+                threadPool.submit(new Runnable() {
+                    public void run() {
+                        try {
+                            cnode.kill();
+                        } catch (IOException e) {logger.error(e);}
+                    }
+                });
+            }
+        }
+        return "sent kill to selected nodes";
+    }
+    
+	public static String killAll(ClusterManager cluster) {
+        ControllerModule control = (ControllerModule)cluster.getModule("controller");
+        killAll(cluster, cluster.getNodes());
 		return "sent kill to all nodes";
 	}
 
-	public static String startall(ClusterManager cluster) {
+    public static String startAll(ClusterManager cluster, List<NodeDescriptor> nodes) {
         ControllerModule control = (ControllerModule)cluster.getModule("controller");
+        for (NodeDescriptor node: nodes) {
+            final ControllerNodeDescriptor cnode = control.getModuleNode(node); 
+            if (cnode!= null) {
+                threadPool.submit(new Runnable() {
+                    public void run() {
+                        try {
+                            cnode.start();
+                        } catch (IOException e) {logger.error(e);}
+                    }
+                });
+            }
+        }
+        return "sent start to selected nodes";
+    }
 
-		for (final ModuleNodeDescriptor n: control.getModuleNodeDescriptors()) {
-			threadPool.submit(new Runnable() {
-				public void run() {
-					try {
-						((ControllerNodeDescriptor)n).start();
-					} catch (IOException e) {logger.error(e);}
-				}
-			});
-		}
+    public static String startAll(ClusterManager cluster) {
+        ControllerModule control = (ControllerModule)cluster.getModule("controller");
+        startAll(cluster, cluster.getNodes());
 		return "sent start to all nodes";
 	}
 }

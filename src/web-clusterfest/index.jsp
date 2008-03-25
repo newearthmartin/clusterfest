@@ -19,9 +19,9 @@ limitations under the License.
 <%@page import="com.flaptor.clusterfest.monitoring.*"%>
 <%@page import="com.flaptor.clusterfest.controlling.*"%>
 <%@page import="com.flaptor.clusterfest.controlling.node.*"%>
-<%@page import="java.util.Date"%>
+<%@page import="java.util.*"%>
 <%@page import="java.io.IOException"%>
-<%@page import="com.flaptor.util.ThreadUtil"%>
+<%@page import="com.flaptor.util.*"%>
 
 <%request.setAttribute("pageTitle","home");%>
 <%@include file="include.top.jsp" %>
@@ -65,6 +65,19 @@ limitations under the License.
     message += "WARNING : host unreachable";
         }
     }
+    if ("selectedNodesAction".equals(action)) {
+        String selectedAction = request.getParameter("selectedAction");
+        List<NodeDescriptor> selectedNodes = new ArrayList<NodeDescriptor>();
+        String [] nodes = request.getParameterValues("node");
+        if (nodes != null) {
+	        for (String idx:nodes){
+	            selectedNodes.add(cluster.getNodes().get(Integer.parseInt(idx)));
+	        }
+        }
+        WebModule wm = cluster.getModuleForSelectNodeAction(selectedAction);
+        String msg = wm.selectedNodesAction(selectedAction, selectedNodes, request);
+        if (msg != null) message += msg;
+    }
     if (action != null) {
     	WebModule wm = cluster.getModuleForAction(action);
     	if (wm != null) {
@@ -77,7 +90,7 @@ limitations under the License.
 <%
     if (message.length()>0) {
 %>
-<p><%=message%></p>
+    <p><%=message%></p>
 <%  }
 %>
 
@@ -86,31 +99,63 @@ limitations under the License.
         No nodes registered
 <%  } else {
 %>
-        <h2>Current nodes</h2><a href="?action=updateall">update all</a>
-        <ul>
+        <h2>Current nodes</h2>
+        
+        <form name="nodeListForm" action="" method="GET">
+
+            <a href="#" onclick="for(var i = 0; i < nodeListForm.node.length; i++) {nodeListForm.node[i].checked=true;}">all</a>    :: 
+            <a href="#" onclick="for(var i = 0; i < nodeListForm.node.length; i++) {nodeListForm.node[i].checked=false;}">none</a>   :: 
+<%          for (String type: cluster.getNodeTypes()) {
+                String onClick = "";
+                for (int i = 0; i < cluster.getNodes().size();++i) { 
+                    onClick += "nodeListForm.node["+i+"].checked=";
+                    if (type.equals(cluster.getNodes().get(i).getType())) onClick += "true;";
+                    else onClick += "false;";
+                }
+%>            <a href="#" onclick="<%=onClick%>"><%=type %> nodes</a>   :: 
+<%                
+            }
+
+%>            
+
+
+
+            <a href="?action=updateall">update list</a>
+            <br/><br/>
 <%
-        int i = 0;
-        for (NodeDescriptor node : cluster.getNodes()) {
-%>
-            <li> 
-            <strong><%= node.getHost() %>:<%= node.getPort() %></strong>:<%= node.getInstallDir() %>
-            <%= node.getType() == null ? "" : (" - " + node.getType()) %>
+            int i = 0;
+            for (NodeDescriptor node : cluster.getNodes()) {
+%> 
+                <input type="checkbox" name="node" value="<%=i%>"><strong><%= node.getHost() %>:<%= node.getPort() %></strong>:<%= node.getInstallDir() %>
+                <%= node.getType() == null ? "" : (" - " + node.getType()) %>
             
-<%          for(WebModule wm: cluster.getWebModules()) {
-	           String nodeLink = wm.getNodeHTML(node, i);
-               if (nodeLink != null) {
-                  out.println(" :: " + nodeLink);
-               }
+<%              for ( WebModule wm: cluster.getWebModules()) {
+                    String nodeLink = wm.getNodeHTML(node, i);
+                    if (nodeLink != null) {
+                        out.println(" :: " + nodeLink);
+                    }
+                }
+%>
+                :: <a href="?action=update&node=<%= i %>">update</a>
+                - <a href="?action=remove&node=<%= i %>">remove</a>
+                <br/>
+<%              i++;
             }
 %>
-            :: <a href="?action=update&node=<%= i %>">update</a>
-            - <a href="?action=remove&node=<%= i %>">remove</a>
-
-            </li>
-<%          i++;
-        }
-%>
-    </ul>
+            <br/>
+            <input type="hidden" name="selectedAction" value=""/>
+            <input type="hidden" name="action" value="selectedNodesAction"/>
+            
+<%          for ( WebModule wm: cluster.getWebModules()) {
+                List<Pair<String,String>> actions  = wm.getSelectedNodesActions();
+                if (actions != null) {
+                    for (Pair<String,String> selectNodeAction : actions) {%>
+                        <a href="#" onclick="nodeListForm.selectedAction.value='<%=selectNodeAction.first()%>';nodeListForm.submit()"><%=selectNodeAction.last()%></a>
+                        <%
+                    }
+                }
+            }
+%>        </form>
 <%  }
 %>
 

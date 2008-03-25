@@ -4,6 +4,8 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.flaptor.util.Pair;
+import com.flaptor.util.Triad;
 import com.flaptor.util.remote.WebServer;
 
 /**
@@ -39,6 +41,19 @@ public interface WebModule {
 	 * @return a list of action names to be registered for this module 
 	 */
 	List<String> getActions();
+	
+	/**
+     * some modules register actions for clusterfest home page, for the nodes selected in the node list. 
+     * 
+     * @return a list of <action name, action HTML to be displayed> to be registered for this module 
+     */
+	List<Pair<String,String>> getSelectedNodesActions();
+
+    /**
+     * execute an action for the selected nodes
+     * @return a message (or null)
+     */
+    String selectedNodesAction(String action, List<NodeDescriptor> nodes, HttpServletRequest request);
 	
 	/**
 	 * execute an action

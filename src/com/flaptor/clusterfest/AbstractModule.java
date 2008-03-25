@@ -63,12 +63,15 @@ abstract public class AbstractModule<T extends ModuleNodeDescriptor> implements 
 	abstract protected void notifyModuleNode(T node);
 	
 	public final void notifyNode(NodeDescriptor node) throws NodeUnreachableException {
-	    if (shouldRegister(node)){
-	        if (!isRegistered(node)) registerNode(node);
-	    } else {
-	        if (isRegistered(node)) unregisterNode(node);
+	    try {
+    	    if (shouldRegister(node)){
+    	        if (!isRegistered(node)) registerNode(node);
+    	    } else {
+    	        if (isRegistered(node)) unregisterNode(node);
+    	    }
+	    } finally {
+            if (isRegistered(node)) notifyModuleNode(getModuleNode(node));
 	    }
-	    if (isRegistered(node)) notifyModuleNode(getModuleNode(node));
 	}
 	
 	public final void nodeUnregistered(NodeDescriptor node) {
