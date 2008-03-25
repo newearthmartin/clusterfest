@@ -1,8 +1,8 @@
 pid=`cat pid`
 if [ -z "$pid" ]; then
-  echo Clusterfest webapp is not running.
+  echo Clusterfest is not running.
 else
   kill $pid
-  echo Clusterfest webapp has stopped.
+  echo Clusterfest has stopped.
   rm pid  
 fi
