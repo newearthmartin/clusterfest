@@ -158,7 +158,7 @@ limitations under the License.
         </target>
 
     <!--******************************************************************************************************-->
-        <target name="dist" depends="clean, distjar, doc">
+        <target name="dist" depends="clean, distjar, doc" description="builds the binary distribution">
             <mkdir dir="${dist.dir}"/>
             <copy todir="${tmp.bin.dir}">
                 <fileset dir="${bin.dir}"/>
@@ -171,28 +171,31 @@ limitations under the License.
                     <include name="*.properties"/>
                 </fileset>
             </copy>
+
+            <property name="prefix" value="${project}-${version}"/>
             <tar destfile="${dist.dir}/${project}-${version}.tgz" compression="gzip">
-                <tarfileset file="${doc.dir}/LICENSE"/>
-                <tarfileset dir="${doc.dir}" prefix="doc"/>
-                <tarfileset dir="${output.dir}">
+                <tarfileset file="${doc.dir}/LICENSE" prefix="${prefix}"/>
+                <tarfileset dir="${doc.dir}" prefix="${prefix}/doc"/>
+                <tarfileset dir="${output.dir}" prefix="${prefix}">
                     <include name="${project}-${version}.jar" />
                 </tarfileset>
-                <tarfileset dir="${tmp.bin.dir}" mode="755"/>
-                <tarfileset dir="${conf.dir}" prefix="conf" />
+                <tarfileset dir="${tmp.bin.dir}" prefix="${prefix}" mode="755"/>
+                <tarfileset dir="${conf.dir}" prefix="${prefix}/conf" />
             </tar>
         </target>
 
-	    <target name="distsrc" depends="dist">
+	    <target name="distsrc" depends="dist" description="builds the source distribution">
+            <property name="prefix" value="${project}-${version}"/>
             <tar destfile="${dist.dir}/${project}-${version}-src.tgz" compression="gzip">
-                <tarfileset file="${doc.dir}/LICENSE"/>
-                <tarfileset dir="${doc.dir}" prefix="doc"/>
-                <tarfileset dir="${conf.dir}" prefix="conf" />
-               	<tarfileset file="build.xml"/>
-                <tarfileset dir="${src.dir}" prefix="src"/>
-                <tarfileset dir="${bin.dir}" mode="755" prefix="bin"/>
-                <tarfileset dir="${test.dir}" prefix="test"/>
-                <tarfileset dir="${tools.dir}" prefix="tools"/>
-                <tarfileset dir="${lib.dir}" prefix="lib"/>            
+                <tarfileset file="${doc.dir}/LICENSE" prefix="${prefix}"/>
+                <tarfileset dir="${doc.dir}" prefix="${prefix}/doc"/>
+                <tarfileset dir="${conf.dir}" prefix="${prefix}/conf" />
+               	<tarfileset file="build.xml" prefix="${prefix}"/>
+                <tarfileset dir="${src.dir}" prefix="${prefix}/src"/>
+                <tarfileset dir="${bin.dir}" mode="755" prefix="${prefix}/bin"/>
+                <tarfileset dir="${test.dir}" prefix="${prefix}/test"/>
+                <tarfileset dir="${tools.dir}" prefix="${prefix}/tools"/>
+                <tarfileset dir="${lib.dir}" prefix="${prefix}/lib"/>
             </tar>
 	    </target>
     <!--******************************************************************************************************-->

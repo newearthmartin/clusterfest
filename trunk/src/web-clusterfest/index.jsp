@@ -122,26 +122,40 @@ limitations under the License.
 
             <a href="?action=updateall">update list</a>
             <br/><br/>
+            <table>
 <%
             int i = 0;
             for (NodeDescriptor node : cluster.getNodes()) {
 %> 
-                <input type="checkbox" name="node" value="<%=i%>"><strong><%= node.getHost() %>:<%= node.getPort() %></strong>:<%= node.getInstallDir() %>
-                <%= node.getType() == null ? "" : (" - " + node.getType()) %>
-            
-<%              for ( WebModule wm: cluster.getWebModules()) {
-                    String nodeLink = wm.getNodeHTML(node, i);
-                    if (nodeLink != null) {
-                        out.println(" :: " + nodeLink);
-                    }
-                }
+                <tr>
+	                <td>
+	                <input type="checkbox" name="node" value="<%=i%>"><strong><%= node.getHost() %>:<%= node.getPort() %></strong>:<%= node.getInstallDir() %>
+                    </td>
+                    <td>
+	                <%= node.getType() == null ? "" : (node.getType()) %>
+                    </td><td>
+<%                    for ( WebModule wm: cluster.getWebModules()) {
+	                    String nodeLink = wm.getNodeHTML(node, i);
+	                    %>
+	                    </td><td>
+	                    <%
+	                    if (nodeLink != null) {
+	                        out.println(nodeLink);
+	                    }
+	                }
 %>
-                :: <a href="?action=update&node=<%= i %>">update</a>
-                - <a href="?action=remove&node=<%= i %>">remove</a>
-                <br/>
+                    </td>
+                    <td>
+                    <a href="?action=update&node=<%= i %>">update</a>
+                    </td>
+                    <td>
+                    <a href="?action=remove&node=<%= i %>">remove</a>
+                    </td>
+                </tr>
 <%              i++;
             }
 %>
+            </table>
             <br/>
             <input type="hidden" name="selectedAction" value=""/>
             <input type="hidden" name="action" value="selectedNodesAction"/>
