@@ -104,7 +104,7 @@ public class MonitoreableImplementation implements Monitoreable {
 		systemProperties.setTopDump(dump);
 		
 		try {
-			dump = CommandUtil.execute("ifconfig", null).second();
+			dump = CommandUtil.execute("/sbin/ifconfig", null).second();
 		} catch (IOException e) {
 			dump = "problem getting ifconfig dump: " + e;
 		}
