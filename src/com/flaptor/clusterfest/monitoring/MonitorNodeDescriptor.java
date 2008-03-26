@@ -16,6 +16,7 @@ limitations under the License.
 
 package com.flaptor.clusterfest.monitoring;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -142,6 +143,7 @@ public class MonitorNodeDescriptor extends ModuleNodeDescriptor {
     
     private void cleanupStateList() {
         long now = System.currentTimeMillis();
+        List<NodeState> statesToRemove = new ArrayList<NodeState>();
         NodeState lastState = null;
         for (NodeState state: states) {
             if (lastState == null || now - state.getTimestamp() < DateUtil.MILLIS_IN_HOUR || states.indexOf(state) == states.size() -1) {
@@ -149,32 +151,33 @@ public class MonitorNodeDescriptor extends ModuleNodeDescriptor {
                 continue;
             }
             
-            
             if (state.getSanity().getSanity() == lastState.getSanity().getSanity()) {
                 if (now - state.getTimestamp() >  7 * DateUtil.MILLIS_IN_DAY) {
                     if (state.getTimestamp() - lastState.getTimestamp() < DateUtil.MILLIS_IN_DAY) {
-                        states.remove(state);
+                        statesToRemove.add(state);
                         continue;
                     }
                 } else if (now - state.getTimestamp() >  DateUtil.MILLIS_IN_DAY) {
                     if (state.getTimestamp() - lastState.getTimestamp() < DateUtil.MILLIS_IN_HOUR) {
-                        states.remove(state);
+                        statesToRemove.add(state);
                         continue;
                     }
                 } else if (now - state.getTimestamp() >  DateUtil.MILLIS_IN_HOUR * 12) {
                     if (state.getTimestamp() - lastState.getTimestamp() < 30 * DateUtil.MILLIS_IN_MINUTE) {
-                        states.remove(state);
+                        statesToRemove.add(state);
                         continue;
                     }
                 } else {
                     if (state.getTimestamp() - lastState.getTimestamp() < 10 * DateUtil.MILLIS_IN_MINUTE) {
-                        states.remove(state);
+                        statesToRemove.add(state);
                         continue;
                     }
                 }
             }
             lastState = state;
         }
+        
+        states.removeAll(statesToRemove);
         
     }
 
