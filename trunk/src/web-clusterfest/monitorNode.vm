@@ -1,0 +1,104 @@
+#*
+Copyright 2008 Flaptor (flaptor.com) 
+
+Licensed under the Apache License, Version 2.0 (the "License"); 
+you may not use this file except in compliance with the License. 
+You may obtain a copy of the License at 
+
+    http://www.apache.org/licenses/LICENSE-2.0 
+
+Unless required by applicable law or agreed to in writing, software 
+distributed under the License is distributed on an "AS IS" BASIS, 
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
+See the License for the specific language governing permissions and 
+limitations under the License.
+*#
+## author Martin Massera
+#if ($node.getType())
+	#set ($nodeType = $node.getType())
+#else 
+    #set ($nodeType = "unknown")
+#end
+#set ($pageTitle = "${nodeType} @ ${node.getHost()} : ${node.getPort()}")
+#parse("include.top.vm")
+
+#if ("update" == $action) {
+    $monitor.updateNodeInfo($monitorNode);
+#end
+
+#if ($node.isReachable() == false)
+    <h2>Node unreachable!</h2>	
+#end
+
+#if ($monitor.isRegistered($node))
+	#set ($monitorNode = $monitor.getModuleNodeDescriptor($node))
+    #if ($stateNum)
+    	#set ($nodeState = $monitorNode.getNodeState($stateNum))
+    #else
+        #set ($nodeState = $monitorNode.getLastState())
+    #end
+    #if ($nodeState)
+        <div id="monitorSideBar">
+            <a href="?action=update&idx=$idx">update node</a></br>
+            <table>
+                <tr><th>logs</th></tr>
+                #foreach ($e in $monitorNode.getLogs().entrySet())
+                	<tr><td><a href="monitorLog.do?log=$e.getKey()&idx=$idx">$e.getKey()</a>
+                	<span class="fuzzy">at $dateUtil.toDate($nodeState.getTimestamp())</span></td></tr>
+                #end
+                <tr><td>
+                    <form action="monitorLog.jsp">
+                        <input type="hidden" name="node" value="$idx"/>
+                        <input type="text" name="log" value=""/>
+                        <input type="submit" value="log file"/>
+                    </form>
+                </td></tr>
+            </table>
+
+            <table>
+                <tr><th>Saved states</th></tr>                
+                #set ($num = $monitorNode.getStates().size())
+                #foreach ($blabla in $monitorNode.getStates())
+                    #set ($num = $num - 1)
+                    #set ($state = $monitorNode.getStates().get($num))
+                    <tr><td>
+                     	$state.getSanity().getSanity() at
+                    	<a href="monitorNode.do?idx=$idx&stateNum=$num">$dateUtil.toDate($state.getTimestamp())</a>
+                    </td></tr>
+                #end
+            </table>
+        </div>
+
+        <h2>State: $nodeState.getSanity().getSanity() <span class="fuzzy">at $dateUtil.toDate($nodeState.getTimestamp())</span></h2>
+        <ul>
+            #foreach ($remark in $nodeState.getSanity().getRemarks())
+            	<li>$remark</li>
+            #end
+        </ul>
+
+        <div id="monitorNodeProperties">
+            #if ($nodeState.getProperties())
+                <table>
+                    <th colspan="2">Properties</th>
+                    #foreach ($entry in $nodeState.getProperties().entrySet())
+	                    <tr>
+	                        <td>$entry.getKey()</td>
+	                        <td>#if ($entry.getValue()) $monitor.format($node.getType(), $entry.getKey(), $entry.getValue()) #else null #end</td>
+	                    </tr>
+                    #end
+                </table>
+            #end
+        </div>
+        
+        <div id="monitorNodeSystenProperties">
+            #if ($nodeState.getSystemProperties())
+                <h2>System properties</h2>
+                <h3>Top</h3>
+                <pre>$nodeState.getSystemProperties().getTopDump()</pre>
+                <h3>ifconfig</h3>
+                <pre>$nodeState.getSystemProperties().getIfconfigDump()</pre>
+            #end
+        </div>
+    #end
+#end
+#parse("include.bottom.vm")

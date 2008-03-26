@@ -1,0 +1,123 @@
+#*
+Copyright 2008 Flaptor (flaptor.com) 
+
+Licensed under the Apache License, Version 2.0 (the "License"); 
+you may not use this file except in compliance with the License. 
+You may obtain a copy of the License at 
+
+    http://www.apache.org/licenses/LICENSE-2.0 
+
+Unless required by applicable law or agreed to in writing, software 
+distributed under the License is distributed on an "AS IS" BASIS, 
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
+See the License for the specific language governing permissions and 
+limitations under the License.
+*#
+## author Martin Massera
+
+#set($pageTitle = "Home")
+#parse("include.top.vm")
+
+#if ($message)
+    <p>$message</p>	
+#end
+
+#if ($cluster.getNodes().isEmpty())
+	No nodes registered
+#else
+    <h2>Current nodes</h2>
+    <form name="nodeListForm" action="" method="GET">
+        <a href="#" onclick="for(var i = 0; i < nodeListForm.node.length; i++) {nodeListForm.node[i].checked=true;}">all</a> :: 
+        <a href="#" onclick="for(var i = 0; i < nodeListForm.node.length; i++) {nodeListForm.node[i].checked=false;}">none</a> :: 
+        #foreach($type in $cluster.getNodeTypes())
+            #set ($i = 0)
+            #set ($onClick = "")
+            #foreach ($node in $cluster.getNodes())
+               #if ($type==$node.getType())
+               	    #set ($value = "true")
+               #else
+                    #set ($value = "false")
+               #end
+               #set ($onClick = "${onClick}nodeListForm.node[${i}].checked=${value};")
+               #set ($i = $i + 1)
+            #end
+            <a href="#" onclick="$onClick">$type nodes</a> ::
+        #end
+        <a href="?action=updateall">update list</a>
+        <br/><br/>
+        
+        <table>
+            #set ($i = 0)
+            #foreach($node in $cluster.getNodes())
+                <tr>
+                    <td>
+                        <input type="checkbox" name="node" value="$i"><strong>$node.getHost():$node.getPort()</strong>:$node.getInstallDir()
+                    </td>
+                    <td>
+                        #if ($node.getType()) $node.getType() #end
+                    </td>
+                   	#foreach ($wm in $cluster.getWebModules())
+                        <td>
+                    		#if ($wm.getNodeHTML($node, $i))
+                    			$wm.getNodeHTML($node, $i)
+		                    #end
+                        </td>
+                    #end
+                    </td>
+                    <td>
+                        <a href="?action=update&node=$i">update</a>
+                    </td>
+                    <td>
+                        <a href="?action=remove&node=$i">remove</a>
+                    </td>
+                </tr>
+                #set ($i = $i + 1)
+            #end
+        </table>
+        <br/>
+        
+        <input type="hidden" name="selectedAction" value=""/>
+        <input type="hidden" name="action" value="selectedNodesAction"/>
+
+        #foreach ($wm in $cluster.getWebModules())
+            #if ($wm.getSelectedNodesActions())
+            	#foreach ($selectNodeAction in $wm.getSelectedNodesActions()) 
+                    <a href="#" onclick="nodeListForm.selectedAction.value='$selectNodeAction.first()';nodeListForm.submit()">$selectNodeAction.last()</a>            		
+	            #end
+            #end
+        #end
+        </form>
+#end
+
+</br>
+
+#foreach ($wm in $cluster.getWebModules())
+    #if ($wm.getModuleHTML())
+    	$wm.getModuleHTML()<br/>
+    #end
+#end
+
+<br/>
+<form method="post" action="index.jsp">
+    <input type="hidden" name="action" value="register"/> 
+    <table border="1">
+        <tr><th colspan="2">Register node</th></tr>
+        <tr>
+            <td>Host:</td>
+            <td><input type="text" name="host" value=""/></td>
+        </tr>
+        <tr>
+            <td>Port:</td>
+            <td><input type="text" name="port" value=""/></td>
+        </tr>
+        <tr>
+            <td>Install dir:</td>
+            <td><input type="text" name="dir" value=""/></td>
+        </tr>
+        <tr>
+            <td colspan="2" align="center"><input type="submit" value="Register"/></td>
+        </tr>
+    </table>
+</form>
+
+#parse("include.bottom.vm")

@@ -1,4 +1,4 @@
-<%-- 
+#*
 Copyright 2008 Flaptor (flaptor.com) 
 
 Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -12,8 +12,23 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
 See the License for the specific language governing permissions and 
 limitations under the License.
---%>
-<%-- author Martin Massera --%>
+*#
+## author Martin Massera
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta HTTP-Equiv="Cache-Control" content="no-cache">
+    <link rel="stylesheet" type="text/css" href="media/style.css" />
+<head>
+
+<title>ClusterFest - $pageTitle</title>
+</head>
+<body>
+<div id="navbar">
+<h1>ClusterFest - $pageTitle</h1>
+<a href="/index.do">ClusterFest home</a>
+#if ($monitorNode)
+	<a href="monitorNode.do?idx=$idx">node status</a>
+#end
 </div>
-</body>
-</html>
+<div id="content">

@@ -52,6 +52,7 @@ public class ClusterManager {
     
     private Map<String, Module> modules = new HashMap<String, Module>();
     private List<WebModule> webModules = new ArrayList<WebModule>();
+    private Map<String, WebModule> modulePageMap = new HashMap<String, WebModule>();
     private Map<String, WebModule> moduleActionMap = new HashMap<String, WebModule>();
     private Map<String, WebModule> moduleSelectNodeActionMap = new HashMap<String, WebModule>();
     
@@ -85,13 +86,22 @@ public class ClusterManager {
     
     
 	private void addWebModule(WebModule wm) {
-        for (String action : wm.getActions()) {
-            moduleActionMap.put(action, wm);
+	    if (wm.getActions() != null) {
+    	    for (String action : wm.getActions()) {
+                moduleActionMap.put(action, wm);
+            }
+	    }
+	    if (wm.getPages() != null) {
+            for (String page : wm.getPages()) {
+                modulePageMap.put(page, wm);
+            }
+	    }
+        if (wm.getSelectedNodesActions() != null) {
+            for (Pair<String,String> action : wm.getSelectedNodesActions()) {
+                moduleSelectNodeActionMap.put(action.first(), wm);
+            }
         }
-        for (Pair<String,String> action : wm.getSelectedNodesActions()) {
-            moduleSelectNodeActionMap.put(action.first(), wm);
-        }
-		webModules.add(wm);
+        webModules.add(wm);
 	}
 	
     /**
@@ -227,6 +237,9 @@ public class ClusterManager {
 	
     public WebModule getModuleForAction(String action) {
         return moduleActionMap.get(action);
+    }
+    public WebModule getModuleForPage(String page) {
+        return modulePageMap.get(page);
     }
     public WebModule getModuleForSelectNodeAction(String action) {
         return moduleSelectNodeActionMap.get(action);

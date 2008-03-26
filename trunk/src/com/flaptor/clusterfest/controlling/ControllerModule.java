@@ -18,9 +18,11 @@ package com.flaptor.clusterfest.controlling;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 
@@ -153,9 +155,9 @@ public class ControllerModule extends AbstractModule<ControllerNodeDescriptor> i
 		if (!isRegistered(node)) return null;
         ControllerNodeState state = node.isReachable() ? getState(node) : ControllerNodeState.STOPPED;
         String ret = "";
-        if (state == ControllerNodeState.RUNNING) ret += "<a href=\"?action=kill&node="+nodeNum+"\"><img src=\"media/stop.png\"/></a>";
-        if (state == ControllerNodeState.PAUSED) ret += "<a href=\"?action=resume&node="+nodeNum+"\"><img src=\"media/start.png\"/></a><a href=\"?action=kill&node="+nodeNum+"\"><img src=\"media/stop.png\"/></a>";
-        if (state == ControllerNodeState.STOPPED) ret += "<a href=\"?action=start&node="+nodeNum+"\"><img src=\"media/start.png\"/></a>";
+        if (state == ControllerNodeState.RUNNING) ret += "<a href=\"?action=kill&idx="+nodeNum+"\"><img src=\"media/stop.png\"/></a>";
+        if (state == ControllerNodeState.PAUSED) ret += "<a href=\"?action=resume&idx="+nodeNum+"\"><img src=\"media/start.png\"/></a><a href=\"?action=kill&node="+nodeNum+"\"><img src=\"media/stop.png\"/></a>";
+        if (state == ControllerNodeState.STOPPED) ret += "<a href=\"?action=start&idx="+nodeNum+"\"><img src=\"media/start.png\"/></a>";
         return ret;
 	}
 	public void setup(WebServer server) {
@@ -165,7 +167,7 @@ public class ControllerModule extends AbstractModule<ControllerNodeDescriptor> i
 		ClusterManager cluster = ClusterManager.getInstance();
 		String message = null;
 		int idx = -1;
-		String nodeParam = request.getParameter("node");
+		String nodeParam = request.getParameter("idx");
 		if (nodeParam != null ) idx = Integer.parseInt(nodeParam);
         if ("start".equals(action)) {
             NodeDescriptor node = cluster.getNodes().get(idx);
@@ -208,7 +210,6 @@ public class ControllerModule extends AbstractModule<ControllerNodeDescriptor> i
         return ret;
     }
 	
-    @Override
     public String selectedNodesAction(String action, List<NodeDescriptor> nodes, HttpServletRequest request) {
         ClusterManager cluster = ClusterManager.getInstance();
         String message = null;
@@ -218,5 +219,12 @@ public class ControllerModule extends AbstractModule<ControllerNodeDescriptor> i
             message = ControllingFrontend.killAll(cluster, nodes);
         }
         return message;
+    }
+
+    public List<String> getPages() {
+        return new ArrayList<String>();
+    }
+    public String doPage(String page, HttpServletRequest request, HttpServletResponse response) {
+        return null;
     }
 }
