@@ -27,5 +27,9 @@
 	<classpathentry kind="lib" path="lib/commons-logging-1.0.2.jar"/>
 	<classpathentry kind="lib" path="lib/language-identifier.jar"/>
 	<classpathentry kind="lib" path="lib/nutch-0.7.2.jar"/>
+	<classpathentry kind="lib" path="lib/velocity-1.5.jar"/>
+	<classpathentry kind="lib" path="lib/velocity-dep-1.5.jar"/>
+	<classpathentry kind="lib" path="lib/velocity-tools-1.4.jar"/>
+	<classpathentry kind="lib" path="lib/commons-digester-1.8.jar"/>
 	<classpathentry kind="output" path="eclipsebin"/>
 </classpath>

@@ -1,0 +1,55 @@
+#*
+Copyright 2008 Flaptor (flaptor.com) 
+
+Licensed under the Apache License, Version 2.0 (the "License"); 
+you may not use this file except in compliance with the License. 
+You may obtain a copy of the License at 
+
+    http://www.apache.org/licenses/LICENSE-2.0 
+
+Unless required by applicable law or agreed to in writing, software 
+distributed under the License is distributed on an "AS IS" BASIS, 
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
+See the License for the specific language governing permissions and 
+limitations under the License.
+*#
+## author Martin Massera
+
+#if ($node.getType())
+    #set ($nodeType = $node.getType())
+#else 
+    #set ($nodeType = "unknown")
+#end
+#set ($pageTitle = "${nodeType} @ ${node.getHost()} : ${node.getPort()} - log: ${logName}")
+#parse("include.top.vm")
+
+<div id="monitorSideBar">
+        <a href="?action=update&idx=$idx&log=$logName">update logs</a></br>
+        <table>
+            <tr><th>logs</th></tr>
+            #foreach ($e in $monitorNode.getLogs().entrySet())
+                <tr><td><a href="monitorLog.do?log=$e.getKey()&idx=$idx">$e.getKey()</a>
+                <span class="fuzzy">at $dateUtil.toDate($e.getValue().last())</span></td></tr>
+            #end
+            <tr><td>
+                <form action="monitorLog.jsp">
+                    <input type="hidden" name="node" value="$idx"/>
+                    <input type="text" name="log" value=""/>
+                    <input type="submit" value="log file"/>
+                </form>
+            </td></tr>
+        </table>
+    </div>
+
+#if ($log)
+    <h2>Log: $logName <span class="fuzzy">at $dateUtil.toDate($log.last())</span></h2>
+    #if ($log.first().length() > 0) 
+    	<pre>$log.first()</pre>
+    #else
+    	The log is empty!
+    #end
+#else
+    <h2>This log is unavailable</h2>
+#end
+
+#parse("include.bottom.vm")

@@ -17,6 +17,8 @@ limitations under the License.
 package com.flaptor.clusterfest.monitoring;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,10 +26,14 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 
+import sun.misc.Cleaner;
+
 import com.flaptor.clusterfest.AbstractModule;
+import com.flaptor.clusterfest.ClusterManager;
 import com.flaptor.clusterfest.ClusterableListener;
 import com.flaptor.clusterfest.NodeDescriptor;
 import com.flaptor.clusterfest.NodeUnreachableException;
@@ -36,6 +42,7 @@ import com.flaptor.clusterfest.monitoring.NodeChecker.Sanity;
 import com.flaptor.clusterfest.monitoring.node.Monitoreable;
 import com.flaptor.util.ClassUtil;
 import com.flaptor.util.Config;
+import com.flaptor.util.DateUtil;
 import com.flaptor.util.Pair;
 import com.flaptor.util.remote.NoSuchRpcMethodException;
 import com.flaptor.util.remote.WebServer;
@@ -219,7 +226,7 @@ public class MonitorModule extends AbstractModule<MonitorNodeDescriptor> impleme
             NodeState state = monitorNode.getLastState();
             if (state != null) sanity = state.getSanity().getSanity();
         }
-        return "<a class=\"sanity"+sanity+"\" href=\"monitorNode.jsp?node=" + nodeNum + "\">"+ sanity +"</a>";
+        return "<a class=\"sanity"+sanity+"\" href=\"monitorNode.do?idx=" + nodeNum + "\">"+ sanity +"</a>";
 	}
 	public void setup(WebServer server) {
 	}
@@ -233,7 +240,7 @@ public class MonitorModule extends AbstractModule<MonitorNodeDescriptor> impleme
 	
 	/**
 	 * formats properties so that they can be displayed in HTML 
-	 * @param name
+	 * @param namenull
 	 * @param value
 	 * @return
 	 */
@@ -246,6 +253,34 @@ public class MonitorModule extends AbstractModule<MonitorNodeDescriptor> impleme
     }
 
     public String selectedNodesAction(String action, List<NodeDescriptor> nodes, HttpServletRequest request) {
+        return null;
+    }
+    public List<String> getPages() {
+        return Arrays.asList(new String[]{"monitorNode", "monitorLog"});
+    }
+    public String doPage(String page, HttpServletRequest request, HttpServletResponse response) {
+        NodeDescriptor node = (NodeDescriptor)request.getAttribute("node");
+        MonitorNodeDescriptor monitorNode = getModuleNode(node);
+        request.setAttribute("monitor", this);
+        request.setAttribute("monitorNode", monitorNode);
+        request.setAttribute("dateUtil", new DateUtil());
+
+        if (page.equals("monitorNode")){
+            String action = request.getParameter("action");
+            if ("update".equals(action)) {
+                updateNodeInfo(monitorNode);
+            }
+            return "monitorNode.vm";
+        } else if (page.equals("monitorLog")){
+            String action = request.getParameter("action");
+            if ("update".equals(action)) {
+                updateLogs(node);
+            }
+            String logName = request.getParameter("log");
+            request.setAttribute("logName", logName);
+            request.setAttribute("log", retrieveLog(node, logName));
+            return "monitorLog.vm";
+        }
         return null;
     }
 }
