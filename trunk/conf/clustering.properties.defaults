@@ -5,3 +5,5 @@ clustering.checkNodesInterval=10000
 clustering.monitor.refreshInterval=60000
 clustering.monitor.formatter=com.flaptor.clustering.monitoring.DefaultPropertyFormatter
 clustering.monitor.checker=com.flaptor.clustering.monitoring.DefaultChecker
+
+clustering.web.appName=Clusterfest
