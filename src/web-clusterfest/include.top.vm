@@ -21,12 +21,12 @@ limitations under the License.
     <link rel="stylesheet" type="text/css" href="media/style.css" />
 <head>
 
-<title>ClusterFest - $pageTitle</title>
+<title>$appName - $pageTitle</title>
 </head>
 <body>
 <div id="navbar">
-<h1>ClusterFest - $pageTitle</h1>
-<a href="/index.do">ClusterFest home</a>
+<h1>$appName - $pageTitle</h1>
+<a href="/index.do">home</a>
 #if ($monitorNode)
 	<a href="monitorNode.do?idx=$idx">node status</a>
 #end

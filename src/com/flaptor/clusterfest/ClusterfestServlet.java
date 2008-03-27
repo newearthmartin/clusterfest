@@ -28,17 +28,20 @@ public class ClusterfestServlet extends MVCServlet {
     private static final long serialVersionUID = 1L;
     private static final Logger logger = Logger.getLogger(Execute.whoAmI());
 
-    private ClusterManager cluster; 
+    private ClusterManager cluster;
+    private String appName;
     
     @Override
     public void init() throws ServletException {
         super.init();
         cluster = ClusterManager.getInstance();
+        appName = Config.getConfig("clustering.properties").getString("clustering.web.appName");
     }
 
     @Override
     protected String doRequest(String uri, HttpServletRequest request, HttpServletResponse response) {
         request.setAttribute("cluster",cluster);
+        request.setAttribute("appName",appName);
         String idx = request.getParameter("idx");
         if (idx != null) {
             int idxi = Integer.parseInt(idx);
