@@ -1,5 +1,7 @@
 package com.flaptor.clusterfest;
 
+import javax.servlet.http.HttpServletRequest;
+
 import com.flaptor.util.remote.NoSuchRpcMethodException;
 import com.flaptor.util.remote.XmlrpcClient;
 import com.flaptor.util.remote.XmlrpcSerialization;
@@ -32,5 +34,16 @@ public class ModuleUtil {
             if (defaultTrue) return true;
             else throw new NodeUnreachableException(e, node);
         }
+    }
+
+    /**
+     * gets the idx parameter from the request and returns that node
+     * @param request
+     * @return
+     */
+    public static NodeDescriptor getNodeFromRequest(HttpServletRequest request) {
+        String nodeParam = request.getParameter("idx");
+        if (nodeParam != null ) return ClusterManager.getInstance().getNodes().get(Integer.parseInt(nodeParam));
+        else return null;
     }
 }

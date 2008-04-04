@@ -88,18 +88,15 @@ public class ClusterfestServlet extends MVCServlet {
                 message += "WARNING : " + host + ":" + port + " registered but unreachable.";
             }
             try {cluster.persistNodeList();} catch(IOException e) {message+="\nWARNING: couldn't persist node list";}
-        }
-        if ("remove".equals(action)) {
+        } else if ("remove".equals(action)) {
             int idx = Integer.parseInt(request.getParameter("node"));
             NodeDescriptor node = cluster.getNodes().get(idx);
             cluster.unregisterNode(node);
             message += "OK : " + node.getHost() + ":" + node.getPort() + " unregistered.";
             try {cluster.persistNodeList();} catch(IOException e) {message+="\nWARNING: couldn't persist node list";}
-        }
-        if ("updateall".equals(action)) {
+        } else if ("updateall".equals(action)) {
             cluster.updateAllInfoAllNodes();
-        }
-        if ("update".equals(action)) { //this action updates all states of the node: cluster, monitor,etc.
+        } else if ("update".equals(action)) { //this action updates all states of the node: cluster, monitor,etc.
             int idx = Integer.parseInt(request.getParameter("node"));
             NodeDescriptor node = cluster.getNodes().get(idx); //update node info
             cluster.updateAllInfo(node);
@@ -108,8 +105,7 @@ public class ClusterfestServlet extends MVCServlet {
             } else {
                 message += "WARNING : host unreachable";
             }
-        }
-        if ("selectedNodesAction".equals(action)) {
+        } else if ("selectedNodesAction".equals(action)) {
             String selectedAction = request.getParameter("selectedAction");
             List<NodeDescriptor> selectedNodes = new ArrayList<NodeDescriptor>();
             String [] nodes = request.getParameterValues("node");
@@ -121,15 +117,7 @@ public class ClusterfestServlet extends MVCServlet {
             WebModule wm = cluster.getModuleForSelectNodeAction(selectedAction);
             String msg = wm.selectedNodesAction(selectedAction, selectedNodes, request);
             if (msg != null) message += msg;
-        }
-        if (action != null) {
-            WebModule wm = cluster.getModuleForAction(action);
-            if (wm != null) {
-                String msg = wm.action(action, request);
-                if (msg != null) message += msg;
-            }
-        }
-        if (action != null) {
+        } else if (action != null) {
             WebModule wm = cluster.getModuleForAction(action);
             if (wm != null) {
                 String msg = wm.action(action, request);

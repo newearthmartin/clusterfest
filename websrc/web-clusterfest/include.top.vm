@@ -29,10 +29,10 @@ limitations under the License.
 <body>
 <div id="navbar">
 <h1>$htmlAppName - $pageTitle</h1>
+<a href="/index.do">home</a>
 #if ($monitorNode)
     <a href="monitorNode.do?idx=$idx">node status</a>
 #end
-<a href="/index.do">home</a>
 <span class="fuzzy">powered by <a class="fuzzy" href="http://opensource.flaptor.com/clusterfest">Clusterfest</a></span>
 </div>
 <div id="content">
