@@ -19,6 +19,7 @@ limitations under the License.
     <property name="version" value="0.2"/>
 
     <property name="src.dir" value="${basedir}/src"/>
+    <property name="websrc.dir" value="${basedir}/websrc"/>
     <property name="test.dir" value="${basedir}/test"/>
     <property name="build.dir" value="${basedir}/build"/>
     <property name="lib.dir" value="${basedir}/lib"/>
@@ -103,7 +104,7 @@ limitations under the License.
                 <attribute name="Version" value="${version}"/>
             </manifest>
 
-        	<fileset dir="${src.dir}">
+        	<fileset dir="${websrc.dir}">
                 <include name="web-clusterfest/**"/>
             </fileset>
 
