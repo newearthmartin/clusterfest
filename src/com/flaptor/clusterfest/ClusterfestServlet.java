@@ -30,18 +30,31 @@ public class ClusterfestServlet extends MVCServlet {
 
     private ClusterManager cluster;
     private String appName;
+    private String htmlAppName;
+    private String additionalCSS;
     
     @Override
     public void init() throws ServletException {
         super.init();
         cluster = ClusterManager.getInstance();
-        appName = Config.getConfig("clustering.properties").getString("clustering.web.appName");
+        Config config = Config.getConfig("clustering.properties");
+        appName = config.getString("clustering.web.appName");
+        htmlAppName = config.getString("clustering.web.htmlAppName");
+        if (config.isDefined("clustering.web.additionalCSS")) {
+            additionalCSS = config.getString("clustering.web.additionalCSS");
+            if (additionalCSS != null) {
+                additionalCSS = additionalCSS.trim();
+                if (additionalCSS.length() ==0) additionalCSS = null;
+            }
+        }
     }
 
     @Override
     protected String doRequest(String uri, HttpServletRequest request, HttpServletResponse response) {
         request.setAttribute("cluster",cluster);
         request.setAttribute("appName",appName);
+        request.setAttribute("htmlAppName",htmlAppName);
+        request.setAttribute("additionalCSS",additionalCSS);
         String idx = request.getParameter("idx");
         if (idx != null) {
             int idxi = Integer.parseInt(idx);
@@ -68,7 +81,7 @@ public class ClusterfestServlet extends MVCServlet {
             String host = request.getParameter("host");
             int port = Integer.parseInt(request.getParameter("port"));
             String installDir = request.getParameter("dir");
-            NodeDescriptor node = cluster.registerNode(host, port, installDir);
+            NodeDescriptor node = cluster.registerNode(host, port, installDir, null);
             if (node.isReachable()) {
                 message += "OK : " + host + ":" + port + " registered.";
             } else {

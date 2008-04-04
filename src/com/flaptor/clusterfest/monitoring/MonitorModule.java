@@ -30,8 +30,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 
-import sun.misc.Cleaner;
-
 import com.flaptor.clusterfest.AbstractModule;
 import com.flaptor.clusterfest.ClusterManager;
 import com.flaptor.clusterfest.ClusterableListener;

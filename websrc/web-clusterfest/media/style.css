@@ -12,108 +12,115 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
 See the License for the specific language governing permissions and 
 limitations under the License.
-*/
-/* author Martin Massera */
+*/ /* author Martin Massera */
+a {
+	color: #FF9933;
+}
 
-a 		{color: #FF9933;}
-a:hover {color: #fca;}
+a:hover {
+	color: #fca;
+}
 
-a img {border: 0;}
+a img {
+	border: 0;
+}
 
-body
-{
+body {
 	background-color: white;
-	color:#445;
+	color: #445;
 	font-family: Verdana, Arial, Helvetica, sans-serif;
 	margin: 0;
 	padding: 0;
 }
 
-#navbar
-{
-	padding-top:5px;
-	padding-bottom:5px;
+h1 {
+	margin: 5px;
+}
+
+h2 {
+	margin: 5px;
+}
+
+#navbar {
 	text-align: center;
 }
-#navbar a
-{
+
+#navbar h1 {
+	margin: 0;
+}
+
+#navbar a {
 	padding-right: 15px;
 	padding-left: 15px;
 }
 
-#content
-{
+#content {
 	padding: 10px;
 	width: 100%;
 	height: auto;
 }
 
-#monitorSideBar
-{
+#monitorSideBar {
 	float: right;
 }
 
-
-.fuzzy
-{
-	color: #aaa;
+.fuzzy {
+	color: #999;
 }
 
-a.sanityGOOD
-{
+a.sanityGOOD,a.sanityGOOD:hover,a.sanityGOOD:visited {
+	color: white;
 	background-color: green;
 }
 
-a.sanityUNKNOWN 
-{
+a.sanityUNKNOWN,a.sanityUNKNOWN:hover,a.sanityUNKNOWN:visited {
+	color: black;
 	background-color: gray;
 }
 
-a.sanityBAD
-{
+a.sanityBAD,a.sanityBAD:hover,a.sanityBAD:visited {
+	color: white;
 	background-color: yellow;
 }
 
-a.sanityUNREACHABLE
-{
+a.sanityUNREACHABLE,a.sanityUNREACHABLE:hover,a.sanityUNREACHABLE:visited
+	{
+	color: white;
 	background-color: red;
 }
 
-table
-{
-	text-align:left;
+table {
+	text-align: left;
 	border-style: solid;
-	border-width: 1px; 
+	border-width: 1px;
 	border-color: #aaa;
 	padding: 2px;
 	margin: 5px;
 }
-td
-{
+
+td {
 	padding: 0;
 	margin: 0;
 	padding-left: 5px;
 	padding-right: 15px;
 	border-style: solid;
-	border-width: 0 0 1px 0; 
+	border-width: 0 0 1px 0;
 	border-color: #f0f0f0;
 }
-th 
-{
+
+th {
 	padding: 0;
 	margin: 0;
 	padding-left: 5px;
 	padding-right: 15px;
-	background-color:#505050;
+	background-color: #505050;
 	color: white;
 }
 
-
-#bottom
-{ 
-	background-color:#505050;
-	color: #FF9933;	
-	font-size:8pt;
+#bottom {
+	background-color: #505050;
+	color: #FF9933;
+	font-size: 8pt;
 	text-align: right;
 	padding-right: 10px;
 }

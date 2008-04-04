@@ -19,16 +19,19 @@ limitations under the License.
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta HTTP-Equiv="Cache-Control" content="no-cache">
     <link rel="stylesheet" type="text/css" href="media/style.css" />
+#if ($additionalCSS)
+	<link rel="stylesheet" type="text/css" href="$additionalCSS" />
+#end
 <head>
 
 <title>$appName - $pageTitle</title>
 </head>
 <body>
 <div id="navbar">
-<h1>$appName - $pageTitle</h1>
-<a href="/index.do">home</a>
+<h1><a href="/index.do">$htmlAppName</a> - $pageTitle</h1>
 #if ($monitorNode)
-	<a href="monitorNode.do?idx=$idx">node status</a>
+    <a href="monitorNode.do?idx=$idx">node status</a>
 #end
+<span class="fuzzy">powered by <a class="fuzzy" href="http://opensource.flaptor.com/clusterfest">Clusterfest</a></span>
 </div>
 <div id="content">

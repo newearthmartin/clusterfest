@@ -73,8 +73,9 @@ public class ClusterManager {
             String[] host = hosts[i].split(":");
             String hostName = host[0];
             int port = Integer.parseInt(host[1].trim());
-            String installDir = (host.length > 2) ? host[2] : null;
-            registerNode(hostName, port, installDir);
+            String installDir = (host.length > 2 && host[2].length() >0) ? host[2] : null;
+            String type = (host.length > 3 && host[3].length() >0) ? host[3] : null;
+            registerNode(hostName, port, installDir, type);
         }
         
 		new Timer().scheduleAtFixedRate(new TimerTask(){
@@ -121,7 +122,11 @@ public class ClusterManager {
         String nodeList = "";
         for (NodeDescriptor node : nodes) {
             if (nodeList.length() > 0) nodeList += ",\\\n\t";
-            nodeList += node.getHost() +":"+node.getPort()+":"+node.getInstallDir();
+            nodeList += 
+                node.getHost() + ":" +
+                node.getPort() + ":" +
+                (node.getInstallDir()!=null?node.getInstallDir() : "") + ":" +
+                (node.getType()!=null?node.getType() : "");
         }
         Config config = Config.getConfig("clustering.properties");
         config.set("clustering.nodes", nodeList);
@@ -132,12 +137,13 @@ public class ClusterManager {
 	 * Registers a node in Clusterfest and notifies it to all its modules
 	 * @param host the host where the node is
 	 * @param port the port where that node is listening for clusterfest 
-	 * @param installDir the directory where it is installed in that host (not the baseDir, should be something like baseDir/searcher)
+	 * @param installDir the directory where it is installed in that host (not the baseDir, should be something like baseDir/searcher) (can be null)
+     * @param type the type of the node (can be null)
 	 * @return the registered node
 	 */
-	public NodeDescriptor registerNode(String host, int port, String installDir) {
+	public NodeDescriptor registerNode(String host, int port, String installDir, String type) {
 		synchronized (nodes) {
-			NodeDescriptor node = new NodeDescriptor(host, port, installDir);
+			NodeDescriptor node = new NodeDescriptor(host, port, installDir, type);
 	        nodes.add(node);
 	       	updateAllInfo(node);
 			return node;

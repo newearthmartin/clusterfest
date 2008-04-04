@@ -44,12 +44,14 @@ public class NodeDescriptor {
 	 * creates a node
 	 * @param host
 	 * @param port
-	 * @param installDir the path where the node is installed (on the target machine)
+	 * @param installDir the path where the node is installed (on the target machine) (can be null)
+     * @param type the node type (can be null)
 	 */
-    public NodeDescriptor(String host, int port, String installDir) {
+    public NodeDescriptor(String host, int port, String installDir, String type) {
         this.host = host;
         this.port = port;
         this.installDir = installDir;
+        this.type = type;
         try {
 			xmlrpcClient = new XmlrpcClient(new URL("http://"+host+":"+port+"/"));
 		} catch (MalformedURLException e) {
