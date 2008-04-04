@@ -17,6 +17,7 @@ package com.flaptor.clusterfest.action;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -30,7 +31,11 @@ import com.flaptor.clusterfest.NodeDescriptor;
 import com.flaptor.clusterfest.NodeUnreachableException;
 import com.flaptor.clusterfest.WebModule;
 import com.flaptor.clusterfest.monitoring.node.Monitoreable;
+import com.flaptor.util.Execute;
+import com.flaptor.util.Execution;
+import com.flaptor.util.MultiExecutor;
 import com.flaptor.util.Pair;
+import com.flaptor.util.Execution.Results;
 import com.flaptor.util.remote.NoSuchRpcMethodException;
 import com.flaptor.util.remote.WebServer;
 import com.flaptor.util.remote.XmlrpcClient;
@@ -43,7 +48,7 @@ import com.flaptor.util.remote.XmlrpcSerialization;
  */
 public class ActionModule extends AbstractModule<ActionNodeDescriptor> {
     private static final Logger logger = Logger.getLogger(com.flaptor.util.Execute.whoAmI());
-
+    MultiExecutor<Void> multiExecutor = new MultiExecutor<Void>(5, "sendAction");
     public final static String MODULE_CONTEXT = "action";
     
 	protected void notifyModuleNode(ActionNodeDescriptor node) {
@@ -57,16 +62,43 @@ public class ActionModule extends AbstractModule<ActionNodeDescriptor> {
         return ModuleUtil.nodeBelongs(node, MODULE_CONTEXT, false);
     }
     
-    public void sendAction(List<NodeDescriptor> nodes, final String action, final Object[] params) {
+    /**
+     * sends an action to nodes. If a node fails, an exception is returned in the exception list 
+     * @param nodes
+     * @param action
+     * @param params
+     * @return
+     */
+    public List<Throwable> sendAction(List<NodeDescriptor> nodes, final String action, final Object[] params) {
+        List<Throwable> errors = new ArrayList<Throwable>();
+        Execution<Void> e = new Execution<Void>();
+
+        int actualNodes = 0;
         for (NodeDescriptor node: nodes) {
             final ActionNodeDescriptor mnode = getModuleNode(node);
             if (mnode != null) {
-                new Thread() {
-                    public void run() {
-                        try {mnode.action(action, params);} catch (NodeUnreachableException e) {logger.error(e,e);}}
-                }.start();
+                e.getTaskQueue().add(new Callable<Void>() {
+                    public Void call() throws Exception {
+                        mnode.action(action, params);
+                        return null;
+                    }
+                });
+                actualNodes++;
             }
         }
+        multiExecutor.addExecution(e);
+        while(true) {
+            synchronized(e) {
+                if (e.getResultsList().size() == actualNodes) break;
+            }
+            Execute.sleep(100);
+        }
+        for (Results<Void> result : e.getResultsList()) {
+            if (!result.isFinishedOk()) {
+                errors.add(result.getException());
+            }
+        }
+        return errors;
     }
 
     /**

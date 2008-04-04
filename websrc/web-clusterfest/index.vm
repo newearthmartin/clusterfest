@@ -79,6 +79,7 @@ limitations under the License.
         <input type="hidden" name="selectedAction" value=""/>
         <input type="hidden" name="action" value="selectedNodesAction"/>
 
+        Selected nodes:
         #foreach ($wm in $cluster.getWebModules())
             #if ($wm.getSelectedNodesActions())
             	#foreach ($selectNodeAction in $wm.getSelectedNodesActions()) 

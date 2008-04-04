@@ -200,8 +200,8 @@ public class ControllerModule extends AbstractModule<ControllerNodeDescriptor> i
 
 	public List<Pair<String, String>> getSelectedNodesActions() {
         List<Pair<String, String>> ret = new ArrayList<Pair<String,String>>();
-        ret.add(new Pair<String, String>("controller.start", "<img src=\"media/start.png\"/>selected"));
-        ret.add(new Pair<String, String>("controller.kill", "<img src=\"media/stop.png\"/>selected"));
+        ret.add(new Pair<String, String>("controller.start", "<img src=\"media/start.png\"/>"));
+        ret.add(new Pair<String, String>("controller.kill", "<img src=\"media/stop.png\"/>"));
         return ret;
     }
 	
