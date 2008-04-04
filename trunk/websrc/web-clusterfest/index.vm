@@ -98,7 +98,7 @@ limitations under the License.
 #end
 
 <br/>
-<form method="post" action="index.jsp">
+<form method="post" action="">
     <input type="hidden" name="action" value="register"/> 
     <table border="1">
         <tr><th colspan="2">Register node</th></tr>

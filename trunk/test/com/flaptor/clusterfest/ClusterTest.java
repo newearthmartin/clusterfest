@@ -71,7 +71,7 @@ public class ClusterTest extends TestCase {
 			assertEquals("searcher", node.getType());
 			assertTrue(node.isReachable());
 		}
-		NodeDescriptor n2 = cluster.registerNode("localhost", 12345, "lalalal");
+		NodeDescriptor n2 = cluster.registerNode("localhost", 12345, "lalalal", "typee");
 		assertFalse(n2.isReachable());
 		assertEquals(NUM_NODES + 1, cluster.getNodes().size());
 		cluster.unregisterNode(n2);

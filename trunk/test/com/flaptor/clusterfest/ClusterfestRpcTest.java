@@ -54,7 +54,7 @@ public class ClusterfestRpcTest extends TestCase {
 		        "monitor:com.flaptor.clusterfest.ClusteringRpcTest$MonitoreableImp");
 	    clusterableListener = new ClusterableListener(PORT);
 		
-		node = new NodeDescriptor("localhost", PORT, "/tmp/lalala");
+		node = new NodeDescriptor("localhost", PORT, "/tmp/lalala", "typee");
 		monitoreableProxy = MonitorModule.getMonitoreableProxy(node.getXmlrpcClient());
 		controllableProxy = ControllerModule.getControllableProxy(node.getXmlrpcClient());
 	}
