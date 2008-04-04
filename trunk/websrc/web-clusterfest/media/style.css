@@ -79,7 +79,7 @@ a.sanityUNKNOWN,a.sanityUNKNOWN:hover,a.sanityUNKNOWN:visited {
 }
 
 a.sanityBAD,a.sanityBAD:hover,a.sanityBAD:visited {
-	color: white;
+	color: black;
 	background-color: yellow;
 }
 
