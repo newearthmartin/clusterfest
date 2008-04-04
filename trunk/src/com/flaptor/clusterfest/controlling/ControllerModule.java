@@ -161,27 +161,20 @@ public class ControllerModule extends AbstractModule<ControllerNodeDescriptor> i
 	public String action(String action, HttpServletRequest request) {
 		ClusterManager cluster = ClusterManager.getInstance();
 		String message = null;
-		int idx = -1;
-		String nodeParam = request.getParameter("idx");
-		if (nodeParam != null ) idx = Integer.parseInt(nodeParam);
+        NodeDescriptor node = ModuleUtil.getNodeFromRequest(request);
         if ("start".equals(action)) {
-            NodeDescriptor node = cluster.getNodes().get(idx);
             message = ControllingFrontend.startNode(cluster, node);
         }    
         if ("kill".equals(action)) {
-            NodeDescriptor node = cluster.getNodes().get(idx);
             message = ControllingFrontend.killNode(cluster, node);
         }    
         if ("pause".equals(action)) {
-            NodeDescriptor node = cluster.getNodes().get(idx);
             pauseNode(node);
         }    
         if ("resume".equals(action)) {
-            NodeDescriptor node = cluster.getNodes().get(idx);
             resumeNode(node);
         }    
         if ("stop".equals(action)) {
-            NodeDescriptor node = cluster.getNodes().get(idx);
             stopNode(node);
         }
         return message;

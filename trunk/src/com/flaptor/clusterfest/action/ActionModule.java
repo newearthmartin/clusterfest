@@ -31,6 +31,7 @@ import com.flaptor.clusterfest.NodeDescriptor;
 import com.flaptor.clusterfest.NodeUnreachableException;
 import com.flaptor.clusterfest.WebModule;
 import com.flaptor.clusterfest.monitoring.node.Monitoreable;
+import com.flaptor.util.CallableWithId;
 import com.flaptor.util.Execute;
 import com.flaptor.util.Execution;
 import com.flaptor.util.MultiExecutor;
@@ -69,15 +70,15 @@ public class ActionModule extends AbstractModule<ActionNodeDescriptor> {
      * @param params
      * @return
      */
-    public List<Throwable> sendAction(List<NodeDescriptor> nodes, final String action, final Object[] params) {
-        List<Throwable> errors = new ArrayList<Throwable>();
+    public List<Pair<NodeDescriptor,Throwable>> sendAction(List<NodeDescriptor> nodes, final String action, final Object[] params) {
+        List<Pair<NodeDescriptor,Throwable>> errors = new ArrayList<Pair<NodeDescriptor,Throwable>>();
         Execution<Void> e = new Execution<Void>();
 
         int actualNodes = 0;
         for (NodeDescriptor node: nodes) {
             final ActionNodeDescriptor mnode = getModuleNode(node);
             if (mnode != null) {
-                e.getTaskQueue().add(new Callable<Void>() {
+                e.getTaskQueue().add(new CallableWithId<Void, NodeDescriptor>(node) {
                     public Void call() throws Exception {
                         mnode.action(action, params);
                         return null;
@@ -95,7 +96,9 @@ public class ActionModule extends AbstractModule<ActionNodeDescriptor> {
         }
         for (Results<Void> result : e.getResultsList()) {
             if (!result.isFinishedOk()) {
-                errors.add(result.getException());
+                errors.add(new Pair<NodeDescriptor, Throwable>(
+                        ((CallableWithId<Void, NodeDescriptor>)result.getTask()).getId(), 
+                        result.getException()));
             }
         }
         return errors;

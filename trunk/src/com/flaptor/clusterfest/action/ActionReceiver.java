@@ -21,6 +21,7 @@ public interface ActionReceiver {
      * called when action received
      * @param action the action name
      * @param params the action params
+     * @return (is ignored, for compatibility with xmlrpc)
      */
-    public void action(String action, Object[] params) throws Exception;
+    public boolean action(String action, Object[] params) throws Exception;
 }
