@@ -33,6 +33,7 @@ import org.apache.log4j.Logger;
 import com.flaptor.clusterfest.AbstractModule;
 import com.flaptor.clusterfest.ClusterManager;
 import com.flaptor.clusterfest.ClusterableListener;
+import com.flaptor.clusterfest.ModuleUtil;
 import com.flaptor.clusterfest.NodeDescriptor;
 import com.flaptor.clusterfest.NodeUnreachableException;
 import com.flaptor.clusterfest.WebModule;
@@ -97,16 +98,8 @@ public class MonitorModule extends AbstractModule<MonitorNodeDescriptor> impleme
     	}
     }
     
-	@Override
 	public boolean shouldRegister(NodeDescriptor node) throws NodeUnreachableException {
-		try {
-			boolean ret = getMonitoreableProxy(node.getXmlrpcClient()).ping();
-			return ret;
-		} catch (NoSuchRpcMethodException e) {
-			return false;
-		} catch (Exception e) {
-			throw new NodeUnreachableException(e);
-		}
+        return ModuleUtil.nodeBelongs(node, MODULE_CONTEXT, false);
 	}
 
 	public boolean updateNodeInfo(MonitorNodeDescriptor node) {

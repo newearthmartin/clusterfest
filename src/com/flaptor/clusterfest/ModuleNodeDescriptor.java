@@ -22,11 +22,11 @@ package com.flaptor.clusterfest;
  * Basic implementation of a node descriptor for modules. Maintains a reference to the original NodeDescriptor
  * @author Martin Massera
  */
-public abstract class ModuleNodeDescriptor {
+public class ModuleNodeDescriptor {
     
     private NodeDescriptor nodeDescriptor;
 
-    protected ModuleNodeDescriptor(NodeDescriptor nodeDescriptor) {
+    public ModuleNodeDescriptor(NodeDescriptor nodeDescriptor) {
         this.nodeDescriptor = nodeDescriptor;
     }
 

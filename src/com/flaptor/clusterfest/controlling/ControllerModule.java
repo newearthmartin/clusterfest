@@ -29,6 +29,7 @@ import org.apache.log4j.Logger;
 import com.flaptor.clusterfest.AbstractModule;
 import com.flaptor.clusterfest.ClusterManager;
 import com.flaptor.clusterfest.ClusterableListener;
+import com.flaptor.clusterfest.ModuleUtil;
 import com.flaptor.clusterfest.NodeDescriptor;
 import com.flaptor.clusterfest.NodeUnreachableException;
 import com.flaptor.clusterfest.WebModule;
@@ -46,6 +47,7 @@ import com.flaptor.util.remote.XmlrpcSerialization;
  * @author Martin Massera
  */
 public class ControllerModule extends AbstractModule<ControllerNodeDescriptor> implements WebModule {
+    public final static String MODULE_CONTEXT = "controller";
 
     /**
      * adds a controller implementation to a clusterableListener
@@ -53,14 +55,14 @@ public class ControllerModule extends AbstractModule<ControllerNodeDescriptor> i
      * @param c
      */
     public static void addControllerListener(ClusterableListener listener, Controllable c) {
-        listener.addModuleListener("controller", XmlrpcSerialization.handler(c));
+        listener.addModuleListener(MODULE_CONTEXT, XmlrpcSerialization.handler(c));
     }
     /**
      * @param client
      * @return a proxy for Controllable xmlrpc calls
      */
     public static Controllable getControllableProxy(XmlrpcClient client) {
-        return (Controllable)XmlrpcClient.proxy("controller", Controllable.class, client);
+        return (Controllable)XmlrpcClient.proxy(MODULE_CONTEXT, Controllable.class, client);
     }
 
     @SuppressWarnings("unused")
@@ -80,14 +82,7 @@ public class ControllerModule extends AbstractModule<ControllerNodeDescriptor> i
     }
 
 	protected boolean shouldRegister(NodeDescriptor node) throws NodeUnreachableException {
-	    try {
-	        getControllableProxy(node.getXmlrpcClient()).ping();
-	        return true;
-	    } catch (NoSuchRpcMethodException e) {
-	        return false;
-	    } catch (Exception e) {
-	        return true; //return true by default
-	    }
+	    return ModuleUtil.nodeBelongs(node, MODULE_CONTEXT, true);
 	}
 
 	/**
