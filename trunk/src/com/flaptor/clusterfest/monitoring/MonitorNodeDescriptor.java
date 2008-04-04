@@ -115,7 +115,7 @@ public class MonitorNodeDescriptor extends ModuleNodeDescriptor {
             logs.put(logName, new Pair<String, Long>(log, System.currentTimeMillis()));
             
         } catch (Exception e) {
-        	getNodeDescriptor().setUnreachable(e);
+            throw new NodeUnreachableException(e, getNodeDescriptor());
         }
     }
     
@@ -191,8 +191,7 @@ public class MonitorNodeDescriptor extends ModuleNodeDescriptor {
             getNodeDescriptor().setReachable(true);
             return properties;
         } catch (Throwable t) {
-        	getNodeDescriptor().setUnreachable(t);
-        	return null; //never called
+            throw new NodeUnreachableException(t, getNodeDescriptor());
         }
     }
     
@@ -202,8 +201,7 @@ public class MonitorNodeDescriptor extends ModuleNodeDescriptor {
             getNodeDescriptor().setReachable(true);
             return systemProperties;
         } catch (Throwable t) {
-            getNodeDescriptor().setUnreachable(t);
-        	return null; //never called
+            throw new NodeUnreachableException(t, getNodeDescriptor());
         }
     }
 }

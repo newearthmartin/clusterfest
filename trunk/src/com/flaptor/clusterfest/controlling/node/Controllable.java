@@ -16,6 +16,7 @@ limitations under the License.
 
 package com.flaptor.clusterfest.controlling.node;
 
+import com.flaptor.clusterfest.Pingable;
 import com.flaptor.clusterfest.controlling.ControllerNodeState;
 
 /**
@@ -23,14 +24,8 @@ import com.flaptor.clusterfest.controlling.ControllerNodeState;
  *
  * @author Martin Massera
  */
-public interface Controllable {
+public interface Controllable extends Pingable{
 
-	/**
-	 * pinging method for determining if the node is controllable
-	 * @return true
-	 */
-	public boolean ping() throws Exception;
-	
 	/**
 	 * @return the state of the node
 	 */

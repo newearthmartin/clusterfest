@@ -18,27 +18,34 @@ package com.flaptor.clusterfest;
 
 /**
  * Exception to be thrown by rpc calls, meaning that the node is unreachable
+ * Sets unreachable to the node
  *  
  * @author Martin Massera
  */
 public class NodeUnreachableException extends Exception {
-
+    NodeDescriptor node;
+    
     private static final long serialVersionUID = 1L;
 
-    public NodeUnreachableException() {
+    public NodeUnreachableException(NodeDescriptor node) {
         super();
+        this.node = node;
+        node.setReachable(false);
     }
 
-    public NodeUnreachableException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public NodeUnreachableException(String message) {
+    public NodeUnreachableException(String message, NodeDescriptor node) {
         super(message);
+        node.setReachable(false);
     }
 
-    public NodeUnreachableException(Throwable cause) {
-        super(cause);
+    public NodeUnreachableException(String message, Throwable cause, NodeDescriptor node) {
+        super(message, cause);
+        node.setReachable(false);
     }
-    
+
+
+    public NodeUnreachableException(Throwable cause, NodeDescriptor node) {
+        super(cause);
+        node.setReachable(false);
+    }
 }

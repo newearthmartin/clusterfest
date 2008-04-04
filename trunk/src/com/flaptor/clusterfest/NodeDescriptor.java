@@ -89,16 +89,7 @@ public class NodeDescriptor {
             type = clusterableStub.getNodeType();
             reachable = true;
         } catch (Exception e) {
-        	setUnreachable(e);
+            throw new NodeUnreachableException(e, this);
         }
-    }
-
-    /**
-     * marks the node as unreachable and throws a NodeUnreachableException
-     * @throws NodeUnreachableException always!!!
-     */
-    public void setUnreachable(Throwable t) throws NodeUnreachableException {
-    	reachable = false;
-    	throw new NodeUnreachableException(t);
     }
 }
