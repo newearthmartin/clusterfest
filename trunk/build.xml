@@ -16,7 +16,7 @@ limitations under the License.
 
 <project name="clusterfest" default="jar" basedir=".">
     <property name="project" value="clusterfest"/>
-    <property name="version" value="0.2"/>
+    <property name="version" value="0.3"/>
 
     <property name="src.dir" value="${basedir}/src"/>
     <property name="websrc.dir" value="${basedir}/websrc"/>
@@ -124,7 +124,7 @@ limitations under the License.
                 <attribute name="Version" value="${version}"/>
             </manifest>
 
-            <fileset dir="${src.dir}">
+            <fileset dir="${websrc.dir}">
                 <include name="web-clusterfest/**"/>
             </fileset>
 
@@ -165,7 +165,7 @@ limitations under the License.
                 <fileset dir="${bin.dir}"/>
             </copy>
             <copy todir="${tmp.bin.dir}/web-clusterfest/">
-                <fileset dir="${src.dir}/web-clusterfest/"/>
+                <fileset dir="${websrc.dir}/web-clusterfest/"/>
             </copy>
             <copy todir="${tmp.conf.dir}">
                 <fileset dir="${conf.dir}">
@@ -191,7 +191,8 @@ limitations under the License.
                 <tarfileset file="${doc.dir}/LICENSE" prefix="${prefix}"/>
                 <tarfileset dir="${doc.dir}" prefix="${prefix}/doc"/>
                 <tarfileset dir="${conf.dir}" prefix="${prefix}/conf" />
-               	<tarfileset file="build.xml" prefix="${prefix}"/>
+                <tarfileset file="build.xml" prefix="${prefix}"/>
+                <tarfileset file="build-test.xml" prefix="${prefix}"/>
                 <tarfileset dir="${src.dir}" prefix="${prefix}/src"/>
                 <tarfileset dir="${bin.dir}" mode="755" prefix="${prefix}/bin"/>
                 <tarfileset dir="${test.dir}" prefix="${prefix}/test"/>

@@ -70,6 +70,7 @@ public class ActionModule extends AbstractModule<ActionNodeDescriptor> {
      * @param params
      * @return
      */
+    @SuppressWarnings("unchecked")
     public List<Pair<NodeDescriptor,Throwable>> sendAction(List<NodeDescriptor> nodes, final String action, final Object[] params) {
         List<Pair<NodeDescriptor,Throwable>> errors = new ArrayList<Pair<NodeDescriptor,Throwable>>();
         Execution<Void> e = new Execution<Void>();

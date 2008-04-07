@@ -10,7 +10,7 @@ echo Starting Clusterfest...
 
 CONF_DIR=conf
 LOG_DIR=logs
-PROJECT_JAR=clusterfest-0.2.jar
+PROJECT_JAR=clusterfest-0.3.jar
 PORT=47050
 
 if [ ! -d ${LOG_DIR} ]; then
