@@ -86,7 +86,8 @@ public class MonitoreableImplementation implements Monitoreable {
 			} else {
 				logFile = FileUtil.getExistingFile(logName, true, false, false);
 			}
-			return IOUtil.readAll(new FileReader(logFile));
+			return new String(IOUtil.tail(logFile, 1024 * 1024)); //read max 1 M
+//			return IOUtil.readAll(new FileReader(logFile));
 		} catch (IOException e) {
 			logger.warn(errorMessage, e);
 			return errorMessage + " - " + e;
