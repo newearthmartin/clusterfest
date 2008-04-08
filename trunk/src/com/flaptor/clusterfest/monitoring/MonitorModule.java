@@ -63,12 +63,14 @@ public class MonitorModule extends AbstractModule<MonitorNodeDescriptor> impleme
 	private final Map<String, PropertyFormatter> formatters = new HashMap<String, PropertyFormatter>();
 	
 	public MonitorModule() {
-		Config config = Config.getConfig("clustering.properties");
-		new Timer().scheduleAtFixedRate(new TimerTask(){
-			public void run() {
-				updateNodes();
-			}
-		}, 0, config.getInt("clustering.monitor.refreshInterval"));
+//this is done when clustermanager notifies nodes	    
+	    
+//		Config config = Config.getConfig("clustering.properties");
+//		new Timer().scheduleAtFixedRate(new TimerTask(){
+//			public void run() {
+//				updateNodes();
+//			}
+//		}, 0, config.getInt("clustering.monitor.refreshInterval"));
 	}
 
 	@Override
@@ -89,14 +91,15 @@ public class MonitorModule extends AbstractModule<MonitorNodeDescriptor> impleme
         updateNodeInfo(node);
     }
 
-    private void updateNodes() {
-    	//update states of all the monitored nodes
-    	synchronized (nodes) {
-	    	for (MonitorNodeDescriptor node : nodes) {
-				updateNodeInfo(node);
-	    	}
-    	}
-    }
+    //this is done when clustermanager notifies nodes       
+//    private void updateNodes() {
+//    	//update states of all the monitored nodes
+//    	synchronized (nodes) {
+//	    	for (MonitorNodeDescriptor node : nodes) {
+//				updateNodeInfo(node);
+//	    	}
+//    	}
+//    }
     
 	public boolean shouldRegister(NodeDescriptor node) throws NodeUnreachableException {
         return ModuleUtil.nodeBelongs(node, MODULE_CONTEXT, false);
