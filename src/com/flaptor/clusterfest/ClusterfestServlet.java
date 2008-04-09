@@ -125,6 +125,6 @@ public class ClusterfestServlet extends MVCServlet {
             }
         }
         if (message.length() > 0) request.setAttribute("message", message);
-    	return "index.vm";
+        return "index.vm";
     }
 }

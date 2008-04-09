@@ -25,6 +25,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 
 import com.flaptor.clusterfest.AbstractModule;
+import com.flaptor.clusterfest.ClusterManager;
 import com.flaptor.clusterfest.ClusterableListener;
 import com.flaptor.clusterfest.ModuleUtil;
 import com.flaptor.clusterfest.NodeDescriptor;
@@ -73,13 +74,13 @@ public class ActionModule extends AbstractModule<ActionNodeDescriptor> {
     @SuppressWarnings("unchecked")
     public List<Pair<NodeDescriptor,Throwable>> sendAction(List<NodeDescriptor> nodes, final String action, final Object[] params) {
         List<Pair<NodeDescriptor,Throwable>> errors = new ArrayList<Pair<NodeDescriptor,Throwable>>();
-        Execution<Void> e = new Execution<Void>();
+        Execution<Void> e = new Execution();
 
         int actualNodes = 0;
         for (NodeDescriptor node: nodes) {
             final ActionNodeDescriptor mnode = getModuleNode(node);
             if (mnode != null) {
-                e.getTaskQueue().add(new CallableWithId<Void, NodeDescriptor>(node) {
+                e.addTask(new CallableWithId<Void, NodeDescriptor>(node) {
                     public Void call() throws Exception {
                         mnode.action(action, params);
                         return null;
@@ -88,19 +89,13 @@ public class ActionModule extends AbstractModule<ActionNodeDescriptor> {
                 actualNodes++;
             }
         }
-        multiExecutor.addExecution(e);
-        while(true) {
-            synchronized(e) {
-                if (e.getResultsList().size() == actualNodes) break;
-            }
-            Execute.sleep(100);
-        }
-        for (Results<Void> result : e.getResultsList()) {
-            if (!result.isFinishedOk()) {
-                errors.add(new Pair<NodeDescriptor, Throwable>(
-                        ((CallableWithId<Void, NodeDescriptor>)result.getTask()).getId(), 
-                        result.getException()));
-            }
+        ClusterManager.getInstance().getMultiExecutor().addExecution(e);
+        e.waitFor();
+        for (Pair<Callable<Void>, Throwable> problem : e.getProblems()) {
+            errors.add(new Pair<NodeDescriptor, Throwable>(
+                    ((CallableWithId<Void, NodeDescriptor>)problem.first()).getId(), 
+                    problem.last()));
+            
         }
         return errors;
     }

@@ -17,7 +17,9 @@ limitations under the License.
 package com.flaptor.clusterfest.controlling;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -25,7 +27,12 @@ import org.apache.log4j.Logger;
 
 import com.flaptor.clusterfest.ClusterManager;
 import com.flaptor.clusterfest.ModuleNodeDescriptor;
+import com.flaptor.clusterfest.ModuleUtil;
 import com.flaptor.clusterfest.NodeDescriptor;
+import com.flaptor.clusterfest.monitoring.NodeState;
+import com.flaptor.util.CallableWithId;
+import com.flaptor.util.Execution;
+import com.flaptor.util.Pair;
 import com.flaptor.util.ThreadUtil;
 
 /**
@@ -35,40 +42,47 @@ import com.flaptor.util.ThreadUtil;
  */
 public class ControllingFrontend {
     private static final Logger logger = Logger.getLogger(com.flaptor.util.Execute.whoAmI());
+ 
+    private static void startOrKill(ClusterManager cluster, NodeDescriptor node, boolean start) throws IllegalStateException, IOException {
+        ControllerModule control = (ControllerModule)cluster.getModule("controller");
 
-    static ExecutorService threadPool = Executors.newFixedThreadPool(50);
+        if (!control.isRegistered(node)) {
+            logger.error("node not registered in controller framework");
+            throw new IllegalStateException("node not registered in controller framework");
+        }
+
+        ControllerNodeState targetState = start ? ControllerNodeState.RUNNING : ControllerNodeState.STOPPED;
+        if (start) control.startNode(node);
+        else control.killNode(node);
+        
+        long ms = System.currentTimeMillis();
+        while(true) {
+            if (System.currentTimeMillis() - ms > 10000) break;
+            if (control.getState(node) == ControllerNodeState.RUNNING) {
+                break;
+            }
+            ThreadUtil.sleep(500);
+        }
+
+        if (start) cluster.updateAllInfo(node); //if stop, hangs everything
+    }
     
 	/**
 	 * start a node through ssh
 	 * @param cluster
 	 * @param node
 	 * @return the message (ok or error explanation)
+	 * @throws Exception 
 	 */
 	public static String startNode(ClusterManager cluster, NodeDescriptor node) {
-        ControllerModule control = (ControllerModule)cluster.getModule("controller");
-        
-		if (!control.isRegistered(node)) {
-			logger.error("trying to start a node that is not registered in the controlling framework");
-			return "trying to start a node that is not registered in the controlling framework";
-		}
-		
         try {
-        	control.startNode(node);
-        	long ms = System.currentTimeMillis();
-        	String message = "Starting node..."; 
-        	while(true) {
-        		if (System.currentTimeMillis() - ms > 5000) break;
-        		if (control.getState(node) == ControllerNodeState.RUNNING) {
-        			message = "node started";
-        			break;
-        		}
-        		ThreadUtil.sleep(500);
-        	}
-        	cluster.updateAllInfo(node);
-        	return message;
-        } catch (IOException e) {
-        	return "Problem starting node: " + e.getMessage();
+            startOrKill(cluster, node, true);
+        } catch (IllegalStateException e1) {
+            return e1.getMessage();
+        } catch (IOException e1) {
+            return "Problem starting node: " + e1.getMessage();
         }
+        return "starting node...";
 	}
 
 	/**
@@ -78,79 +92,74 @@ public class ControllingFrontend {
 	 * @return the message (ok or error explanation)
 	 */
 	public static String killNode(ClusterManager cluster, NodeDescriptor node) {
-        ControllerModule control = (ControllerModule)cluster.getModule("controller");
-
-		if (!control.isRegistered(node)) {
-			logger.error("trying to kill a node that is not registered in the controlling framework");
-			return "trying to kill a node that is not registered in the controlling framework";
-		}
-        
         try {
-        	control.killNode(node);
-        	long ms = System.currentTimeMillis();
-        	String message = "killing node...";
-        	while(true) {
-        		if (System.currentTimeMillis() - ms > 5000) break;
-        		ControllerNodeState state = control.getState(node);
-        		if (state == ControllerNodeState.STOPPED) {
-        			message = "node killed";
-        			node.setReachable(false);
-        			break;
-        		}
-        		ThreadUtil.sleep(500);
-        	}
-//hangs everything, commented
-//        	cluster.updateAllInfo(node);
-        	return message;
-        } catch (IOException e) {
-        	return "Problem killing node: " + e.getMessage();
+            startOrKill(cluster, node, false);
+        } catch (IllegalStateException e1) {
+            return e1.getMessage();
+        } catch (IOException e1) {
+            return "Problem killing node: " + e1.getMessage();
         }
+        return "killing node...";
 	}
 
-    public static String killAll(ClusterManager cluster, List<NodeDescriptor> nodes) {
+    @SuppressWarnings("unchecked")
+    public static String killAll(final ClusterManager cluster, List<NodeDescriptor> nodes) {
         ControllerModule control = (ControllerModule)cluster.getModule("controller");
-        for (NodeDescriptor node: nodes) {
-            final ControllerNodeDescriptor cnode = control.getModuleNode(node); 
+        Execution<Void> e = new Execution<Void>();
+        for (final NodeDescriptor node: nodes) {
+            final ControllerNodeDescriptor cnode = control.getModuleNode(node);
             if (cnode!= null) {
-                threadPool.submit(new Runnable() {
-                    public void run() {
-                        try {
-                            cnode.kill();
-                        } catch (IOException e) {logger.error(e);}
+                e.addTask(new CallableWithId<Void, NodeDescriptor>(node) {
+                    public Void call() throws Exception {
+                        startOrKill(cluster, node, false);
+                        return null;
                     }
                 });
             }
         }
-        return "sent kill to selected nodes";
+        cluster.getMultiExecutor().addExecution(e);
+        e.waitFor();
+        List<Pair<Callable<Void>,Throwable>> problems = e.getProblems();
+        if (problems.size() > 0) {
+            return "problems while killing nodes:<br/>" + ModuleUtil.problemListToHTML(problems);
+        } else {
+            return "nodes killed";    
+        }
     }
     
 	public static String killAll(ClusterManager cluster) {
         ControllerModule control = (ControllerModule)cluster.getModule("controller");
-        killAll(cluster, cluster.getNodes());
-		return "sent kill to all nodes";
+        return killAll(cluster, cluster.getNodes());
 	}
 
-    public static String startAll(ClusterManager cluster, List<NodeDescriptor> nodes) {
+	@SuppressWarnings("unchecked")
+    public static String startAll(final ClusterManager cluster, List<NodeDescriptor> nodes) {
         ControllerModule control = (ControllerModule)cluster.getModule("controller");
-        for (NodeDescriptor node: nodes) {
+        Execution<Void> e = new Execution<Void>();
+        for (final NodeDescriptor node: nodes) {
             final ControllerNodeDescriptor cnode = control.getModuleNode(node); 
             if (cnode!= null) {
-                threadPool.submit(new Runnable() {
-                    public void run() {
-                        try {
-                            cnode.start();
-                        } catch (IOException e) {logger.error(e);}
+                e.addTask(new CallableWithId<Void, NodeDescriptor>(node) {
+                    public Void call() throws Exception {
+                        startOrKill(cluster, node, true);
+                        return null;
                     }
                 });
             }
         }
-        return "sent start to selected nodes";
+        cluster.getMultiExecutor().addExecution(e);
+        e.waitFor();
+        List<Pair<Callable<Void>,Throwable>> problems = e.getProblems();
+        if (problems.size() > 0) {
+            return "problems while starting nodes:<br/>" + ModuleUtil.problemListToHTML(problems);
+        } else {
+            return "nodes started";    
+        }
     }
 
     public static String startAll(ClusterManager cluster) {
         ControllerModule control = (ControllerModule)cluster.getModule("controller");
-        startAll(cluster, cluster.getNodes());
-		return "sent start to all nodes";
+        return startAll(cluster, cluster.getNodes());
 	}
 }
 
