@@ -57,6 +57,7 @@ public class ModuleUtil {
      * @param problems
      * @return
      */
+    @SuppressWarnings("unchecked")
     public static String problemListToHTML(List<Pair<Callable<Void>,Throwable>> problems) {
         String message = "<ul>";
         for (Pair<Callable<Void>,Throwable> problem : problems) {
