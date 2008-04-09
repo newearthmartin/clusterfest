@@ -66,7 +66,7 @@ public class ControllerNodeDescriptor extends ModuleNodeDescriptor {
 	public void start() throws IOException {
 		updateState();
 		if (state == ControllerNodeState.STOPPED) {
-			Triad<Integer, String, String> rv = CommandUtil.remoteSSHCommand(getNodeDescriptor().getHost(), -1, "cd "+getNodeDescriptor().getInstallDir() + "\n./start.sh", 5000);
+			Triad<Integer, String, String> rv = CommandUtil.remoteSSHCommand(getNodeDescriptor().getHost(), -1, "cd "+getNodeDescriptor().getInstallDir() + "\n./start.sh", 30000);
 			if (rv.first() == 0) return;
 			else throw new IOException("could not start remote host. error code: " + rv.first() + " - " + rv.second() + " - " + rv.third()); 
 		}
@@ -77,7 +77,7 @@ public class ControllerNodeDescriptor extends ModuleNodeDescriptor {
 	 */
 	public void kill() throws IOException {
 		updateState();
-		Triad<Integer, String, String> rv = CommandUtil.remoteSSHCommand(getNodeDescriptor().getHost(), -1, "cd "+getNodeDescriptor().getInstallDir() + "\n./stop.sh", 5000);
+		Triad<Integer, String, String> rv = CommandUtil.remoteSSHCommand(getNodeDescriptor().getHost(), -1, "cd "+getNodeDescriptor().getInstallDir() + "\n./stop.sh", 30000);
 		if (rv.first() == 0) return;
 		else throw new IOException("could not kill remote host. error code: " + rv.first() + " - " + rv.second() + " - " + rv.third()); 
 	}

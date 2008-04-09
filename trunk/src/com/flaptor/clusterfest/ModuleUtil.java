@@ -1,7 +1,12 @@
 package com.flaptor.clusterfest;
 
+import java.util.List;
+import java.util.concurrent.Callable;
+
 import javax.servlet.http.HttpServletRequest;
 
+import com.flaptor.util.CallableWithId;
+import com.flaptor.util.Pair;
 import com.flaptor.util.remote.NoSuchRpcMethodException;
 import com.flaptor.util.remote.XmlrpcClient;
 import com.flaptor.util.remote.XmlrpcSerialization;
@@ -45,5 +50,20 @@ public class ModuleUtil {
         String nodeParam = request.getParameter("idx");
         if (nodeParam != null ) return ClusterManager.getInstance().getNodes().get(Integer.parseInt(nodeParam));
         else return null;
+    }
+
+    /**
+     * creates a ul list of problems encountered in a multi execution
+     * @param problems
+     * @return
+     */
+    public static String problemListToHTML(List<Pair<Callable<Void>,Throwable>> problems) {
+        String message = "<ul>";
+        for (Pair<Callable<Void>,Throwable> problem : problems) {
+            NodeDescriptor node = ((CallableWithId<Void, NodeDescriptor>)problem.first()).getId();
+            message+="<li>"+node.getHost() + ":"+node.getPort() + ": " + problem.last() + "</li>";
+        }
+        message += "</li>";
+        return message;
     }
 }

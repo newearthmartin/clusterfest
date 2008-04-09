@@ -25,6 +25,7 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.TreeSet;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -33,6 +34,8 @@ import org.apache.log4j.Logger;
 
 import com.flaptor.util.ClassUtil;
 import com.flaptor.util.Config;
+import com.flaptor.util.Execution;
+import com.flaptor.util.MultiExecutor;
 import com.flaptor.util.Pair;
 
 /**
@@ -46,6 +49,8 @@ public class ClusterManager {
 	
     private static final Logger logger = Logger.getLogger(com.flaptor.util.Execute.whoAmI());
 	
+    MultiExecutor multiExecutor = new MultiExecutor(40, "clusterfest");
+    
     private static class InitializiationOnDemandHolder {
         private static ClusterManager instance = new ClusterManager();    
     }
@@ -75,16 +80,23 @@ public class ClusterManager {
             int port = Integer.parseInt(host[1].trim());
             String installDir = (host.length > 2 && host[2].length() >0) ? host[2] : null;
             String type = (host.length > 3 && host[3].length() >0) ? host[3] : null;
-            registerNode(hostName, port, installDir, type);
+            registerWithoutUpdating(hostName, port, installDir, type);
         }
-        
+    	updateNodes();
+    	int interval = config.getInt("clustering.checkNodesInterval");
 		new Timer().scheduleAtFixedRate(new TimerTask(){
 			public void run() {
 				updateNodes();
 			}
-		}, 0, config.getInt("clustering.checkNodesInterval"));
+		}, interval, interval);
     }
     
+    /**
+     * @return the official clusterfest multiexecutor, all modules can register executions here
+     */
+    public MultiExecutor getMultiExecutor() {
+        return multiExecutor;
+    }
     
 	private void addWebModule(WebModule wm) {
 	    if (wm.getActions() != null) {
@@ -134,6 +146,23 @@ public class ClusterManager {
     }
 
 	/**
+	 * adds a node to the nodelist but doesnt update it's info
+	 * 
+     * @param host the host where the node is
+     * @param port the port where that node is listening for clusterfest 
+     * @param installDir the directory where it is installed in that host (not the baseDir, should be something like baseDir/searcher) (can be null)
+     * @param type the type of the node (can be null)
+	 * @return the registered node
+	 */
+	private NodeDescriptor registerWithoutUpdating(String host, int port, String installDir, String type) {
+        synchronized (nodes) {
+            NodeDescriptor node = new NodeDescriptor(host, port, installDir, type);
+            nodes.add(node);
+            return node;
+        }
+	}
+	
+	/**
 	 * Registers a node in Clusterfest and notifies it to all its modules
 	 * @param host the host where the node is
 	 * @param port the port where that node is listening for clusterfest 
@@ -143,8 +172,7 @@ public class ClusterManager {
 	 */
 	public NodeDescriptor registerNode(String host, int port, String installDir, String type) {
 		synchronized (nodes) {
-			NodeDescriptor node = new NodeDescriptor(host, port, installDir, type);
-	        nodes.add(node);
+			NodeDescriptor node = registerWithoutUpdating(host, port, installDir, type);
 	       	updateAllInfo(node);
 			return node;
 		}
@@ -165,21 +193,25 @@ public class ClusterManager {
 	/**
 	 * updates all info of all nodes
 	 */
+	@SuppressWarnings("unchecked")
 	public void updateAllInfoAllNodes() {
+	    Execution<Void> execution = new Execution<Void>();
 		synchronized (nodes) {
-			ExecutorService threadPool = Executors.newFixedThreadPool(nodes.size());
 			for(final NodeDescriptor node: nodes) {
-				threadPool.submit(new Runnable() {
-					public void run() {
-						updateAllInfo(node);
-					}
-				});
+			    execution.addTask(new Callable<Void>() {
+                    public Void call() throws Exception {
+                        updateAllInfo(node);
+                        return null;
+                    }
+			    });
 			}
-			try {
-			    threadPool.shutdown();
-			    if (!threadPool.awaitTermination(60, TimeUnit.SECONDS)) logger.error("nodes took too long to update");
-			} catch (InterruptedException e) {logger.error("unexpected interruption while waiting", e);}
 		}
+		multiExecutor.addExecution(execution);
+		try {
+            execution.waitFor(60000);
+        } catch (InterruptedException e) {
+            logger.error("nodes took too long to update");
+        }
 	}
 
 	/**
