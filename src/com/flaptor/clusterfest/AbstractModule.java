@@ -78,6 +78,14 @@ abstract public class AbstractModule<T extends ModuleNodeDescriptor> implements 
 	    unregisterNode(node);
 	}
 	
+	public boolean hasReachableNodes() {
+	    for (T node: nodes) {
+	        if (node.getNodeDescriptor().isReachable()) return true; 
+	    }
+	    return false;
+	}
+
+	
 	/**
 	 * @return true iff the node is registered
 	 */

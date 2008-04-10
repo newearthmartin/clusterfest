@@ -58,7 +58,7 @@ public class ControllingFrontend {
         long ms = System.currentTimeMillis();
         while(true) {
             if (System.currentTimeMillis() - ms > 10000) break;
-            if (control.getState(node) == ControllerNodeState.RUNNING) {
+            if (control.getState(node) == targetState) {
                 break;
             }
             ThreadUtil.sleep(500);

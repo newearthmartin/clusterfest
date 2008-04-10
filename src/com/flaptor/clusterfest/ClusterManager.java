@@ -57,9 +57,6 @@ public class ClusterManager {
     
     private Map<String, Module> modules = new HashMap<String, Module>();
     private List<WebModule> webModules = new ArrayList<WebModule>();
-    private Map<String, WebModule> modulePageMap = new HashMap<String, WebModule>();
-    private Map<String, WebModule> moduleActionMap = new HashMap<String, WebModule>();
-    private Map<String, WebModule> moduleSelectNodeActionMap = new HashMap<String, WebModule>();
     
     private ClusterManager() {
     	//after initializing everything, register all nodes
@@ -99,21 +96,6 @@ public class ClusterManager {
     }
     
 	private void addWebModule(WebModule wm) {
-	    if (wm.getActions() != null) {
-    	    for (String action : wm.getActions()) {
-                moduleActionMap.put(action, wm);
-            }
-	    }
-	    if (wm.getPages() != null) {
-            for (String page : wm.getPages()) {
-                modulePageMap.put(page, wm);
-            }
-	    }
-        if (wm.getSelectedNodesActions() != null) {
-            for (Pair<String,String> action : wm.getSelectedNodesActions()) {
-                moduleSelectNodeActionMap.put(action.first(), wm);
-            }
-        }
         webModules.add(wm);
 	}
 	
@@ -274,13 +256,24 @@ public class ClusterManager {
 	}
 	
     public WebModule getModuleForAction(String action) {
-        return moduleActionMap.get(action);
+        for (WebModule wm : webModules) {
+            if (wm.getActions().contains(action)) return wm;
+        }
+        return null;
     }
     public WebModule getModuleForPage(String page) {
-        return modulePageMap.get(page);
+        for (WebModule wm : webModules) {
+            if (wm.getPages().contains(page)) return wm;
+        }
+        return null;
     }
     public WebModule getModuleForSelectNodeAction(String action) {
-        return moduleSelectNodeActionMap.get(action);
+        for (WebModule wm : webModules) {
+            for (Pair<String,String> pair: wm.getSelectedNodesActions()) {
+                if (pair.first().contains(action)) return wm;
+            }
+        }
+        return null;
     }
 	
 	/**
