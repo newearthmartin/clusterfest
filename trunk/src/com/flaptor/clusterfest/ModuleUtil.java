@@ -62,9 +62,9 @@ public class ModuleUtil {
         String message = "<ul>";
         for (Pair<Callable<Void>,Throwable> problem : problems) {
             NodeDescriptor node = ((CallableWithId<Void, NodeDescriptor>)problem.first()).getId();
-            message+="<li>"+node.getHost() + ":"+node.getPort() + ": " + problem.last() + "</li>";
+            message+="<li><strong>" + (node.getType()!= null ? "@"+node.getType() : "")+ node.getHost() + ":"+node.getPort()+ "</strong>: " + problem.last() + "</li>";
         }
-        message += "</li>";
+        message += "</ul>";
         return message;
     }
 }

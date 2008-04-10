@@ -114,9 +114,13 @@ public class ClusterfestServlet extends MVCServlet {
                     selectedNodes.add(cluster.getNodes().get(Integer.parseInt(idx)));
                 }
             }
-            WebModule wm = cluster.getModuleForSelectNodeAction(selectedAction);
-            String msg = wm.selectedNodesAction(selectedAction, selectedNodes, request);
-            if (msg != null) message += msg;
+            if (selectedNodes.size() > 0) {
+                WebModule wm = cluster.getModuleForSelectNodeAction(selectedAction);
+                if (wm != null) {
+                    String msg = wm.selectedNodesAction(selectedAction, selectedNodes, request);
+                    if (msg != null) message += msg;
+                }
+            }
         } else if (action != null) {
             WebModule wm = cluster.getModuleForAction(action);
             if (wm != null) {
