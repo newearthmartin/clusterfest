@@ -6,4 +6,4 @@ clustering.monitor.formatter=com.flaptor.clustering.monitoring.DefaultPropertyFo
 clustering.monitor.checker=com.flaptor.clustering.monitoring.DefaultChecker
 
 clustering.web.appName=Clusterfest
-clustering.web.htmlAppName=<strong>Clusterfest</strong>
+clustering.web.htmlAppName=<img src="media/logo.png"/>

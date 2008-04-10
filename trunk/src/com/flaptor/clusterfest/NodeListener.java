@@ -27,13 +27,14 @@ import com.flaptor.util.remote.XmlrpcSerialization;
 import com.flaptor.util.remote.XmlrpcServer;
 
 /**
- * Implementation of all interfaces exposed by Clusterfest.
- * Implementation of these interfaces can be set or not, this node aggregates the set interfaces
- * and tells the client which are set.
- *
+ * This is the listener that runs on the nodes, that listens to clusterfest RPC.
+ * 
+ * It is a xmlrpc server that exports the clusterable interface. Modules can register other
+ * services here too.
+ * 
  * @author Martin Massera
  */
-public class ClusterableListener implements Stoppable {
+public class NodeListener implements Stoppable {
     private static final Logger logger = Logger.getLogger(Execute.whoAmI());
 
 	private String nodeType = "generic-node";
@@ -48,7 +49,7 @@ public class ClusterableListener implements Stoppable {
      *
 	 * @param port the port where it will listen for connections
 	 */
-	public ClusterableListener(int port) {
+	public NodeListener(int port) {
         xmlrpcServer = new XmlrpcServer(port);
 		xmlrpcServer.addHandler(CONTEXT, new ClusterableImpl());
         try {
@@ -64,7 +65,7 @@ public class ClusterableListener implements Stoppable {
 	 * @param port
 	 * @param cfg
 	 */
-    public ClusterableListener(int port, Config cfg) {
+    public NodeListener(int port, Config cfg) {
         xmlrpcServer = new XmlrpcServer(port);
         xmlrpcServer.addHandler(CONTEXT, new ClusterableImpl());
         config(cfg);

@@ -32,7 +32,7 @@ import org.apache.log4j.Logger;
 
 import com.flaptor.clusterfest.AbstractModule;
 import com.flaptor.clusterfest.ClusterManager;
-import com.flaptor.clusterfest.ClusterableListener;
+import com.flaptor.clusterfest.NodeListener;
 import com.flaptor.clusterfest.ModuleUtil;
 import com.flaptor.clusterfest.NodeDescriptor;
 import com.flaptor.clusterfest.NodeUnreachableException;
@@ -196,7 +196,7 @@ public class MonitorModule extends AbstractModule<MonitorNodeDescriptor> impleme
 	 * @param clusterableServer
 	 * @param m
 	 */
-	public static void addMonitorListener(ClusterableListener clusterableServer, Monitoreable m) {
+	public static void addMonitorListener(NodeListener clusterableServer, Monitoreable m) {
 		clusterableServer.addModuleListener(MODULE_CONTEXT, XmlrpcSerialization.handler(m));
 	}
 	/**

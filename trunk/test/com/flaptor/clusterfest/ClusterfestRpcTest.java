@@ -19,7 +19,7 @@ package com.flaptor.clusterfest;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.flaptor.clusterfest.ClusterableListener;
+import com.flaptor.clusterfest.NodeListener;
 import com.flaptor.clusterfest.NodeDescriptor;
 import com.flaptor.clusterfest.controlling.ControllerModule;
 import com.flaptor.clusterfest.controlling.ControllerNodeState;
@@ -40,7 +40,7 @@ import com.flaptor.util.TestInfo;
  */
 public class ClusterfestRpcTest extends TestCase {
 	private NodeDescriptor node;
-	private ClusterableListener clusterableListener;
+	private NodeListener clusterableListener;
 	private Monitoreable monitoreableProxy;
 	private Controllable controllableProxy;
 	
@@ -52,7 +52,7 @@ public class ClusterfestRpcTest extends TestCase {
 		cfg.set("clustering.node.listeners",   
 		        "controller:com.flaptor.clusterfest.ClusteringRpcTest$ControllableImp,"+
 		        "monitor:com.flaptor.clusterfest.ClusteringRpcTest$MonitoreableImp");
-	    clusterableListener = new ClusterableListener(PORT);
+	    clusterableListener = new NodeListener(PORT);
 		
 		node = new NodeDescriptor("localhost", PORT, "/tmp/lalala", "typee");
 		monitoreableProxy = MonitorModule.getMonitoreableProxy(node.getXmlrpcClient());
