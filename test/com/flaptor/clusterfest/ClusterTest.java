@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.flaptor.clusterfest.ClusterManager;
-import com.flaptor.clusterfest.ClusterableListener;
+import com.flaptor.clusterfest.NodeListener;
 import com.flaptor.clusterfest.NodeDescriptor;
 import com.flaptor.util.Config;
 import com.flaptor.util.FileUtil;
@@ -35,14 +35,14 @@ public class ClusterTest extends TestCase {
 	private static final int NUM_NODES = 3;
     
     private ClusterManager cluster;
-    private List<ClusterableListener> clusterableListeners;
+    private List<NodeListener> clusterableListeners;
 	
 	public void setUp() throws Exception {
-	    clusterableListeners = new ArrayList<ClusterableListener>();
+	    clusterableListeners = new ArrayList<NodeListener>();
         String dir = FileUtil.createTempDir("clustertest", "").getAbsolutePath();
         String nodes = "";
         for (int i = 0; i < NUM_NODES; i++) {
-            ClusterableListener s = new ClusterableListener(50000+i);
+            NodeListener s = new NodeListener(50000+i);
             s.setNodeType("searcher");
             clusterableListeners.add(s);
             if (i != 0) nodes +=",";
@@ -51,13 +51,13 @@ public class ClusterTest extends TestCase {
         Config.getConfig("clustering.properties").set("clustering.modules", "");
         Config.getConfig("clustering.properties").set("clustering.nodes", nodes);
         cluster = ClusterManager.getInstance();
-		for (ClusterableListener s : clusterableListeners) {
+		for (NodeListener s : clusterableListeners) {
 			s.start();
 		}
 	}
 	public void tearDown() throws Exception {
 	    // TODO: wait until they're actually stopped or a timeout is reached
-		for (ClusterableListener s : clusterableListeners) {
+		for (NodeListener s : clusterableListeners) {
 	        s.requestStop();
 		}
 	}

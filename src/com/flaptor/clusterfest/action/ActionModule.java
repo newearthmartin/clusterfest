@@ -26,7 +26,7 @@ import org.apache.log4j.Logger;
 
 import com.flaptor.clusterfest.AbstractModule;
 import com.flaptor.clusterfest.ClusterManager;
-import com.flaptor.clusterfest.ClusterableListener;
+import com.flaptor.clusterfest.NodeListener;
 import com.flaptor.clusterfest.ModuleUtil;
 import com.flaptor.clusterfest.NodeDescriptor;
 import com.flaptor.clusterfest.NodeUnreachableException;
@@ -105,7 +105,7 @@ public class ActionModule extends AbstractModule<ActionNodeDescriptor> {
      * @param clusterableListener
      * @param m
      */
-    public static void setActionReceiver(ClusterableListener clusterableListener, ActionReceiver actionReceiver) {
+    public static void setActionReceiver(NodeListener clusterableListener, ActionReceiver actionReceiver) {
         clusterableListener.addModuleListener(MODULE_CONTEXT, XmlrpcSerialization.handler(actionReceiver));
     }
     /**

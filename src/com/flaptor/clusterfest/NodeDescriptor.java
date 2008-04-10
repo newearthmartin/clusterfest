@@ -57,7 +57,7 @@ public class NodeDescriptor {
 		} catch (MalformedURLException e) {
 			throw new RuntimeException(e);
 		}
-        clusterableStub = (Clusterable)XmlrpcClient.proxy(ClusterableListener.CONTEXT, Clusterable.class, xmlrpcClient); 
+        clusterableStub = (Clusterable)XmlrpcClient.proxy(NodeListener.CONTEXT, Clusterable.class, xmlrpcClient); 
     }
     public String getHost() {
         return host;
