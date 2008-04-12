@@ -193,11 +193,11 @@ public class MonitorModule extends AbstractModule<MonitorNodeDescriptor> impleme
 	
 	/**
 	 * adds a monitoreable implementation to a clusterable server
-	 * @param clusterableServer
+	 * @param nodeListener
 	 * @param m
 	 */
-	public static void addMonitorListener(NodeListener clusterableServer, Monitoreable m) {
-		clusterableServer.addModuleListener(MODULE_CONTEXT, XmlrpcSerialization.handler(m));
+	public static void addMonitorListener(NodeListener nodeListener, Monitoreable m) {
+		nodeListener.addModuleListener(MODULE_CONTEXT, XmlrpcSerialization.handler(m));
 	}
 	/**
 	 * @param client
