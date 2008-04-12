@@ -51,11 +51,11 @@ public class ControllerModule extends AbstractModule<ControllerNodeDescriptor> i
 
     /**
      * adds a controller implementation to a clusterableListener
-     * @param listener
+     * @param nodeListener
      * @param c
      */
-    public static void addControllerListener(NodeListener listener, Controllable c) {
-        listener.addModuleListener(MODULE_CONTEXT, XmlrpcSerialization.handler(c));
+    public static void addControllerListener(NodeListener nodeListener, Controllable c) {
+        nodeListener.addModuleListener(MODULE_CONTEXT, XmlrpcSerialization.handler(c));
     }
     /**
      * @param client
