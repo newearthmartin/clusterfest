@@ -71,7 +71,6 @@ public class NodeListener implements Stoppable {
         config(cfg);
         xmlrpcServer.start();
     }
-
     private void config(Config cfg) {
         try {
             nodeType = cfg.getString("clustering.node.type");
@@ -83,6 +82,16 @@ public class NodeListener implements Stoppable {
                 xmlrpcServer.addHandler(service.first(), XmlrpcSerialization.handler(serviceInstance));   
             }
         } catch (IllegalStateException e) {logger.warn("clustering.node.services not set in " + cfg.getFilename());}
+        try {
+            for (String ip: cfg.getStringArray("clustering.node.connections.accept")) {
+                xmlrpcServer.addAcceptedClient(ip);
+            }
+        } catch (IllegalStateException e) {logger.warn("clustering.node.connections.accept not set in " + cfg.getFilename());}
+        try {
+            for (String ip: cfg.getStringArray("clustering.node.connections.deny")) {
+                xmlrpcServer.addDeniedClient(ip);
+            }
+        } catch (IllegalStateException e) {logger.warn("clustering.node.connections.deny not set in " + cfg.getFilename());}
     }
 	
 	public void setNodeType(String nodeType) {
