@@ -63,14 +63,6 @@ public class MonitorModule extends AbstractModule<MonitorNodeDescriptor> impleme
 	private final Map<String, PropertyFormatter> formatters = new HashMap<String, PropertyFormatter>();
 	
 	public MonitorModule() {
-//this is done when clustermanager notifies nodes	    
-	    
-//		Config config = Config.getConfig("clustering.properties");
-//		new Timer().scheduleAtFixedRate(new TimerTask(){
-//			public void run() {
-//				updateNodes();
-//			}
-//		}, 0, config.getInt("clustering.monitor.refreshInterval"));
 	}
 
 	@Override
@@ -90,16 +82,6 @@ public class MonitorModule extends AbstractModule<MonitorNodeDescriptor> impleme
         // we update the node info every time notify gets invoked
         updateNodeInfo(node);
     }
-
-    //this is done when clustermanager notifies nodes       
-//    private void updateNodes() {
-//    	//update states of all the monitored nodes
-//    	synchronized (nodes) {
-//	    	for (MonitorNodeDescriptor node : nodes) {
-//				updateNodeInfo(node);
-//	    	}
-//    	}
-//    }
     
 	public boolean shouldRegister(NodeDescriptor node) throws NodeUnreachableException {
         return ModuleUtil.nodeBelongs(node, MODULE_CONTEXT, false);
@@ -264,6 +246,18 @@ public class MonitorModule extends AbstractModule<MonitorNodeDescriptor> impleme
             if ("update".equals(action)) {
                 updateNodeInfo(monitorNode);
             }
+            
+            if (monitorNode != null) {
+                NodeState nodeState = null;
+                String stateNum = request.getParameter("stateNum");
+                if (stateNum != null) {
+                    nodeState = monitorNode.getNodeState(Integer.parseInt(stateNum));
+                } else {
+                    nodeState = monitorNode.getLastState();
+                }
+                request.setAttribute("nodeState", nodeState);
+            }
+
             return "monitorNode.vm";
         } else if (page.equals("monitorLog")){
             String action = request.getParameter("action");

@@ -30,7 +30,7 @@ body {
 	color: #445;
 	font-family: Verdana, Arial, Helvetica, sans-serif;
 	margin: 0;
-	padding: 0;
+	padding: 5px;
 }
 
 h1 {
@@ -45,6 +45,10 @@ h2 {
 	margin: 5px;
 	text-align: center;
 }
+#footer {
+    background: #dfdfdf;
+    text-align: right;
+}
 
 #navbar h1 {
 	margin: 0;
@@ -56,7 +60,6 @@ h2 {
 }
 
 #content {
-	padding: 10px;
 	width: 100%;
 	height: auto;
 }

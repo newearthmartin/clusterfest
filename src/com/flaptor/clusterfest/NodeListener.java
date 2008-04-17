@@ -69,7 +69,6 @@ public class NodeListener implements Stoppable {
         xmlrpcServer = new XmlrpcServer(port);
         xmlrpcServer.addHandler(CONTEXT, new ClusterableImpl());
         config(cfg);
-        xmlrpcServer.start();
     }
     private void config(Config cfg) {
         try {

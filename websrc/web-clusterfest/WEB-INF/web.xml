@@ -19,6 +19,18 @@ Clusterfest webapp
         <param-value>/error.vm</param-value>
     </init-param>
 </filter>
+<filter>
+    <filter-name>userAuthorization</filter-name>
+    <filter-class>com.flaptor.util.web.UserAuthorizationFilter</filter-class>
+    <init-param>
+        <param-name>restrictedPages</param-name>
+        <param-value>/vote.do:/submitUrl.do</param-value>
+    </init-param>
+    <init-param>
+        <param-name>failPage</param-name>
+        <param-value>/showLoginForm.do</param-value>
+    </init-param>
+</filter>
 
 <servlet>
     <servlet-name>clusterfest</servlet-name>
