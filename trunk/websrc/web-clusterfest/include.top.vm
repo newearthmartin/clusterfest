@@ -33,5 +33,8 @@ limitations under the License.
 #if ($monitorNode)
     <a href="monitorNode.do?idx=$idx">node status</a>
 #end
+#if ($user)
+    <a href="logout.do">logout</a>
+#end
 </div>
 <div id="content">

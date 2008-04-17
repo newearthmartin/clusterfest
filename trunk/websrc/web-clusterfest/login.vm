@@ -15,13 +15,22 @@ limitations under the License.
 *#
 ## author Martin Massera
 
-#set($pageTitle = "Error")
+#set($pageTitle = "Login")
 #parse("include.top.vm")
 
-There was an error: <b>$message</b>
+<br/>
 
-<pre>
-$stacktrace
-</pre>
+<div style="margin: 0 auto">
+	#if ($loginFailed) 
+		<h2 style="text-align: center">Login failed</h2>
+	#end
+	<form action="login.do"  method="POST">
+		<table style="margin: 0 auto">
+	        <tr><td>user</td><td><input type="text" name="user"/></td></td>
+	        <tr><td>pass</td><td><input type="password" name="password"/></td></td>
+	        <tr><td></td><td><input type="submit" value="login"/></td></td>
+		</table>
+	</form>
+</div>
 
 #parse("include.bottom.vm")

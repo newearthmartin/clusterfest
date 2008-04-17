@@ -5,5 +5,9 @@ clustering.checkNodesInterval=60000
 clustering.monitor.formatter=com.flaptor.clustering.monitoring.DefaultPropertyFormatter
 clustering.monitor.checker=com.flaptor.clustering.monitoring.DefaultChecker
 
+clustering.web.login.enabled=false
+clustering.web.login.user=clusteruser
+clustering.web.login.pass=clusterpass
+
 clustering.web.appName=Clusterfest
 clustering.web.htmlAppName=<img src="media/logo.png"/>
