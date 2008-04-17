@@ -33,6 +33,5 @@ limitations under the License.
 #if ($monitorNode)
     <a href="monitorNode.do?idx=$idx">node status</a>
 #end
-<span class="fuzzy">powered by <a class="fuzzy" href="http://opensource.flaptor.com/clusterfest">Clusterfest</a></span>
 </div>
 <div id="content">

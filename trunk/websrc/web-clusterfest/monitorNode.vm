@@ -26,17 +26,13 @@ limitations under the License.
     $monitor.updateNodeInfo($monitorNode);
 #end
 
-#if ($node.isReachable() == false)
-    <h2>Node unreachable!</h2>	
-#end
 
-#if ($monitor.isRegistered($node))
+#if (!$monitor.isRegistered($node))
+	#if ($node.isReachable() == false)
+	    <h2>Node unreachable!</h2>
+	#end
+#else
 	#set ($monitorNode = $monitor.getModuleNodeDescriptor($node))
-    #if ($stateNum)
-    	#set ($nodeState = $monitorNode.getNodeState($stateNum))
-    #else
-        #set ($nodeState = $monitorNode.getLastState())
-    #end
     #if ($nodeState)
         <div id="monitorSideBar">
             <a href="?action=update&idx=$idx">update node</a></br>

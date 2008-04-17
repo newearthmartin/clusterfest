@@ -81,6 +81,7 @@ public class ControllerModule extends AbstractModule<ControllerNodeDescriptor> i
         //does nothing
     }
 
+	@Override
 	protected boolean shouldRegister(NodeDescriptor node) throws NodeUnreachableException {
 	    return ModuleUtil.nodeBelongs(node, MODULE_CONTEXT, true);
 	}
@@ -91,7 +92,7 @@ public class ControllerModule extends AbstractModule<ControllerNodeDescriptor> i
 	 * @return the state of the node (for the controller framework)
 	 */
 	public ControllerNodeState getState(NodeDescriptor node) {
-		return getModuleNode(node).getState();
+	    return getModuleNode(node).getState();
 	}
 	
 	/**
