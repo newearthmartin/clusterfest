@@ -32,6 +32,8 @@ public class ClusterfestServlet extends MVCServlet {
     private String appName;
     private String htmlAppName;
     private String additionalCSS;
+    private String user;
+    private String pass;
     
     @Override
     public void init() throws ServletException {
@@ -47,6 +49,8 @@ public class ClusterfestServlet extends MVCServlet {
                 if (additionalCSS.length() ==0) additionalCSS = null;
             }
         }
+        user = config.getString("clustering.web.login.user");
+        pass = config.getString("clustering.web.login.pass");
     }
 
     @Override
@@ -65,6 +69,13 @@ public class ClusterfestServlet extends MVCServlet {
         String template = null;
         if (uri.contains("/index.do")) {
             template = doStartPage(request);
+        } else if (uri.contains("/showLoginForm.do")) {
+            template = "login.vm";
+        } else if (uri.contains("/login.do")) {
+            template = doLogin(request);
+        } else if (uri.contains("/logout.do")) {
+            request.getSession().invalidate();
+            template = "/index.do";
         } else if (uri.endsWith(".do")) {
             String page = uri.substring(uri.lastIndexOf("/")+1);
             page = page.substring(0, page.lastIndexOf(".do"));
@@ -72,6 +83,19 @@ public class ClusterfestServlet extends MVCServlet {
             if (wm != null) template = wm.doPage(page, request, response);
         }
         return template;
+    }
+    
+    private String doLogin(HttpServletRequest request) {
+        String user = request.getParameter("user");
+        String pass = request.getParameter("password");
+        System.out.println(user + " " + this.user + " " + pass + " " + this.pass);
+        if (this.user.equals(user) && this.pass.equals(pass)) {
+            request.getSession().setAttribute("user", user);
+            return "/index.do";
+        } else {
+            request.setAttribute("loginFailed", true);
+            return "/login.vm";
+        }
     }
     
     private String doStartPage(HttpServletRequest request) {
