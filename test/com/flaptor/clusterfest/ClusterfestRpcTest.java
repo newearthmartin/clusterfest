@@ -55,8 +55,8 @@ public class ClusterfestRpcTest extends TestCase {
 	    clusterableListener = new NodeListener(PORT);
 		
 		node = new NodeDescriptor("localhost", PORT, "/tmp/lalala", "typee");
-		monitoreableProxy = MonitorModule.getMonitoreableProxy(node.getXmlrpcClient());
-		controllableProxy = ControllerModule.getControllableProxy(node.getXmlrpcClient());
+		monitoreableProxy = MonitorModule.getModuleListener(node.getXmlrpcClient());
+		controllableProxy = ControllerModule.getModuleListener(node.getXmlrpcClient());
 	}
 
 	protected void tearDown() throws Exception {

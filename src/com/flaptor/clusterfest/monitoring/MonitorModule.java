@@ -178,14 +178,14 @@ public class MonitorModule extends AbstractModule<MonitorNodeDescriptor> impleme
 	 * @param nodeListener
 	 * @param m
 	 */
-	public static void addMonitorListener(NodeListener nodeListener, Monitoreable m) {
+	public static void addModuleListener(NodeListener nodeListener, Monitoreable m) {
 		nodeListener.addModuleListener(MODULE_CONTEXT, XmlrpcSerialization.handler(m));
 	}
 	/**
 	 * @param client
 	 * @return a proxy for monitoreable xmlrpc calls
 	 */
-	public static Monitoreable getMonitoreableProxy(XmlrpcClient client) {
+	public static Monitoreable getModuleListener(XmlrpcClient client) {
 		return (Monitoreable)XmlrpcClient.proxy(MODULE_CONTEXT, Monitoreable.class, client);
 	}
 	

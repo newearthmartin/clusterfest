@@ -41,7 +41,7 @@ public class ControllerNodeDescriptor extends ModuleNodeDescriptor {
 	
     public ControllerNodeDescriptor(NodeDescriptor node) {
     	super(node);
-    	controllable = ControllerModule.getControllableProxy(node.getXmlrpcClient());
+    	controllable = ControllerModule.getModuleListener(node.getXmlrpcClient());
     }
 
 	public void updateState() {

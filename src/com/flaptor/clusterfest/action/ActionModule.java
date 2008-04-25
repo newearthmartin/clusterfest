@@ -50,7 +50,6 @@ import com.flaptor.util.remote.XmlrpcSerialization;
  */
 public class ActionModule extends AbstractModule<ActionNodeDescriptor> {
     private static final Logger logger = Logger.getLogger(com.flaptor.util.Execute.whoAmI());
-    MultiExecutor<Void> multiExecutor = new MultiExecutor<Void>(5, "sendAction");
     public final static String MODULE_CONTEXT = "action";
     
 	protected void notifyModuleNode(ActionNodeDescriptor node) {
@@ -105,14 +104,14 @@ public class ActionModule extends AbstractModule<ActionNodeDescriptor> {
      * @param clusterableListener
      * @param m
      */
-    public static void setActionReceiver(NodeListener clusterableListener, ActionReceiver actionReceiver) {
+    public static void addModuleListener(NodeListener clusterableListener, ActionReceiver actionReceiver) {
         clusterableListener.addModuleListener(MODULE_CONTEXT, XmlrpcSerialization.handler(actionReceiver));
     }
     /**
      * @param client
      * @return a proxy for action xmlrpc calls
      */
-    public static ActionReceiver getActionReceiverProxy(XmlrpcClient client) {
+    public static ActionReceiver getModuleListener(XmlrpcClient client) {
         return (ActionReceiver)XmlrpcClient.proxy(MODULE_CONTEXT, ActionReceiver.class, client);    
     }
 }
