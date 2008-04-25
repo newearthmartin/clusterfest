@@ -15,7 +15,7 @@ public class ActionNodeDescriptor extends ModuleNodeDescriptor{
     
     public ActionNodeDescriptor(NodeDescriptor nodeDescriptor) {
         super(nodeDescriptor);
-        receiver = ActionModule.getActionReceiverProxy(nodeDescriptor.getXmlrpcClient());
+        receiver = ActionModule.getModuleListener(nodeDescriptor.getXmlrpcClient());
     }
     
     /**

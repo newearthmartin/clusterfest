@@ -52,7 +52,7 @@ public class MonitorNodeDescriptor extends ModuleNodeDescriptor {
     	
         this.states = new LinkedList<NodeState>();
         this.logs = new HashMap<String, Pair<String,Long>>();
-        this.monitoreable = MonitorModule.getMonitoreableProxy(node.getXmlrpcClient());
+        this.monitoreable = MonitorModule.getModuleListener(node.getXmlrpcClient());
         // TODO set default checker
         
         //TODO hardcoded logs

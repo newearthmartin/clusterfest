@@ -54,14 +54,14 @@ public class ControllerModule extends AbstractModule<ControllerNodeDescriptor> i
      * @param nodeListener
      * @param c
      */
-    public static void addControllerListener(NodeListener nodeListener, Controllable c) {
+    public static void addModuleListener(NodeListener nodeListener, Controllable c) {
         nodeListener.addModuleListener(MODULE_CONTEXT, XmlrpcSerialization.handler(c));
     }
     /**
      * @param client
      * @return a proxy for Controllable xmlrpc calls
      */
-    public static Controllable getControllableProxy(XmlrpcClient client) {
+    public static Controllable getModuleListener(XmlrpcClient client) {
         return (Controllable)XmlrpcClient.proxy(MODULE_CONTEXT, Controllable.class, client);
     }
 
