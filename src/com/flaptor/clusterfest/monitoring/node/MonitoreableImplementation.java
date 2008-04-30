@@ -128,7 +128,7 @@ public class MonitoreableImplementation implements Monitoreable {
 	 * Update a property before returning them
 	 */
 	public void updateProperty(String property) {
-		
+	    //TODO update only property
+		updateProperties();
 	}
-	
 }
