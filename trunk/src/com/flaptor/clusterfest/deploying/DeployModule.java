@@ -48,7 +48,7 @@ import com.flaptor.util.remote.XmlrpcSerialization;
  * 
  * @author Martin Massera
  */
-public class DeployModule extends AbstractModule<DeployNodeDescriptor> {
+public class DeployModule extends AbstractModule<DeployNodeDescriptor> implements WebModule {
     private static final Logger logger = Logger.getLogger(com.flaptor.util.Execute.whoAmI());
     public final static String MODULE_CONTEXT = "deploy";
     
@@ -62,43 +62,32 @@ public class DeployModule extends AbstractModule<DeployNodeDescriptor> {
     protected boolean shouldRegister(NodeDescriptor node) throws NodeUnreachableException {
         return ModuleUtil.nodeBelongs(node, MODULE_CONTEXT, false);
     }
-    
-//    /**
-//     * sends an action to nodes. If a node fails, an exception is returned in the exception list 
-//     * @param nodes
-//     * @param action
-//     * @param params
-//     * @return
-//     */
-//    @SuppressWarnings("unchecked")
-//    public List<Pair<NodeDescriptor,Throwable>> sendAction(List<NodeDescriptor> nodes, final String action, final Object[] params) {
-//        List<Pair<NodeDescriptor,Throwable>> errors = new ArrayList<Pair<NodeDescriptor,Throwable>>();
-//        Execution<Void> e = new Execution();
-//
-//        int actualNodes = 0;
-//        for (NodeDescriptor node: nodes) {
-//            final DeployNodeDescriptor mnode = getModuleNode(node);
-//            if (mnode != null) {
-//                e.addTask(new CallableWithId<Void, NodeDescriptor>(node) {
-//                    public Void call() throws Exception {
-//                        mnode.action(action, params);
-//                        return null;
-//                    }
-//                });
-//                actualNodes++;
-//            }
-//        }
-//        ClusterManager.getInstance().getMultiExecutor().addExecution(e);
-//        e.waitFor();
-//        for (Pair<Callable<Void>, Throwable> problem : e.getProblems()) {
-//            errors.add(new Pair<NodeDescriptor, Throwable>(
-//                    ((CallableWithId<Void, NodeDescriptor>)problem.first()).getId(), 
-//                    problem.last()));
-//            
-//        }
-//        return errors;
-//    }
 
+    @SuppressWarnings("unchecked")
+    public List<Pair<NodeDescriptor,Throwable>> deployFiles(List<NodeDescriptor> nodes, final String filename, final byte[] content) {
+        List<Pair<NodeDescriptor, Throwable>> errors = new ArrayList<Pair<NodeDescriptor, Throwable>>();
+        Execution<Void> e = new Execution();
+
+        for (NodeDescriptor node : nodes) {
+            final DeployNodeDescriptor dnode= getModuleNode(node);
+            if (dnode != null) {
+                e.addTask(new CallableWithId<Void, NodeDescriptor>(node) {
+                    public Void call() throws Exception {
+                        dnode.deployFile(null, filename, content);
+                        return null;
+                    }
+                });
+            }
+        }
+        ClusterManager.getInstance().getMultiExecutor().addExecution(e);
+        e.waitFor();
+        for (Pair<Callable<Void>, Throwable> problem : e.getProblems()) {
+            errors.add(new Pair<NodeDescriptor, Throwable>(((CallableWithId<Void, NodeDescriptor>) problem.first()).getId(), problem.last()));
+
+        }
+        return errors;
+    }
+    
     /**
      * adds an actionReceiver implementation to a clusterable listener
      * @param clusterableListener
@@ -113,5 +102,59 @@ public class DeployModule extends AbstractModule<DeployNodeDescriptor> {
      */
     public static DeployListener getModuleListener(XmlrpcClient client) {
         return (DeployListener)XmlrpcClient.proxy(MODULE_CONTEXT, DeployListener.class, client);    
+    }
+
+    @Override
+    public String action(String action, HttpServletRequest request) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public String doPage(String page, HttpServletRequest request, HttpServletResponse response) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public List<String> getActions() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public String getModuleHTML() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public String getNodeHTML(NodeDescriptor node, int nodeNum) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public List<String> getPages() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public List<Pair<String, String>> getSelectedNodesActions() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public String selectedNodesAction(String action, List<NodeDescriptor> nodes, HttpServletRequest request) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public void setup(WebServer server) {
+        // TODO Auto-generated method stub
+        
     }
 }
