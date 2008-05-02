@@ -11,10 +11,14 @@ import com.flaptor.clusterfest.monitoring.MonitorModule;
  */
 public class DeployNodeDescriptor extends ModuleNodeDescriptor{
 
-    private DeployListener receiver;
+    private DeployListener deployListener;
     
     public DeployNodeDescriptor(NodeDescriptor nodeDescriptor) {
         super(nodeDescriptor);
-        receiver = DeployModule.getModuleListener(nodeDescriptor.getXmlrpcClient());
+        deployListener = DeployModule.getModuleListener(nodeDescriptor.getXmlrpcClient());
+    }
+    
+    public void deployFile(String path, String filename, byte[] content) throws Exception {
+        deployListener.deployFile(path, filename, content);
     }
 }

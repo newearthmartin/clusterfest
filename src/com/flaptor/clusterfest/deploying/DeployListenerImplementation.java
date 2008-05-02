@@ -1,5 +1,9 @@
 package com.flaptor.clusterfest.deploying;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
+
 /**
  * implementation of the deploy listener
  * 
@@ -11,7 +15,12 @@ public class DeployListenerImplementation implements DeployListener{
         return true;
     }
     
-    public boolean deployFile(String filename, byte[] content) throws Exception{
-        throw new Exception("implement this");
+    public boolean deployFile(String path, String filename, byte[] content) throws Exception{
+        if (path == null) path = ".";
+        OutputStream out = new FileOutputStream(new File(path, filename));
+        out.write(content);
+        out.flush();
+        out.close();
+        return true;
     }
 }

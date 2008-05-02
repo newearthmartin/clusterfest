@@ -19,9 +19,10 @@ public interface DeployListener {
 
     /**
      * called when action received
+     * @param path the path where the file is to be written
      * @param filename the file name
      * @param content the file content
      * @return (is ignored, for compatibility with xmlrpc)
      */
-    public boolean deployFile(String filename, byte[] content) throws Exception;
+    public boolean deployFile(String path, String filename, byte[] content) throws Exception;
 }
