@@ -170,6 +170,7 @@ limitations under the License.
             <copy todir="${tmp.conf.dir}">
                 <fileset dir="${conf.dir}">
                     <include name="*.properties"/>
+                    <include name="*.xml"/>
                 </fileset>
             </copy>
 
