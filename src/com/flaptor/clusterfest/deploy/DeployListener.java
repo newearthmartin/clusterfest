@@ -1,5 +1,6 @@
 package com.flaptor.clusterfest.deploy;
 
+import java.io.IOException;
 import java.util.List;
 
 import com.flaptor.clusterfest.NodeDescriptor;
@@ -24,5 +25,5 @@ public interface DeployListener {
      * @param content the file content
      * @return (is ignored, for compatibility with xmlrpc)
      */
-    public boolean deployFile(String path, String filename, byte[] content) throws Exception;
+    public boolean deployFile(String path, String filename, byte[] content) throws IOException;
 }

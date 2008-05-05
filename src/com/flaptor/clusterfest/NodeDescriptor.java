@@ -92,4 +92,7 @@ public class NodeDescriptor {
             throw new NodeUnreachableException(e, this);
         }
     }
+    public String toString() {
+        return host+":"+port+":"+installDir+":"+type;
+    }
 }

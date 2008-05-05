@@ -16,12 +16,18 @@ limitations under the License.
 package com.flaptor.clusterfest.deploy;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Callable;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileItemFactory;
+import org.apache.commons.fileupload.FileUploadException;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.log4j.Logger;
 
 import com.flaptor.clusterfest.AbstractModule;
@@ -35,6 +41,7 @@ import com.flaptor.clusterfest.monitoring.node.Monitoreable;
 import com.flaptor.util.CallableWithId;
 import com.flaptor.util.Execute;
 import com.flaptor.util.Execution;
+import com.flaptor.util.IOUtil;
 import com.flaptor.util.MultiExecutor;
 import com.flaptor.util.Pair;
 import com.flaptor.util.Execution.Results;
@@ -64,7 +71,7 @@ public class DeployModule extends AbstractModule<DeployNodeDescriptor> implement
     }
 
     @SuppressWarnings("unchecked")
-    public List<Pair<NodeDescriptor,Throwable>> deployFiles(List<NodeDescriptor> nodes, final String filename, final byte[] content) {
+    public List<Pair<NodeDescriptor,Throwable>> deployFiles(List<NodeDescriptor> nodes, final String path, final String filename, final byte[] content) {
         List<Pair<NodeDescriptor, Throwable>> errors = new ArrayList<Pair<NodeDescriptor, Throwable>>();
         Execution<Void> e = new Execution();
 
@@ -73,7 +80,7 @@ public class DeployModule extends AbstractModule<DeployNodeDescriptor> implement
             if (dnode != null) {
                 e.addTask(new CallableWithId<Void, NodeDescriptor>(node) {
                     public Void call() throws Exception {
-                        dnode.deployFile(null, filename, content);
+                        dnode.deployFile(path, filename, content);
                         return null;
                     }
                 });
@@ -90,11 +97,11 @@ public class DeployModule extends AbstractModule<DeployNodeDescriptor> implement
     
     /**
      * adds an actionReceiver implementation to a clusterable listener
-     * @param clusterableListener
+     * @param nodeListener
      * @param m
      */
-    public static void addModuleListener(NodeListener clusterableListener, DeployListener deployListener) {
-        clusterableListener.addModuleListener(MODULE_CONTEXT, XmlrpcSerialization.handler(deployListener));
+    public static void addModuleListener(NodeListener nodeListener, DeployListener deployListener) {
+        nodeListener.addModuleListener(MODULE_CONTEXT, XmlrpcSerialization.handler(deployListener));
     }
     /**
      * @param client
@@ -104,57 +111,84 @@ public class DeployModule extends AbstractModule<DeployNodeDescriptor> implement
         return (DeployListener)XmlrpcClient.proxy(MODULE_CONTEXT, DeployListener.class, client);    
     }
 
-    @Override
-    public String action(String action, HttpServletRequest request) {
-        // TODO Auto-generated method stub
+    public ActionReturn action(String action, HttpServletRequest request) {
         return null;
     }
-
-    @Override
     public String doPage(String page, HttpServletRequest request, HttpServletResponse response) {
-        // TODO Auto-generated method stub
-        return null;
-    }
+        List<NodeDescriptor> nodes = new ArrayList<NodeDescriptor>();
+        String [] nodesParam =request.getParameterValues("node");
+        if (nodesParam != null) {
+            for (String idx:nodesParam){
+                nodes.add(ClusterManager.getInstance().getNodes().get(Integer.parseInt(idx)));
+            }
+        }
+        request.setAttribute("nodes", nodes);
 
-    @Override
+        if (ServletFileUpload.isMultipartContent(request)) {
+            // Create a factory for disk-based file items
+            FileItemFactory factory = new DiskFileItemFactory();
+
+            // Create a new file upload handler
+            ServletFileUpload upload = new ServletFileUpload(factory);
+            
+            String name = null;
+            byte[] content = null; 
+            String path = null;
+            // Parse the request
+            try {
+                List<FileItem> items = upload.parseRequest(request);
+                String message = "";
+                for (FileItem item : items ) {
+                    String fieldName = item.getFieldName();
+                    if (fieldName.equals("node")) {
+                        NodeDescriptor node = ClusterManager.getInstance().getNodes().get(Integer.parseInt(item.getString()));
+                        if (!node.isReachable()) message += node + " is unreachable<br/>";
+                        if (getModuleNode(node) != null) nodes.add(node);
+                        else message += node + " is not registered as deployable<br/>";
+                    }
+                    if (fieldName.equals("path")) path = item.getString();
+
+                    if (fieldName.equals("file")) {
+                        name = item.getName();
+                        content = IOUtil.readAllBinary(item.getInputStream());
+                    }
+                }
+                List<Pair<NodeDescriptor,Throwable>> errors = deployFiles(nodes, path, name, content);
+                if (errors != null && errors.size() > 0) {
+                    request.setAttribute("deployCorrect", false);
+                    request.setAttribute("deployErrors", errors);
+                } else request.setAttribute("deployCorrect", true);
+                request.setAttribute("message", message);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        return "deploy.vm";
+    }
     public List<String> getActions() {
-        // TODO Auto-generated method stub
-        return null;
+        return new ArrayList<String>();
     }
-
-    @Override
-    public String getModuleHTML() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
     public String getNodeHTML(NodeDescriptor node, int nodeNum) {
-        // TODO Auto-generated method stub
         return null;
     }
-
-    @Override
     public List<String> getPages() {
-        // TODO Auto-generated method stub
-        return null;
+        return Arrays.asList(new String[]{"deploy"});
     }
-
-    @Override
     public List<Pair<String, String>> getSelectedNodesActions() {
-        // TODO Auto-generated method stub
+        List<Pair<String, String>> ret = new ArrayList<Pair<String,String>>();
+        ret.add(new Pair<String, String>("deploy", "deploy files"));
+        return ret;
+    }
+    public ActionReturn selectedNodesAction(String action, List<NodeDescriptor> nodes, HttpServletRequest request) {
+        if (action.equals("deploy")) {
+            return ActionReturn.redirectToPage("deploy");
+        } else {
+            return null;
+        }
+    }
+    public String getModuleHTML() {
         return null;
     }
-
-    @Override
-    public String selectedNodesAction(String action, List<NodeDescriptor> nodes, HttpServletRequest request) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public void setup(WebServer server) {
-        // TODO Auto-generated method stub
-        
-    }
+    public void setup(WebServer server) {}
 }

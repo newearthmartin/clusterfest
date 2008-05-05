@@ -2,6 +2,7 @@ package com.flaptor.clusterfest.deploy;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 
 /**
@@ -15,9 +16,10 @@ public class DeployListenerImplementation implements DeployListener{
         return true;
     }
     
-    public boolean deployFile(String path, String filename, byte[] content) throws Exception{
+    public boolean deployFile(String path, String filename, byte[] content) throws IOException{
         if (path == null) path = ".";
-        OutputStream out = new FileOutputStream(new File(path, filename));
+        File file = new File(path, filename);
+        OutputStream out = new FileOutputStream(file);
         out.write(content);
         out.flush();
         out.close();

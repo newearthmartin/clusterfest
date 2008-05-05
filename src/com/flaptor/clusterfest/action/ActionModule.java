@@ -101,11 +101,11 @@ public class ActionModule extends AbstractModule<ActionNodeDescriptor> {
 
     /**
      * adds an actionReceiver implementation to a clusterable listener
-     * @param clusterableListener
+     * @param nodeListener
      * @param m
      */
-    public static void addModuleListener(NodeListener clusterableListener, ActionReceiver actionReceiver) {
-        clusterableListener.addModuleListener(MODULE_CONTEXT, XmlrpcSerialization.handler(actionReceiver));
+    public static void addModuleListener(NodeListener nodeListener, ActionReceiver actionReceiver) {
+        nodeListener.addModuleListener(MODULE_CONTEXT, XmlrpcSerialization.handler(actionReceiver));
     }
     /**
      * @param client
