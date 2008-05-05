@@ -52,15 +52,13 @@ public interface WebModule {
 
     /**
      * execute an action for the selected nodes
-     * @return a message (or null)
      */
-    String selectedNodesAction(String action, List<NodeDescriptor> nodes, HttpServletRequest request);
+	ActionReturn selectedNodesAction(String action, List<NodeDescriptor> nodes, HttpServletRequest request);
 	
 	/**
 	 * execute an action
-	 * @return a message (or null)
 	 */
-	String action(String action,  HttpServletRequest request);
+    ActionReturn action(String action,  HttpServletRequest request);
 	
 	/**
 	 * @return a list of pages that this server attends, these pages will have .do suffix appended:
@@ -77,4 +75,34 @@ public interface WebModule {
 	 * @return a template to redirect to (.jsp, .vm, etc) or null if you serve the page yourself
 	 */
 	String doPage(String page, HttpServletRequest request, HttpServletResponse response);
+	
+	/**
+	 * indicates wether the action is a redirect to another page
+	 * or the action has been performed and returns a message
+	 * @author Martin Massera
+	 */
+	public static class ActionReturn {
+        private String message  = null;
+        private String redirectToPage = null;
+	    
+        public static ActionReturn redirectToPage(String page) {
+            ActionReturn ret = new ActionReturn();
+            ret.redirectToPage = page;
+            return ret;
+        }
+        public static ActionReturn returnMessage(String message) {
+            ActionReturn ret = new ActionReturn();
+            ret.message = message;
+            return ret;
+        }
+        public boolean isRedirect() {
+            return redirectToPage != null;
+        }
+        public String getMessage() {
+            return message;
+        }
+        public String getRedirectToPage() {
+            return redirectToPage;
+        }
+	}
 }

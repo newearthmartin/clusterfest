@@ -8,10 +8,12 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.ws.Response;
 
 import org.apache.log4j.Logger;
 import org.apache.velocity.tools.generic.EscapeTool;
 
+import com.flaptor.clusterfest.WebModule.ActionReturn;
 import com.flaptor.clusterfest.monitoring.MonitorNodeDescriptor;
 import com.flaptor.util.Config;
 import com.flaptor.util.Execute;
@@ -68,7 +70,7 @@ public class ClusterfestServlet extends MVCServlet {
         }
         String template = null;
         if (uri.contains("/index.do")) {
-            template = doStartPage(request);
+            template = doStartPage(request, response);
         } else if (uri.contains("/showLoginForm.do")) {
             template = "login.vm";
         } else if (uri.contains("/login.do")) {
@@ -79,10 +81,15 @@ public class ClusterfestServlet extends MVCServlet {
         } else if (uri.endsWith(".do")) {
             String page = uri.substring(uri.lastIndexOf("/")+1);
             page = page.substring(0, page.lastIndexOf(".do"));
-            WebModule wm = cluster.getModuleForPage(page);
-            if (wm != null) template = wm.doPage(page, request, response);
+            template = doPage(page, request, response);
         }
         return template;
+    }
+    
+    private String doPage(String page, HttpServletRequest request, HttpServletResponse response) {
+        WebModule wm = cluster.getModuleForPage(page);
+        if (wm != null) return wm.doPage(page, request, response);
+        else return null;
     }
     
     private String doLogin(HttpServletRequest request) {
@@ -98,7 +105,7 @@ public class ClusterfestServlet extends MVCServlet {
         }
     }
     
-    private String doStartPage(HttpServletRequest request) {
+    private String doStartPage(HttpServletRequest request, HttpServletResponse response) {
         String action = request.getParameter("action");
         String message = "";
         if ("register".equals(action)) {
@@ -141,15 +148,23 @@ public class ClusterfestServlet extends MVCServlet {
             if (selectedNodes.size() > 0) {
                 WebModule wm = cluster.getModuleForSelectNodeAction(selectedAction);
                 if (wm != null) {
-                    String msg = wm.selectedNodesAction(selectedAction, selectedNodes, request);
-                    if (msg != null) message += msg;
+                    ActionReturn actionReturn = wm.selectedNodesAction(selectedAction, selectedNodes, request);
+                    if (actionReturn.isRedirect()) {
+                        return doPage(actionReturn.getRedirectToPage(), request, response);
+                    } else {
+                        if (null != actionReturn.getMessage()) message += actionReturn.getMessage();
+                    }
                 }
             }
         } else if (action != null) {
             WebModule wm = cluster.getModuleForAction(action);
             if (wm != null) {
-                String msg = wm.action(action, request);
-                if (msg != null) message += msg;
+                ActionReturn actionReturn =  wm.action(action, request);
+                if (actionReturn.isRedirect()) {
+                    return doPage(actionReturn.getRedirectToPage(), request, response);
+                } else {
+                    if (null != actionReturn.getMessage()) message += actionReturn.getMessage();
+                }
             }
         }
         if (message.length() > 0) request.setAttribute("message", message);

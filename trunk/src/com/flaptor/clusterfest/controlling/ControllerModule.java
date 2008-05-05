@@ -159,7 +159,7 @@ public class ControllerModule extends AbstractModule<ControllerNodeDescriptor> i
 	public void setup(WebServer server) {
 	}
 
-	public String action(String action, HttpServletRequest request) {
+	public ActionReturn action(String action, HttpServletRequest request) {
 		ClusterManager cluster = ClusterManager.getInstance();
 		String message = null;
         NodeDescriptor node = ModuleUtil.getNodeFromRequest(request);
@@ -178,7 +178,7 @@ public class ControllerModule extends AbstractModule<ControllerNodeDescriptor> i
         if ("stop".equals(action)) {
             stopNode(node);
         }
-        return message;
+        return ActionReturn.returnMessage(message);
 	}
 
 	public List<String> getActions() {
@@ -199,7 +199,7 @@ public class ControllerModule extends AbstractModule<ControllerNodeDescriptor> i
         return ret;
     }
 	
-    public String selectedNodesAction(String action, List<NodeDescriptor> nodes, HttpServletRequest request) {
+    public ActionReturn selectedNodesAction(String action, List<NodeDescriptor> nodes, HttpServletRequest request) {
         ClusterManager cluster = ClusterManager.getInstance();
         String message = null;
         if ("controller.start".equals(action)) {
@@ -207,7 +207,7 @@ public class ControllerModule extends AbstractModule<ControllerNodeDescriptor> i
         } else if ("controller.kill".equals(action)) {
             message = ControllingFrontend.killAll(cluster, nodes);
         }
-        return message;
+        return ActionReturn.returnMessage(message);
     }
 
     public List<String> getPages() {

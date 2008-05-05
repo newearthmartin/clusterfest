@@ -247,6 +247,14 @@ public class ClusterManager {
 		return nodes;
 	}
 	
+	/**
+	 * @param node
+	 * @return the position of the node in the list
+	 */
+	public int getNodeIndex(NodeDescriptor node) {
+	    return nodes.indexOf(node);
+	}
+	
 	public Module getModule(String moduleName) {
 		return modules.get(moduleName);
 	}

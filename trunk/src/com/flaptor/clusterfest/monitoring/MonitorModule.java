@@ -158,17 +158,16 @@ public class MonitorModule extends AbstractModule<MonitorNodeDescriptor> impleme
         PropertyFormatter formatter = formatters.get(type);
         if (formatter == null) {
             Config config = Config.getConfig("clustering.properties");
+            String clazz = null;
             try {
-                String clazz = config.getString("clustering.monitor.formatter."+type);
-                if (clazz == null) {
-                    clazz = config.getString("clustering.monitor.formatter");
-                }
-                formatter = (PropertyFormatter) ClassUtil.instance(clazz);
-                formatters.put(type, formatter);
-            }catch (Throwable t) {
-                logger.error(t);
-                return new DefaultPropertyFormatter();
+                clazz = config.getString("clustering.monitor.formatter."+type);
+            }catch (Throwable t) {logger.warn(t);} //if not found look for default formatter
+
+            if (clazz == null) {
+                clazz = config.getString("clustering.monitor.formatter");
             }
+            formatter = (PropertyFormatter) ClassUtil.instance(clazz);
+            formatters.put(type, formatter);
         }
         return formatter;
     }
@@ -206,7 +205,7 @@ public class MonitorModule extends AbstractModule<MonitorNodeDescriptor> impleme
 	}
 	public void setup(WebServer server) {
 	}
-	public String action(String action, HttpServletRequest request) {
+	public ActionReturn action(String action, HttpServletRequest request) {
 		return null;
 	}
 
@@ -228,7 +227,7 @@ public class MonitorModule extends AbstractModule<MonitorNodeDescriptor> impleme
         return new ArrayList<Pair<String,String>>();
     }
 
-    public String selectedNodesAction(String action, List<NodeDescriptor> nodes, HttpServletRequest request) {
+    public ActionReturn selectedNodesAction(String action, List<NodeDescriptor> nodes, HttpServletRequest request) {
         return null;
     }
     public List<String> getPages() {
