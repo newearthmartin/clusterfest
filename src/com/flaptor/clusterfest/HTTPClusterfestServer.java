@@ -28,7 +28,7 @@ import com.flaptor.util.remote.WebServer;
 public class HTTPClusterfestServer extends WebServer {
 
 	public HTTPClusterfestServer(int port){
-		super(port);
+		super(port, "clusterfest-jetty.xml");
         URL webappPath = this.getClass().getClassLoader().getResource("web-clusterfest");
         String path = webappPath.getPath();
 		addWebAppHandler("/", path);
