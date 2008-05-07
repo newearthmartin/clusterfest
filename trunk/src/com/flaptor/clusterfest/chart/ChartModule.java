@@ -43,14 +43,14 @@ abstract public class ChartModule implements Module, WebModule{
     public ActionReturn selectedNodesAction(String action, List<NodeDescriptor> nodes, HttpServletRequest request) {return null;}
 
     public List<String> getPages() {
-        return Arrays.asList(new String[]{"chart"});
+        return Arrays.asList(new String[]{pageName});
     }
     
-    abstract Pair<List<String>, Map<Date, List<Number>>> getChartData(HttpServletRequest request); 
+    abstract public Pair<List<String>, Map<Date, List<Number>>> getChartData(HttpServletRequest request); 
     
     public String doPage(String page, HttpServletRequest request, HttpServletResponse response) {
         Pair<List<String>, Map<Date, List<Number>>> chartData = getChartData(request);
-        TimePlotUtils.generateInputDate(chartData.last(), "\\n");
+        
          
         List<LineInfo> lineInfos = new ArrayList<LineInfo>();
         int i = 1;
@@ -59,6 +59,7 @@ abstract public class ChartModule implements Module, WebModule{
             i++;
         }
         request.setAttribute("lineInfos", lineInfos);
+        request.setAttribute("plot", TimePlotUtils.generateInputDate(chartData.last(), "\\n"));
         return "chart.vm";
     }
     

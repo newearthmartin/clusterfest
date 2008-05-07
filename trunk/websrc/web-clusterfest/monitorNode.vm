@@ -79,7 +79,7 @@ limitations under the License.
                     #foreach ($entry in $nodeState.getProperties().entrySet())
 	                    <tr>
 	                        <td>$entry.getKey()</td>
-	                        <td>#if ($entry.getValue()) $monitor.format($node.getType(), $entry.getKey(), $entry.getValue()) #else null #end</td>
+	                        <td>#if ($entry.getValue()) $$monitor.format($node, $entry.getKey(), $entry.getValue()) #else null #end</td>
 	                    </tr>
                     #end
                 </table>

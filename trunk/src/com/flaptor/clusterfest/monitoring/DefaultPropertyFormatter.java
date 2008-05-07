@@ -1,5 +1,6 @@
 package com.flaptor.clusterfest.monitoring;
 
+import com.flaptor.clusterfest.NodeDescriptor;
 import com.flaptor.util.StringUtil;
 
 /**
@@ -9,7 +10,7 @@ import com.flaptor.util.StringUtil;
  */
 public class DefaultPropertyFormatter implements PropertyFormatter {
 
-    public String format(String name, Object value) {
+    public String format(NodeDescriptor node, String name, Object value) {
     	if (name.equals("freeMemory") || name.equals("totalMemory") || name.equals("usedMemory")) {
     		return bytesToString(((Long)value).longValue());
     	}
