@@ -219,8 +219,8 @@ public class MonitorModule extends AbstractModule<MonitorNodeDescriptor> impleme
 	 * @param value
 	 * @return
 	 */
-	public String format(String nodeType, String name, Object value) {
-	    return getFormatterForType(nodeType).format(name, value); 
+	public String format(NodeDescriptor node, String name, Object value) {
+	    return getFormatterForType(node.getType()).format(node,name, value); 
 	}
 
     public List<Pair<String, String>> getSelectedNodesActions() {
