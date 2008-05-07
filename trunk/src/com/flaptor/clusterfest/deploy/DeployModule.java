@@ -114,6 +114,7 @@ public class DeployModule extends AbstractModule<DeployNodeDescriptor> implement
     public ActionReturn action(String action, HttpServletRequest request) {
         return null;
     }
+    @SuppressWarnings("unchecked")
     public String doPage(String page, HttpServletRequest request, HttpServletResponse response) {
         List<NodeDescriptor> nodes = new ArrayList<NodeDescriptor>();
         String [] nodesParam =request.getParameterValues("node");
