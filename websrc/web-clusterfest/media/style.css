@@ -73,23 +73,19 @@ h2 {
 }
 
 a.sanityGOOD,a.sanityGOOD:hover,a.sanityGOOD:visited {
-	color: white;
 	background-color: green;
 }
 
 a.sanityUNKNOWN,a.sanityUNKNOWN:hover,a.sanityUNKNOWN:visited {
-	color: black;
 	background-color: gray;
 }
 
 a.sanityBAD,a.sanityBAD:hover,a.sanityBAD:visited {
-	color: black;
 	background-color: yellow;
 }
 
 a.sanityUNREACHABLE,a.sanityUNREACHABLE:hover,a.sanityUNREACHABLE:visited
 	{
-	color: white;
 	background-color: red;
 }
 
