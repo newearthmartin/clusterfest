@@ -30,8 +30,10 @@ import com.flaptor.clusterfest.monitoring.NodeState;
 import com.flaptor.clusterfest.monitoring.SystemProperties;
 import com.flaptor.clusterfest.monitoring.node.Monitoreable;
 import com.flaptor.util.Config;
+import com.flaptor.util.FileUtil;
 import com.flaptor.util.TestCase;
 import com.flaptor.util.TestInfo;
+import com.flaptor.util.TestUtils;
 
 /**
  * Test cases for testing rpcs in the clustering framework 
@@ -78,7 +80,7 @@ public class ClusterfestRpcTest extends TestCase {
 
     @TestInfo(testType = TestInfo.TestType.INTEGRATION)//, requiresPort = {PORT})
 	public void testMonitoreable() throws Exception {
-		MonitorNodeDescriptor mnode = new MonitorNodeDescriptor(node);
+		MonitorNodeDescriptor mnode = new MonitorNodeDescriptor(node, FileUtil.createTempDir("tempStates", ""));
 		mnode.updateState();
 		
 		NodeState nodeState = mnode.getLastState();

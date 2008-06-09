@@ -16,20 +16,25 @@ limitations under the License.
 
 package com.flaptor.clusterfest.monitoring;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
 
 import org.apache.log4j.Logger;
 
+import com.flaptor.clusterfest.ClusterManager;
 import com.flaptor.clusterfest.ModuleNodeDescriptor;
 import com.flaptor.clusterfest.NodeDescriptor;
 import com.flaptor.clusterfest.NodeUnreachableException;
 import com.flaptor.clusterfest.monitoring.node.Monitoreable;
 import com.flaptor.util.DateUtil;
+import com.flaptor.util.Execution;
+import com.flaptor.util.FileSerializer;
 import com.flaptor.util.Pair;
 import com.flaptor.util.remote.RpcConnectionException;
 
@@ -47,14 +52,20 @@ public class MonitorNodeDescriptor extends ModuleNodeDescriptor {
     private NodeChecker checker;
     private Monitoreable monitoreable;
 	
-    public MonitorNodeDescriptor(NodeDescriptor node) {
+    FileSerializer stateFileSerializer;
+
+    @SuppressWarnings("unchecked")
+    public MonitorNodeDescriptor(NodeDescriptor node, File statesDir) {
     	super(node);
     	
-        this.states = new LinkedList<NodeState>();
+        stateFileSerializer = new FileSerializer(new File(statesDir, node.getHost()+"."+node.getPort()+".states"));
+
+        states = (LinkedList<NodeState>)stateFileSerializer.deserialize();
+        if (states == null) states = new LinkedList<NodeState>();
+        
         this.logs = new HashMap<String, Pair<String,Long>>();
         this.monitoreable = MonitorModule.getModuleListener(node.getXmlrpcClient());
-        // TODO set default checker
-        
+
         //TODO hardcoded logs
         this.logs.put("out", null);
         this.logs.put("err", null);
@@ -119,24 +130,36 @@ public class MonitorNodeDescriptor extends ModuleNodeDescriptor {
         }
     }
     
+    @SuppressWarnings("unchecked")
     public void updateState() throws NodeUnreachableException {
 		
     	NodeState state = null; 
 		try {
 			state = retrieveCurrentState();
-	        state.updateSanity(checker);
+	        state.updateSanity(checker, this);
 	        updateLogs();
 		} catch (NodeUnreachableException e) {
 			if (e.getCause() == null || !(e.getCause() instanceof RpcConnectionException)) {
 				logger.error("node unreachable but not because of RpcConnectionException, cause: "+ e.getMessage(), e);
 				System.out.println("node unreachable but not because of RpcConnectionException, cause: "+ e.getMessage());
 			}
-		    state = NodeState.createUnreachableState(this);
+		    state = NodeState.createUnreachableState();
 		    throw e;
 		} finally {
 			synchronized (states) {
 		        states.add(state);
+		         
 		        cleanupStateList();
+		        ClusterManager.getMultiExecutor().addExecution(
+		            new Execution(new Callable(){
+                        public Object call() throws Exception {
+                                synchronized (states) {
+                                    stateFileSerializer.serialize(states);
+                                    return null;
+                                }
+                            }
+		            })
+		        );
 			}
 		}
     }
@@ -182,7 +205,7 @@ public class MonitorNodeDescriptor extends ModuleNodeDescriptor {
     }
 
     private NodeState retrieveCurrentState() throws NodeUnreachableException {
-        return new NodeState(this, retrieveProperties(), retrieveSystemProperties());
+        return new NodeState(retrieveProperties(), retrieveSystemProperties());
     }
     
     private Map<String, Object> retrieveProperties() throws NodeUnreachableException {

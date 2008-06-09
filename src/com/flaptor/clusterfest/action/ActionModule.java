@@ -88,7 +88,7 @@ public class ActionModule extends AbstractModule<ActionNodeDescriptor> {
                 actualNodes++;
             }
         }
-        ClusterManager.getInstance().getMultiExecutor().addExecution(e);
+        ClusterManager.getMultiExecutor().addExecution(e);
         e.waitFor();
         for (Pair<Callable<Void>, Throwable> problem : e.getProblems()) {
             errors.add(new Pair<NodeDescriptor, Throwable>(

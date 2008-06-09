@@ -16,6 +16,7 @@ limitations under the License.
 
 package com.flaptor.clusterfest.monitoring;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -45,7 +46,7 @@ public interface NodeChecker {
      * For expressing the result of the checker, contains a sanity value
      * and a list of (human readable) remarks that express what's wrong
      */
-    public static class Result {
+    public static class Result implements Serializable{
         private Sanity sanity;
         private List<String> remarks;
 

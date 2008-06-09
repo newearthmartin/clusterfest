@@ -1,9 +1,11 @@
 clustering.nodes=
 clustering.modules=
 
-clustering.checkNodesInterval=60000
+clustering.checkNodesInterval=60
 clustering.monitor.formatter=com.flaptor.clustering.monitoring.DefaultPropertyFormatter
 clustering.monitor.checker=com.flaptor.clustering.monitoring.DefaultChecker
+
+clustering.monitor.statesDir=states
 
 clustering.web.login.enabled=false
 clustering.web.login.user=clusteruser
