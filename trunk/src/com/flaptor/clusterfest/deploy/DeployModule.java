@@ -86,7 +86,7 @@ public class DeployModule extends AbstractModule<DeployNodeDescriptor> implement
                 });
             }
         }
-        ClusterManager.getInstance().getMultiExecutor().addExecution(e);
+        ClusterManager.getMultiExecutor().addExecution(e);
         e.waitFor();
         for (Pair<Callable<Void>, Throwable> problem : e.getProblems()) {
             errors.add(new Pair<NodeDescriptor, Throwable>(((CallableWithId<Void, NodeDescriptor>) problem.first()).getId(), problem.last()));

@@ -117,7 +117,7 @@ public class ControllingFrontend {
                 });
             }
         }
-        cluster.getMultiExecutor().addExecution(e);
+        ClusterManager.getMultiExecutor().addExecution(e);
         e.waitFor();
         List<Pair<Callable<Void>,Throwable>> problems = e.getProblems();
         if (problems.size() > 0) {
@@ -147,7 +147,7 @@ public class ControllingFrontend {
                 });
             }
         }
-        cluster.getMultiExecutor().addExecution(e);
+        ClusterManager.getMultiExecutor().addExecution(e);
         e.waitFor();
         List<Pair<Callable<Void>,Throwable>> problems = e.getProblems();
         if (problems.size() > 0) {

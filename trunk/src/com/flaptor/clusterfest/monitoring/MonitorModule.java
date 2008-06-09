@@ -16,6 +16,8 @@ limitations under the License.
 
 package com.flaptor.clusterfest.monitoring;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -42,6 +44,7 @@ import com.flaptor.clusterfest.monitoring.node.Monitoreable;
 import com.flaptor.util.ClassUtil;
 import com.flaptor.util.Config;
 import com.flaptor.util.DateUtil;
+import com.flaptor.util.FileUtil;
 import com.flaptor.util.Pair;
 import com.flaptor.util.remote.NoSuchRpcMethodException;
 import com.flaptor.util.remote.WebServer;
@@ -62,12 +65,22 @@ public class MonitorModule extends AbstractModule<MonitorNodeDescriptor> impleme
 
 	private final Map<String, PropertyFormatter> formatters = new HashMap<String, PropertyFormatter>();
 	
-	public MonitorModule() {
+    File statesDir;
+
+    public MonitorModule() {
+        try {
+            statesDir = FileUtil.createOrGetDir(
+                    new File(Config.getConfig("clustering.properties").getString("clustering.monitor.statesDir")).getAbsolutePath(),
+                    true, true);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 	}
 
+	
 	@Override
 	protected MonitorNodeDescriptor createModuleNode(NodeDescriptor node) {
-		MonitorNodeDescriptor monitorNode = new MonitorNodeDescriptor(node);
+		MonitorNodeDescriptor monitorNode = new MonitorNodeDescriptor(node, statesDir);
 		try {
 			monitorNode.setChecker(getCheckerForType(node.getType()));
 		} catch (Exception e) {

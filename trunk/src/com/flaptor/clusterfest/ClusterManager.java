@@ -28,6 +28,7 @@ import java.util.TreeSet;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
@@ -49,10 +50,17 @@ public class ClusterManager {
 	
     private static final Logger logger = Logger.getLogger(com.flaptor.util.Execute.whoAmI());
 	
-    MultiExecutor multiExecutor = new MultiExecutor(40, "clusterfest");
+    static MultiExecutor multiExecutor = new MultiExecutor(40, "clusterfest");
+    ScheduledThreadPoolExecutor scheduler = new ScheduledThreadPoolExecutor(1);
     
     private static class InitializiationOnDemandHolder {
         private static ClusterManager instance = new ClusterManager();    
+    }
+    /**
+     * @return the singleton instance of Cluster
+     */
+    public static ClusterManager getInstance() {
+        return InitializiationOnDemandHolder.instance;
     }
     
     private Map<String, Module> modules = new HashMap<String, Module>();
@@ -81,17 +89,15 @@ public class ClusterManager {
         }
     	updateNodes();
     	int interval = config.getInt("clustering.checkNodesInterval");
-		new Timer().scheduleAtFixedRate(new TimerTask(){
-			public void run() {
-				updateNodes();
-			}
-		}, interval, interval);
+    	scheduler.scheduleWithFixedDelay(new Runnable() {
+            public void run() {updateNodes();}
+    	}, interval, interval, TimeUnit.SECONDS);
     }
     
     /**
      * @return the official clusterfest multiexecutor, all modules can register executions here
      */
-    public MultiExecutor getMultiExecutor() {
+    static public MultiExecutor getMultiExecutor() {
         return multiExecutor;
     }
     
@@ -99,13 +105,6 @@ public class ClusterManager {
         webModules.add(wm);
 	}
 	
-    /**
-     * @return the singleton instance of Cluster
-     */
-    public static ClusterManager getInstance() {
-        return InitializiationOnDemandHolder.instance;
-    }
-
 	private List<NodeDescriptor> nodes = new ArrayList<NodeDescriptor>();
 
 	/**
