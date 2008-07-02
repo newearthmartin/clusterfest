@@ -20,8 +20,6 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Map;
 
-import javassist.SerialVersionUID;
-
 /**
  * The state of a node in the monitoring module
  *
@@ -41,16 +39,22 @@ public class NodeState implements Serializable{
 
     public static NodeState createUncheckedState() {
         NodeState state = new NodeState(null, null);
-        state.sanity = UNREACHABLE_RESULT; 
+        state.sanity = UNCHECKED_RESULT; 
         return state;
     }
 
     public static NodeState createUnreachableState() {
-		NodeState state = new NodeState(null, null);
-		state.sanity = UNREACHABLE_RESULT; 
-		return state;
-	}
-	
+        NodeState state = new NodeState(null, null);
+        state.sanity = UNREACHABLE_RESULT; 
+        return state;
+    }
+    
+    public static NodeState createErrorState(Throwable t) {
+        NodeState state = new NodeState(null, null);
+        state.sanity = new NodeChecker.Result(NodeChecker.Sanity.ERROR, Arrays.asList(new String[]{"Node throwing exception in clusterfest code", t.getMessage()})); 
+        return state;
+    }
+    
     public NodeState(Map<String, Object> properties, SystemProperties systemProperties) {
         super();
         // should be updated later by a NodeChecker

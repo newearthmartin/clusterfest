@@ -2,8 +2,7 @@ package com.flaptor.clusterfest.action;
 
 import com.flaptor.clusterfest.ModuleNodeDescriptor;
 import com.flaptor.clusterfest.NodeDescriptor;
-import com.flaptor.clusterfest.NodeUnreachableException;
-import com.flaptor.clusterfest.monitoring.MonitorModule;
+import com.flaptor.clusterfest.exceptions.NodeException;
 
 /**
  * Base class for nodes of the action module
@@ -23,11 +22,11 @@ public class ActionNodeDescriptor extends ModuleNodeDescriptor{
      * @param action the name of the action
      * @param params the parameters (must be serializable)
      */
-    public void action(String action, Object[] params) throws NodeUnreachableException{
+    public void action(String action, Object[] params) throws NodeException{
         try {
             receiver.action(action, params);
-        } catch (Exception e) {
-            throw new NodeUnreachableException(e, getNodeDescriptor());
+        } catch (Throwable t) {
+            getNodeDescriptor().checkAndThrow(t);
         }
     }
 }

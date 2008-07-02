@@ -85,8 +85,13 @@ a.sanityBAD,a.sanityBAD:hover,a.sanityBAD:visited {
 }
 
 a.sanityUNREACHABLE,a.sanityUNREACHABLE:hover,a.sanityUNREACHABLE:visited
-	{
+{
 	background-color: red;
+}
+
+a.sanityERROR,a.sanityERROR:hover,a.sanityERROR:visited
+{
+    background-color: purple;
 }
 
 table {

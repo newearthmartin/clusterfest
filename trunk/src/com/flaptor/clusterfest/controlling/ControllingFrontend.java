@@ -17,19 +17,14 @@ limitations under the License.
 package com.flaptor.clusterfest.controlling;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
 
 import com.flaptor.clusterfest.ClusterManager;
-import com.flaptor.clusterfest.ModuleNodeDescriptor;
 import com.flaptor.clusterfest.ModuleUtil;
 import com.flaptor.clusterfest.NodeDescriptor;
-import com.flaptor.clusterfest.monitoring.NodeState;
 import com.flaptor.util.CallableWithId;
 import com.flaptor.util.Execution;
 import com.flaptor.util.Pair;

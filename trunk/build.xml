@@ -16,7 +16,7 @@ limitations under the License.
 
 <project name="clusterfest" default="jar" basedir=".">
     <property name="project" value="clusterfest"/>
-    <property name="version" value="0.5RC"/>
+    <property name="version" value="0.6-trunk"/>
 
     <property name="src.dir" value="${basedir}/src"/>
     <property name="websrc.dir" value="${basedir}/websrc"/>

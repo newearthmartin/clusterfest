@@ -18,9 +18,6 @@ package com.flaptor.clusterfest;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.flaptor.clusterfest.ClusterManager;
-import com.flaptor.clusterfest.NodeListener;
-import com.flaptor.clusterfest.NodeDescriptor;
 import com.flaptor.util.Config;
 import com.flaptor.util.FileUtil;
 import com.flaptor.util.TestCase;

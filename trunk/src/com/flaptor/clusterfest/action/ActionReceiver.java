@@ -1,8 +1,5 @@
 package com.flaptor.clusterfest.action;
 
-import java.util.List;
-
-import com.flaptor.clusterfest.NodeDescriptor;
 
 /**
  * interface for nodes that receive actions

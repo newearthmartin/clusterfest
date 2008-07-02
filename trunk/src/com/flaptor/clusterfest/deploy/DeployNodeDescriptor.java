@@ -4,8 +4,6 @@ import org.apache.log4j.Logger;
 
 import com.flaptor.clusterfest.ModuleNodeDescriptor;
 import com.flaptor.clusterfest.NodeDescriptor;
-import com.flaptor.clusterfest.NodeUnreachableException;
-import com.flaptor.clusterfest.monitoring.MonitorModule;
 
 /**
  * Base class for nodes of the action module

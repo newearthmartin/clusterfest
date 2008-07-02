@@ -18,7 +18,6 @@ package com.flaptor.clusterfest.controlling;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -28,14 +27,13 @@ import org.apache.log4j.Logger;
 
 import com.flaptor.clusterfest.AbstractModule;
 import com.flaptor.clusterfest.ClusterManager;
-import com.flaptor.clusterfest.NodeListener;
 import com.flaptor.clusterfest.ModuleUtil;
 import com.flaptor.clusterfest.NodeDescriptor;
-import com.flaptor.clusterfest.NodeUnreachableException;
+import com.flaptor.clusterfest.NodeListener;
 import com.flaptor.clusterfest.WebModule;
 import com.flaptor.clusterfest.controlling.node.Controllable;
+import com.flaptor.clusterfest.exceptions.NodeException;
 import com.flaptor.util.Pair;
-import com.flaptor.util.remote.NoSuchRpcMethodException;
 import com.flaptor.util.remote.WebServer;
 import com.flaptor.util.remote.XmlrpcClient;
 import com.flaptor.util.remote.XmlrpcSerialization;
@@ -82,7 +80,7 @@ public class ControllerModule extends AbstractModule<ControllerNodeDescriptor> i
     }
 
 	@Override
-	protected boolean shouldRegister(NodeDescriptor node) throws NodeUnreachableException {
+	protected boolean shouldRegister(NodeDescriptor node) throws NodeException {
 	    return ModuleUtil.nodeBelongs(node, MODULE_CONTEXT, true);
 	}
 

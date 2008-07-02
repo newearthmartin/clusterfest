@@ -21,18 +21,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.TreeSet;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 
+import com.flaptor.clusterfest.exceptions.NodeException;
 import com.flaptor.util.ClassUtil;
 import com.flaptor.util.Config;
 import com.flaptor.util.Execution;
@@ -205,15 +200,15 @@ public class ClusterManager {
 		boolean noErrors = true;
 		try {
 			node.updateInfo();
-		} catch (NodeUnreachableException e) {
-			logger.warn("tried to update info for unreachable node at " + node.getHost() + ":" + node.getPort() + " - " +  e);
+		} catch (NodeException e) {
+			logger.warn("exception trying to update " + node, e);
 			noErrors = false;
 		}
 		for (Module module: modules.values()) {
 			try {
 			    module.notifyNode(node);
-			} catch (NodeUnreachableException e) {
-				logger.warn("tried to update info for unreachable node at " + node.getHost() + ":" + node.getPort(), e);
+			} catch (NodeException e) {
+	            logger.warn("exception trying to update " + node, e);
 				noErrors = false;
 			}
 		}

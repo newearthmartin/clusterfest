@@ -1,9 +1,6 @@
 package com.flaptor.clusterfest.deploy;
 
 import java.io.IOException;
-import java.util.List;
-
-import com.flaptor.clusterfest.NodeDescriptor;
 
 /**
  * interface for nodes of the deploy module

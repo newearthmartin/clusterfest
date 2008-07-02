@@ -19,8 +19,6 @@ package com.flaptor.clusterfest;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.flaptor.clusterfest.NodeListener;
-import com.flaptor.clusterfest.NodeDescriptor;
 import com.flaptor.clusterfest.controlling.ControllerModule;
 import com.flaptor.clusterfest.controlling.ControllerNodeState;
 import com.flaptor.clusterfest.controlling.node.Controllable;
@@ -33,7 +31,6 @@ import com.flaptor.util.Config;
 import com.flaptor.util.FileUtil;
 import com.flaptor.util.TestCase;
 import com.flaptor.util.TestInfo;
-import com.flaptor.util.TestUtils;
 
 /**
  * Test cases for testing rpcs in the clustering framework 
