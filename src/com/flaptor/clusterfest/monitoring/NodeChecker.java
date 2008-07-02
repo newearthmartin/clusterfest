@@ -39,7 +39,8 @@ public interface NodeChecker {
         UNREACHABLE,
         UNKNOWN,
         GOOD,
-        BAD
+        BAD,
+        ERROR
     }
     
     /**

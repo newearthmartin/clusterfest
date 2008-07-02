@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.flaptor.clusterfest.exceptions.NodeException;
+
 
 /**
  * One implementation of the Module interface for modules that 
@@ -42,9 +44,9 @@ abstract public class AbstractModule<T extends ModuleNodeDescriptor> implements 
      * 
      * @param node
      * @return true iff the node should be registered in this module
-     * @throws NodeUnreachableException if the node is unreachable 
+     * @throws NodeException if the node throws an exception or is unreachable 
      */
-    abstract protected boolean shouldRegister(NodeDescriptor node) throws NodeUnreachableException; 
+    abstract protected boolean shouldRegister(NodeDescriptor node) throws NodeException; 
 
 	/**
 	 * Create a module node from a NodeDescriptor. Nodes that should be registered
@@ -62,7 +64,7 @@ abstract public class AbstractModule<T extends ModuleNodeDescriptor> implements 
 	 */
 	abstract protected void notifyModuleNode(T node);
 	
-	public final void notifyNode(NodeDescriptor node) throws NodeUnreachableException {
+	public final void notifyNode(NodeDescriptor node) throws NodeException {
 	    try {
     	    if (shouldRegister(node)){
     	        if (!isRegistered(node)) registerNode(node);

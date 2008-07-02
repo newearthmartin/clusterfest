@@ -30,13 +30,13 @@ import org.apache.log4j.Logger;
 import com.flaptor.clusterfest.ClusterManager;
 import com.flaptor.clusterfest.ModuleNodeDescriptor;
 import com.flaptor.clusterfest.NodeDescriptor;
-import com.flaptor.clusterfest.NodeUnreachableException;
+import com.flaptor.clusterfest.exceptions.NodeException;
+import com.flaptor.clusterfest.exceptions.NodeUnreachableException;
 import com.flaptor.clusterfest.monitoring.node.Monitoreable;
 import com.flaptor.util.DateUtil;
 import com.flaptor.util.Execution;
 import com.flaptor.util.FileSerializer;
 import com.flaptor.util.Pair;
-import com.flaptor.util.remote.RpcConnectionException;
 
 /**
  * represents a monitoring module node
@@ -106,9 +106,9 @@ public class MonitorNodeDescriptor extends ModuleNodeDescriptor {
     
     /**
      * update all logs
-     * @throws NodeUnreachableException
+     * @throws NodeException
      */
-    public void updateLogs() throws NodeUnreachableException {
+    public void updateLogs() throws NodeException {
 		for (String logName: logs.keySet()) {
 			updateLog(logName);
 		}
@@ -116,22 +116,22 @@ public class MonitorNodeDescriptor extends ModuleNodeDescriptor {
     
     /**
      * updates the version of the log
+     * 
      * @param logName
-     * @throws NodeUnreachableException
+     * @throws NodeException
      */
-    public void updateLog(String logName) throws NodeUnreachableException {
+    public void updateLog(String logName) throws NodeException {
     	try {
             String log = monitoreable.getLog(logName);
             getNodeDescriptor().setReachable(true);
             logs.put(logName, new Pair<String, Long>(log, System.currentTimeMillis()));
-            
-        } catch (Exception e) {
-            throw new NodeUnreachableException(e, getNodeDescriptor());
+        } catch (Throwable t) {
+            getNodeDescriptor().checkAndThrow(t);
         }
     }
     
     @SuppressWarnings("unchecked")
-    public void updateState() throws NodeUnreachableException {
+    public void updateState() throws NodeException {
 		
     	NodeState state = null; 
 		try {
@@ -139,12 +139,11 @@ public class MonitorNodeDescriptor extends ModuleNodeDescriptor {
 	        state.updateSanity(checker, this);
 	        updateLogs();
 		} catch (NodeUnreachableException e) {
-			if (e.getCause() == null || !(e.getCause() instanceof RpcConnectionException)) {
-				logger.error("node unreachable but not because of RpcConnectionException, cause: "+ e.getMessage(), e);
-				System.out.println("node unreachable but not because of RpcConnectionException, cause: "+ e.getMessage());
-			}
-		    state = NodeState.createUnreachableState();
-		    throw e;
+            state = NodeState.createUnreachableState();
+            throw e;
+        } catch (NodeException e) {
+            state = NodeState.createErrorState(e.getCause());
+            throw e;
 		} finally {
 			synchronized (states) {
 		        states.add(state);
@@ -204,27 +203,29 @@ public class MonitorNodeDescriptor extends ModuleNodeDescriptor {
         
     }
 
-    private NodeState retrieveCurrentState() throws NodeUnreachableException {
+    private NodeState retrieveCurrentState() throws NodeException {
         return new NodeState(retrieveProperties(), retrieveSystemProperties());
     }
     
-    private Map<String, Object> retrieveProperties() throws NodeUnreachableException {
+    private Map<String, Object> retrieveProperties() throws NodeException {
     	try {
             Map<String, Object> properties = monitoreable.getProperties();
             getNodeDescriptor().setReachable(true);
             return properties;
         } catch (Throwable t) {
-            throw new NodeUnreachableException(t, getNodeDescriptor());
+            getNodeDescriptor().checkAndThrow(t);
+            return null; //never called
         }
     }
     
-    private SystemProperties retrieveSystemProperties() throws NodeUnreachableException {
+    private SystemProperties retrieveSystemProperties() throws NodeException {
         try {
             SystemProperties systemProperties = monitoreable.getSystemProperties();
             getNodeDescriptor().setReachable(true);
             return systemProperties;
         } catch (Throwable t) {
-            throw new NodeUnreachableException(t, getNodeDescriptor());
+            getNodeDescriptor().checkAndThrow(t);
+            return null; //never called
         }
     }
 }

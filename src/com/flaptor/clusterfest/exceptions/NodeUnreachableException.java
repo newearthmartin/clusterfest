@@ -14,7 +14,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package com.flaptor.clusterfest;
+package com.flaptor.clusterfest.exceptions;
+
+import com.flaptor.clusterfest.NodeDescriptor;
 
 /**
  * Exception to be thrown by rpc calls, meaning that the node is unreachable
@@ -22,30 +24,15 @@ package com.flaptor.clusterfest;
  *  
  * @author Martin Massera
  */
-public class NodeUnreachableException extends Exception {
-    NodeDescriptor node;
+public class NodeUnreachableException extends NodeException {
     
-    private static final long serialVersionUID = 1L;
-
     public NodeUnreachableException(NodeDescriptor node) {
-        super();
-        this.node = node;
+        super(node, "node " + node + " unreachable");
         node.setReachable(false);
     }
 
-    public NodeUnreachableException(String message, NodeDescriptor node) {
-        super(message);
-        node.setReachable(false);
-    }
-
-    public NodeUnreachableException(String message, Throwable cause, NodeDescriptor node) {
-        super(message, cause);
-        node.setReachable(false);
-    }
-
-
-    public NodeUnreachableException(Throwable cause, NodeDescriptor node) {
-        super(cause);
+    public NodeUnreachableException(NodeDescriptor node, Throwable cause) {
+        super(node, "node " + node + " unreachable - " + cause.getMessage(), cause);
         node.setReachable(false);
     }
 }

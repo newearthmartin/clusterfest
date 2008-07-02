@@ -19,6 +19,10 @@ package com.flaptor.clusterfest;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import com.flaptor.clusterfest.exceptions.NodeCodeException;
+import com.flaptor.clusterfest.exceptions.NodeException;
+import com.flaptor.clusterfest.exceptions.NodeUnreachableException;
+import com.flaptor.util.remote.RpcConnectionException;
 import com.flaptor.util.remote.XmlrpcClient;
 
 
@@ -84,15 +88,26 @@ public class NodeDescriptor {
     /**
      * updates the info of the node
      */
-    void updateInfo() throws NodeUnreachableException {
+    void updateInfo() throws NodeException {
         try {
             type = clusterableStub.getNodeType();
             reachable = true;
-        } catch (Exception e) {
-            throw new NodeUnreachableException(e, this);
+        } catch (Throwable t) {
+            checkAndThrow(t);
         }
     }
     public String toString() {
         return host+":"+port+":"+installDir+":"+type;
+    }
+    
+    /**
+     * method for checking thrown exceptions, sees if it is an unreachable exception and throws it as a NodeUnreachableException.
+     * Otherwise throws a NodeCodeException 
+     * @param t
+     * @throws NodeException
+     */
+    public void checkAndThrow(Throwable t) throws NodeException {
+        if (t instanceof RpcConnectionException) throw new NodeUnreachableException(this, t);
+        else throw new NodeCodeException(this, t);
     }
 }

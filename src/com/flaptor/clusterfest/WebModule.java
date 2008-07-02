@@ -6,7 +6,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.flaptor.util.Pair;
-import com.flaptor.util.Triad;
 import com.flaptor.util.remote.WebServer;
 
 /**

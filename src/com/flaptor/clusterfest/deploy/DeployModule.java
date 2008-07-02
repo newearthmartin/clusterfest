@@ -25,27 +25,21 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
-import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.log4j.Logger;
 
 import com.flaptor.clusterfest.AbstractModule;
 import com.flaptor.clusterfest.ClusterManager;
-import com.flaptor.clusterfest.NodeListener;
 import com.flaptor.clusterfest.ModuleUtil;
 import com.flaptor.clusterfest.NodeDescriptor;
-import com.flaptor.clusterfest.NodeUnreachableException;
+import com.flaptor.clusterfest.NodeListener;
 import com.flaptor.clusterfest.WebModule;
-import com.flaptor.clusterfest.monitoring.node.Monitoreable;
+import com.flaptor.clusterfest.exceptions.NodeException;
 import com.flaptor.util.CallableWithId;
-import com.flaptor.util.Execute;
 import com.flaptor.util.Execution;
 import com.flaptor.util.IOUtil;
-import com.flaptor.util.MultiExecutor;
 import com.flaptor.util.Pair;
-import com.flaptor.util.Execution.Results;
-import com.flaptor.util.remote.NoSuchRpcMethodException;
 import com.flaptor.util.remote.WebServer;
 import com.flaptor.util.remote.XmlrpcClient;
 import com.flaptor.util.remote.XmlrpcSerialization;
@@ -66,7 +60,7 @@ public class DeployModule extends AbstractModule<DeployNodeDescriptor> implement
         return new DeployNodeDescriptor(node);
     }
 
-    protected boolean shouldRegister(NodeDescriptor node) throws NodeUnreachableException {
+    protected boolean shouldRegister(NodeDescriptor node) throws NodeException {
         return ModuleUtil.nodeBelongs(node, MODULE_CONTEXT, false);
     }
 

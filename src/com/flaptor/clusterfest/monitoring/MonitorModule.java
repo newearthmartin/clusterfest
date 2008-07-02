@@ -20,12 +20,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -33,12 +30,11 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 
 import com.flaptor.clusterfest.AbstractModule;
-import com.flaptor.clusterfest.ClusterManager;
-import com.flaptor.clusterfest.NodeListener;
 import com.flaptor.clusterfest.ModuleUtil;
 import com.flaptor.clusterfest.NodeDescriptor;
-import com.flaptor.clusterfest.NodeUnreachableException;
+import com.flaptor.clusterfest.NodeListener;
 import com.flaptor.clusterfest.WebModule;
+import com.flaptor.clusterfest.exceptions.NodeException;
 import com.flaptor.clusterfest.monitoring.NodeChecker.Sanity;
 import com.flaptor.clusterfest.monitoring.node.Monitoreable;
 import com.flaptor.util.ClassUtil;
@@ -46,7 +42,6 @@ import com.flaptor.util.Config;
 import com.flaptor.util.DateUtil;
 import com.flaptor.util.FileUtil;
 import com.flaptor.util.Pair;
-import com.flaptor.util.remote.NoSuchRpcMethodException;
 import com.flaptor.util.remote.WebServer;
 import com.flaptor.util.remote.XmlrpcClient;
 import com.flaptor.util.remote.XmlrpcSerialization;
@@ -96,7 +91,7 @@ public class MonitorModule extends AbstractModule<MonitorNodeDescriptor> impleme
         updateNodeInfo(node);
     }
     
-	public boolean shouldRegister(NodeDescriptor node) throws NodeUnreachableException {
+	public boolean shouldRegister(NodeDescriptor node) throws NodeException {
         return ModuleUtil.nodeBelongs(node, MODULE_CONTEXT, false);
 	}
 
@@ -104,7 +99,7 @@ public class MonitorModule extends AbstractModule<MonitorNodeDescriptor> impleme
 		try {
 			node.updateState();
 			return true;
-		} catch (NodeUnreachableException e) {
+		} catch (NodeException e) {
 			logger.warn(e);
 			return false;
 		}
@@ -122,7 +117,7 @@ public class MonitorModule extends AbstractModule<MonitorNodeDescriptor> impleme
 		if (!moduleNode.getLogs().containsKey(logName)) {
 			try {
                 moduleNode.updateLog(logName);
-			} catch (NodeUnreachableException e) {
+			} catch (NodeException e) {
 				logger.warn(e);
 			}
 		}
@@ -132,7 +127,7 @@ public class MonitorModule extends AbstractModule<MonitorNodeDescriptor> impleme
 	public void updateLogs(NodeDescriptor node) {
 	    try {
 	        getModuleNode(node).updateLogs();
-	    } catch (NodeUnreachableException e) {
+	    } catch (NodeException e) {
 	        logger.warn(e);
 	    }
 	}

@@ -11,8 +11,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.flaptor.clusterfest.Module;
 import com.flaptor.clusterfest.NodeDescriptor;
-import com.flaptor.clusterfest.NodeUnreachableException;
 import com.flaptor.clusterfest.WebModule;
+import com.flaptor.clusterfest.exceptions.NodeException;
 import com.flaptor.util.Pair;
 import com.flaptor.util.remote.WebServer;
 import com.flaptor.util.timeplot.TimePlotUtils;
@@ -32,7 +32,7 @@ abstract public class ChartModule implements Module, WebModule{
     }
     
     public void nodeUnregistered(NodeDescriptor node) {}
-    public void notifyNode(NodeDescriptor nodeDescriptor) throws NodeUnreachableException {}
+    public void notifyNode(NodeDescriptor nodeDescriptor) throws NodeException {}
 
     public void setup(WebServer server) {}
     public List<String> getActions() {return null;}

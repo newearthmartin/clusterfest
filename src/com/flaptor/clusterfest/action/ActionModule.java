@@ -19,27 +19,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.log4j.Logger;
 
 import com.flaptor.clusterfest.AbstractModule;
 import com.flaptor.clusterfest.ClusterManager;
-import com.flaptor.clusterfest.NodeListener;
 import com.flaptor.clusterfest.ModuleUtil;
 import com.flaptor.clusterfest.NodeDescriptor;
-import com.flaptor.clusterfest.NodeUnreachableException;
-import com.flaptor.clusterfest.WebModule;
-import com.flaptor.clusterfest.monitoring.node.Monitoreable;
+import com.flaptor.clusterfest.NodeListener;
+import com.flaptor.clusterfest.exceptions.NodeException;
 import com.flaptor.util.CallableWithId;
-import com.flaptor.util.Execute;
 import com.flaptor.util.Execution;
-import com.flaptor.util.MultiExecutor;
 import com.flaptor.util.Pair;
-import com.flaptor.util.Execution.Results;
-import com.flaptor.util.remote.NoSuchRpcMethodException;
-import com.flaptor.util.remote.WebServer;
 import com.flaptor.util.remote.XmlrpcClient;
 import com.flaptor.util.remote.XmlrpcSerialization;
 
@@ -59,7 +49,7 @@ public class ActionModule extends AbstractModule<ActionNodeDescriptor> {
         return new ActionNodeDescriptor(node);
     }
 
-    protected boolean shouldRegister(NodeDescriptor node) throws NodeUnreachableException {
+    protected boolean shouldRegister(NodeDescriptor node) throws NodeException {
         return ModuleUtil.nodeBelongs(node, MODULE_CONTEXT, false);
     }
     
