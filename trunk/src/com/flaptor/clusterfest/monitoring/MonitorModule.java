@@ -113,15 +113,15 @@ public class MonitorModule extends AbstractModule<MonitorNodeDescriptor> impleme
 	 * @return a pair (log, timestamp)
 	 */
 	public Pair<String, Long> retrieveLog(NodeDescriptor node, String logName) {
-	    MonitorNodeDescriptor moduleNode = getModuleNode(node);
-		if (!moduleNode.getLogs().containsKey(logName)) {
+	    MonitorNodeDescriptor monitorNode = getModuleNode(node);
+		if (!monitorNode.getLogs().containsKey(logName)) {
 			try {
-                moduleNode.updateLog(logName);
+                monitorNode.updateLog(logName);
 			} catch (NodeException e) {
 				logger.warn(e);
 			}
 		}
-		return moduleNode.retrieveLog(logName);
+		return monitorNode.retrieveLog(logName);
 	}
 	
 	public void updateLogs(NodeDescriptor node) {
@@ -270,7 +270,7 @@ public class MonitorModule extends AbstractModule<MonitorNodeDescriptor> impleme
             String action = request.getParameter("action");
             if ("update".equals(action)) {
                 updateLogs(node);
-            }
+            } 
             String logName = request.getParameter("log");
             request.setAttribute("logName", logName);
             request.setAttribute("log", retrieveLog(node, logName));
