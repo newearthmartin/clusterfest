@@ -59,23 +59,27 @@ public class MonitorModule extends AbstractModule<MonitorNodeDescriptor> impleme
 	private static final Logger logger = Logger.getLogger(com.flaptor.util.Execute.whoAmI());
 
 	private final Map<String, PropertyFormatter> formatters = new HashMap<String, PropertyFormatter>();
+	private List<String>initialLogs;
 	
     File statesDir;
 
     public MonitorModule() {
+        Config cfg = Config.getConfig("clustering.properties");
         try {
             statesDir = FileUtil.createOrGetDir(
-                    new File(Config.getConfig("clustering.properties").getString("clustering.monitor.statesDir")).getAbsolutePath(),
+                    new File(cfg.getString("clustering.monitor.statesDir")).getAbsolutePath(),
                     true, true);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+        
+        initialLogs=Arrays.asList(cfg.getStringArray("clustering.monitor.logs.defaults"));
 	}
 
 	
 	@Override
 	protected MonitorNodeDescriptor createModuleNode(NodeDescriptor node) {
-		MonitorNodeDescriptor monitorNode = new MonitorNodeDescriptor(node, statesDir);
+		MonitorNodeDescriptor monitorNode = new MonitorNodeDescriptor(node, statesDir, initialLogs);
 		try {
 			monitorNode.setChecker(getCheckerForType(node.getType()));
 		} catch (Exception e) {
@@ -253,7 +257,6 @@ public class MonitorModule extends AbstractModule<MonitorNodeDescriptor> impleme
             if ("update".equals(action)) {
                 updateNodeInfo(monitorNode);
             }
-            
             if (monitorNode != null) {
                 NodeState nodeState = null;
                 String stateNum = request.getParameter("stateNum");
@@ -264,7 +267,6 @@ public class MonitorModule extends AbstractModule<MonitorNodeDescriptor> impleme
                 }
                 request.setAttribute("nodeState", nodeState);
             }
-
             return "monitorNode.vm";
         } else if (page.equals("monitorLog")){
             String action = request.getParameter("action");

@@ -119,7 +119,7 @@ public class ClusterfestServlet extends MVCServlet {
             message += "OK : " + node.getHost() + ":" + node.getPort() + " unregistered.";
             try {cluster.persistNodeList();} catch(IOException e) {message+="\nWARNING: couldn't persist node list";}
         } else if ("updateall".equals(action)) {
-            cluster.updateAllInfoAllNodes();
+            cluster.updateNodes();
         } else if ("update".equals(action)) { //this action updates all states of the node: cluster, monitor,etc.
             int idx = Integer.parseInt(request.getParameter("node"));
             NodeDescriptor node = cluster.getNodes().get(idx); //update node info

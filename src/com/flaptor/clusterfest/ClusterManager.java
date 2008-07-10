@@ -170,7 +170,7 @@ public class ClusterManager {
 	 * updates all info of all nodes
 	 */
 	@SuppressWarnings("unchecked")
-	public void updateAllInfoAllNodes() {
+	public void updateNodes() {
 	    Execution<Void> execution = new Execution<Void>();
 		synchronized (nodes) {
 			for(final NodeDescriptor node: nodes) {
@@ -277,15 +277,4 @@ public class ClusterManager {
         }
         return null;
     }
-	
-	/**
-	 * check to see if nodes that weren't alive came to live
-	 */
-	private void updateNodes() {
-		synchronized (nodes) {
-			for (NodeDescriptor node: nodes) {
-				updateAllInfo(node);
-			}
-		}
-	}	
 }
