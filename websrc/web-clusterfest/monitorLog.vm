@@ -32,10 +32,10 @@ limitations under the License.
                 <span class="fuzzy">at $dateUtil.toDate($e.getValue().last())</span></td></tr>
             #end
             <tr><td>
-                <form action="monitorLog.jsp">
-                    <input type="hidden" name="node" value="$idx"/>
+                <form action="monitorLog.do">
+                    <input type="hidden" name="idx" value="$idx"/>
                     <input type="text" name="log" value=""/>
-                    <input type="submit" value="log file"/>
+                    <input type="submit" value="add log file"/>
                 </form>
             </td></tr>
         </table>
