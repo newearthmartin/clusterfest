@@ -53,7 +53,8 @@ public interface Monitoreable {
 	/**
 	 * gets a log from the node
 	 * @param logName the name of the log to be retrieved
+	 * @param maxChars maximum size in chars to retrieve
 	 * @return the log
 	 */
-	public String getLog(String logName) throws Exception;
+	public String getLog(String logName, int maxChars) throws Exception;
 }

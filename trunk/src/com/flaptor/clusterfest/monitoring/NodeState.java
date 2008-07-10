@@ -16,7 +16,9 @@ limitations under the License.
 
 package com.flaptor.clusterfest.monitoring;
 
+import java.io.PrintWriter;
 import java.io.Serializable;
+import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.Map;
 
@@ -50,8 +52,15 @@ public class NodeState implements Serializable{
     }
     
     public static NodeState createErrorState(Throwable t) {
+        StringWriter stringWriter = new StringWriter();
+        PrintWriter printWriter = new PrintWriter(stringWriter);
+        t.printStackTrace(printWriter);
+        printWriter.flush();
+        stringWriter.flush();
+        String stacktrace = stringWriter.getBuffer().toString();
+        
         NodeState state = new NodeState(null, null);
-        state.sanity = new NodeChecker.Result(NodeChecker.Sanity.ERROR, Arrays.asList(new String[]{"Node throwing exception in clusterfest code", t.getMessage()})); 
+        state.sanity = new NodeChecker.Result(NodeChecker.Sanity.ERROR, Arrays.asList(new String[]{"Node throwing exception in clusterfest code", t.getMessage(), stacktrace}));
         return state;
     }
     

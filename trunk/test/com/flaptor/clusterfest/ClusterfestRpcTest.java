@@ -16,6 +16,7 @@ limitations under the License.
 
 package com.flaptor.clusterfest;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -77,7 +78,7 @@ public class ClusterfestRpcTest extends TestCase {
 
     @TestInfo(testType = TestInfo.TestType.INTEGRATION)//, requiresPort = {PORT})
 	public void testMonitoreable() throws Exception {
-		MonitorNodeDescriptor mnode = new MonitorNodeDescriptor(node, FileUtil.createTempDir("tempStates", ""));
+		MonitorNodeDescriptor mnode = new MonitorNodeDescriptor(node, FileUtil.createTempDir("tempStates", ""), new ArrayList<String>());
 		mnode.updateState();
 		
 		NodeState nodeState = mnode.getLastState();
@@ -87,7 +88,7 @@ public class ClusterfestRpcTest extends TestCase {
 	}
 
 	public static class MonitoreableImp implements Monitoreable{
-		public String getLog(String logName) throws Exception {
+		public String getLog(String logName, int chars) throws Exception {
 			return "log";
 		}
 		public Map<String, Object> getProperties() throws Exception {

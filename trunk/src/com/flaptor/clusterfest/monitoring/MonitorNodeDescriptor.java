@@ -55,7 +55,7 @@ public class MonitorNodeDescriptor extends ModuleNodeDescriptor {
     FileSerializer stateFileSerializer;
 
     @SuppressWarnings("unchecked")
-    public MonitorNodeDescriptor(NodeDescriptor node, File statesDir) {
+    public MonitorNodeDescriptor(NodeDescriptor node, File statesDir, List<String> logNames) {
     	super(node);
     	
         stateFileSerializer = new FileSerializer(new File(statesDir, node.getHost()+"."+node.getPort()+".states"));
@@ -66,9 +66,9 @@ public class MonitorNodeDescriptor extends ModuleNodeDescriptor {
         this.logs = new HashMap<String, Pair<String,Long>>();
         this.monitoreable = MonitorModule.getModuleListener(node.getXmlrpcClient());
 
-        //TODO hardcoded logs
-        this.logs.put("out", null);
-        this.logs.put("err", null);
+        for (String log : logNames) {
+            this.logs.put(log, null);
+        }
     }
 
     public List<NodeState> getStates() {
@@ -122,7 +122,7 @@ public class MonitorNodeDescriptor extends ModuleNodeDescriptor {
      */
     public void updateLog(String logName) throws NodeException {
     	try {
-            String log = monitoreable.getLog(logName);
+            String log = monitoreable.getLog(logName, 512*1024); //retrieve only 500k
             getNodeDescriptor().setReachable(true);
             logs.put(logName, new Pair<String, Long>(log, System.currentTimeMillis()));
         } catch (Throwable t) {
@@ -142,6 +142,7 @@ public class MonitorNodeDescriptor extends ModuleNodeDescriptor {
             state = NodeState.createUnreachableState();
             throw e;
         } catch (NodeException e) {
+            logger.error("remote code exception", e.getCause());
             state = NodeState.createErrorState(e.getCause());
             throw e;
 		} finally {

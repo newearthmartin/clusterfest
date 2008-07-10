@@ -17,6 +17,7 @@ limitations under the License.
 package com.flaptor.clusterfest.monitoring.node;
 
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -69,24 +70,17 @@ public class MonitoreableImplementation implements Monitoreable {
 	 * @param logName can be "out", "err" or the full path of a log
 	 * @return the contents of the log 
 	 */
-	public String getLog(String logName) {
+	public String getLog(String logName, int maxChars) {
 		File logFile = null;
 		String errorMessage = "log " + logName + " not found"; 
 
 		try {
-			if ("out".equals(logName) || "err".equals(logName)) {
-				for (File file : FileUtil.getExistingFile("logs", true, false, true).listFiles()) {
-					if (file.getName().contains(logName)) logFile = file;  
-				}
-				if (logFile == null) {
-					logger.warn(errorMessage);
-					return errorMessage;
-				}	
+			logFile = FileUtil.getExistingFile(logName, true, false, false);
+			if (maxChars > 0){
+			    return new String(IOUtil.tail(logFile,maxChars)); //read max 500k
 			} else {
-				logFile = FileUtil.getExistingFile(logName, true, false, false);
+			    return IOUtil.readAll(new FileReader(logFile));
 			}
-			return new String(IOUtil.tail(logFile, 1024 * 1024)); //read max 1 M
-//			return IOUtil.readAll(new FileReader(logFile));
 		} catch (IOException e) {
 			logger.warn(errorMessage, e);
 			return errorMessage + " - " + e;
