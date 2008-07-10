@@ -6,6 +6,7 @@ clustering.monitor.formatter=com.flaptor.clustering.monitoring.DefaultPropertyFo
 clustering.monitor.checker=com.flaptor.clustering.monitoring.DefaultChecker
 
 clustering.monitor.statesDir=states
+clustering.monitor.logs.defaults=
 
 clustering.web.login.enabled=false
 clustering.web.login.user=clusteruser
