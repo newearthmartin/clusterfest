@@ -82,7 +82,7 @@ public class MonitoreableImplementation implements Monitoreable {
 			    return IOUtil.readAll(new FileReader(logFile));
 			}
 		} catch (IOException e) {
-			logger.warn(errorMessage, e);
+			logger.warn(errorMessage);
 			return errorMessage + " - " + e;
 		}
 	}

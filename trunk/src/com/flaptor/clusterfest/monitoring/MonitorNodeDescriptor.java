@@ -66,9 +66,7 @@ public class MonitorNodeDescriptor extends ModuleNodeDescriptor {
         this.logs = new HashMap<String, Pair<String,Long>>();
         this.monitoreable = MonitorModule.getModuleListener(node.getXmlrpcClient());
 
-        for (String log : logNames) {
-            this.logs.put(log, null);
-        }
+        addLogs(logNames);
     }
 
     public List<NodeState> getStates() {
@@ -83,6 +81,12 @@ public class MonitorNodeDescriptor extends ModuleNodeDescriptor {
         else return null;
     }
     
+    public void addLogs(List<String> logNames) {
+        for (String logname: logNames) {
+            if (!logs.containsKey(logname)) logs.put(logname, null);
+        }
+    }
+
     public Map<String, Pair<String, Long>> getLogs() {
     	return logs;
     }
