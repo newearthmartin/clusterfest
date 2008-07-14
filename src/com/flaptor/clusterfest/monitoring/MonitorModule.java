@@ -59,7 +59,6 @@ public class MonitorModule extends AbstractModule<MonitorNodeDescriptor> impleme
 	private static final Logger logger = Logger.getLogger(com.flaptor.util.Execute.whoAmI());
 
 	private final Map<String, PropertyFormatter> formatters = new HashMap<String, PropertyFormatter>();
-	private List<String>initialLogs;
 	
     File statesDir;
 
@@ -72,20 +71,20 @@ public class MonitorModule extends AbstractModule<MonitorNodeDescriptor> impleme
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        
-        initialLogs=Arrays.asList(cfg.getStringArray("clustering.monitor.logs.defaults"));
 	}
 
 	
 	@Override
 	protected MonitorNodeDescriptor createModuleNode(NodeDescriptor node) {
-		MonitorNodeDescriptor monitorNode = new MonitorNodeDescriptor(node, statesDir, initialLogs);
+		MonitorNodeDescriptor monitorNode = new MonitorNodeDescriptor(node, statesDir, new ArrayList<String>());
 		try {
 			monitorNode.setChecker(getCheckerForType(node.getType()));
+            monitorNode.addLogs(getLogsForType(node.getType()));
 		} catch (Exception e) {
 			logger.error(e);
 			throw new RuntimeException(e);
 		}
+		
 		updateNodeInfo(monitorNode);
 		return monitorNode;
 	}
@@ -147,16 +146,30 @@ public class MonitorModule extends AbstractModule<MonitorNodeDescriptor> impleme
 	 * @throws IllegalAccessException
 	 * @throws ClassNotFoundException
 	 */
-	private NodeChecker getCheckerForType(String type) {
-		Config config = Config.getConfig("clustering.properties");
-		try {
-			String clazz = config.getString("clustering.monitor.checker."+type);
-			if (clazz == null) clazz = config.getString("clustering.monitor.checker");
+    private NodeChecker getCheckerForType(String type) {
+        Config config = Config.getConfig("clustering.properties");
+        try {
+            String clazz = config.getString("clustering.monitor.checker."+type);
+            if (clazz == null) clazz = config.getString("clustering.monitor.checker");
             return (NodeChecker) ClassUtil.instance(clazz);
-		}catch (Throwable t) {
-			logger.error(t);
-			return null;
-		}
+        }catch (Throwable t) {
+            logger.error(t);
+            return null;
+        }
+    }
+
+    private List<String> getLogsForType(String type) {
+        Config config = Config.getConfig("clustering.properties");
+        List<String> ret = new ArrayList<String>();
+        ret.addAll(Arrays.asList(config.getStringArray("clustering.monitor.logs.defaults")));
+        try {
+            String property = "clustering.monitor.logs."+type;
+            ret.addAll(Arrays.asList(config.getStringArray(property)));
+        }catch (Throwable t) {
+            t.printStackTrace();
+            logger.warn(t);
+        }
+        return ret;
     }
 
     /**
