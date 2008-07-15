@@ -14,9 +14,24 @@ public class DefaultPropertyFormatter implements PropertyFormatter {
     	if (name.equals("freeMemory") || name.equals("totalMemory") || name.equals("usedMemory")) {
     		return bytesToString(((Long)value).longValue());
     	}
+    	if (value instanceof Iterable<?>) {
+    	    return iterableToString((Iterable<?>)value);
+    	}
         return StringUtil.whitespaceToHtml(value.toString());
     }
     
+    private String iterableToString(Iterable<?> value) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("<ul>");
+        for (Object v : value) {
+            sb.append("<li>");
+            sb.append(v);
+            sb.append("</li>");
+        }
+        sb.append("</ul>");
+        return sb.toString();
+    }
+
     /**
      * This method returns a nice representation of longs in the format
      * G,M,k,

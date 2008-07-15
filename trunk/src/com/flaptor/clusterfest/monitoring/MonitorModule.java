@@ -224,9 +224,14 @@ public class MonitorModule extends AbstractModule<MonitorNodeDescriptor> impleme
     
         if (monitorNode != null) {
             NodeState state = monitorNode.getLastState();
-            if (state != null) sanity = state.getSanity().getSanity();
+            if (state != null) {
+                sanity = state.getSanity().getSanity();
+            }
         }
-        return "<a class=\"sanity"+sanity+"\" href=\"monitorNode.do?idx=" + nodeNum + "\">"+ sanity +"</a>";
+        
+        String sanityHtml = "<a class=\"sanity"+sanity+"\" href=\"monitorNode.do?idx=" + nodeNum + "\">"+ sanity +"</a>";
+        
+        return sanityHtml;
 	}
 	public void setup(WebServer server) {
 	}
