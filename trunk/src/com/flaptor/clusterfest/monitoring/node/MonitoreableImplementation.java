@@ -77,7 +77,7 @@ public class MonitoreableImplementation implements Monitoreable {
 		try {
 			logFile = FileUtil.getExistingFile(logName, true, false, false);
 			if (maxChars > 0){
-			    return new String(IOUtil.tail(logFile,maxChars)); //read max 500k
+			    return new String(IOUtil.tail(logFile,maxChars));
 			} else {
 			    return IOUtil.readAll(new FileReader(logFile));
 			}
