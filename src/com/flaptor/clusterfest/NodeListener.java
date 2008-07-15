@@ -73,24 +73,24 @@ public class NodeListener implements Stoppable {
     private void config(Config cfg) {
         try {
             nodeType = cfg.getString("clustering.node.type");
-        } catch (IllegalStateException e) {logger.warn("clustering.node.type not set in " + cfg.getFilename());}
+        } catch (IllegalStateException e) {logger.info("clustering.node.type not set in " + cfg.getFilename());}
         
         try {
             for (Pair<String,String> service : cfg.getPairList("clustering.node.listeners")) {
                 Object serviceInstance = ClassUtil.instance(service.last());
                 xmlrpcServer.addHandler(service.first(), XmlrpcSerialization.handler(serviceInstance));   
             }
-        } catch (IllegalStateException e) {logger.warn("clustering.node.services not set in " + cfg.getFilename());}
+        } catch (IllegalStateException e) {logger.info("clustering.node.services not set in " + cfg.getFilename());}
         try {
             for (String ip: cfg.getStringArray("clustering.node.connections.accept")) {
                 xmlrpcServer.addAcceptedClient(ip);
             }
-        } catch (IllegalStateException e) {logger.warn("clustering.node.connections.accept not set in " + cfg.getFilename());}
+        } catch (IllegalStateException e) {logger.info("clustering.node.connections.accept not set in " + cfg.getFilename());}
         try {
             for (String ip: cfg.getStringArray("clustering.node.connections.deny")) {
                 xmlrpcServer.addDeniedClient(ip);
             }
-        } catch (IllegalStateException e) {logger.warn("clustering.node.connections.deny not set in " + cfg.getFilename());}
+        } catch (IllegalStateException e) {logger.info("clustering.node.connections.deny not set in " + cfg.getFilename());}
     }
 	
 	public void setNodeType(String nodeType) {
