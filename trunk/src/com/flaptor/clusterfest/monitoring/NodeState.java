@@ -50,17 +50,23 @@ public class NodeState implements Serializable{
         state.sanity = UNREACHABLE_RESULT; 
         return state;
     }
-    
-    public static NodeState createErrorState(Throwable t) {
+    private static String getStack(Throwable t) {
         StringWriter stringWriter = new StringWriter();
         PrintWriter printWriter = new PrintWriter(stringWriter);
         t.printStackTrace(printWriter);
         printWriter.flush();
         stringWriter.flush();
-        String stacktrace = stringWriter.getBuffer().toString();
-        
+        return stringWriter.getBuffer().toString();
+    }
+    public static NodeState createNodeErrorState(Throwable t) {
         NodeState state = new NodeState(null, null);
-        state.sanity = new NodeChecker.Result(NodeChecker.Sanity.ERROR, Arrays.asList(new String[]{"Node throwing exception in clusterfest code", t.getMessage(), stacktrace}));
+        state.sanity = new NodeChecker.Result(NodeChecker.Sanity.ERROR, Arrays.asList(new String[]{"NODE throwing exception", t.getMessage(), getStack(t)}));
+        return state;
+    }
+
+    public static NodeState createClusterManagerErrorState(Throwable t) {
+        NodeState state = new NodeState(null, null);
+        state.sanity = new NodeChecker.Result(NodeChecker.Sanity.ERROR, Arrays.asList(new String[]{"CLUSTER MANAGER throwing exception", t.getMessage(), getStack(t)}));
         return state;
     }
     
