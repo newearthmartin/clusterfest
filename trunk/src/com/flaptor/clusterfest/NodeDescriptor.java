@@ -22,6 +22,7 @@ import java.net.URL;
 import com.flaptor.clusterfest.exceptions.NodeCodeException;
 import com.flaptor.clusterfest.exceptions.NodeException;
 import com.flaptor.clusterfest.exceptions.NodeUnreachableException;
+import com.flaptor.util.remote.RemoteHostCodeException;
 import com.flaptor.util.remote.RpcConnectionException;
 import com.flaptor.util.remote.XmlrpcClient;
 
@@ -108,6 +109,8 @@ public class NodeDescriptor {
      */
     public void checkAndThrow(Throwable t) throws NodeException {
         if (t instanceof RpcConnectionException) throw new NodeUnreachableException(this, t);
-        else throw new NodeCodeException(this, t);
+        else if (t instanceof RemoteHostCodeException) throw new NodeCodeException(this, t);
+        else if (t instanceof RuntimeException) throw (RuntimeException)t;
+        else throw new RuntimeException("unexpected exception", t);
     }
 }
