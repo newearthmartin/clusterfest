@@ -33,7 +33,9 @@ import com.flaptor.clusterfest.NodeDescriptor;
 import com.flaptor.clusterfest.exceptions.NodeException;
 import com.flaptor.clusterfest.exceptions.NodeUnreachableException;
 import com.flaptor.clusterfest.monitoring.node.Monitoreable;
+import com.flaptor.util.Config;
 import com.flaptor.util.DateUtil;
+import com.flaptor.util.Execute;
 import com.flaptor.util.Execution;
 import com.flaptor.util.FileSerializer;
 import com.flaptor.util.Pair;
@@ -51,6 +53,7 @@ public class MonitorNodeDescriptor extends ModuleNodeDescriptor {
 	private Map<String, Pair<String, Long>> logs;
     private NodeChecker checker;
     private Monitoreable monitoreable;
+    private int logSize;
 	
     FileSerializer stateFileSerializer;
 
@@ -63,9 +66,10 @@ public class MonitorNodeDescriptor extends ModuleNodeDescriptor {
         states = (LinkedList<NodeState>)stateFileSerializer.deserialize();
         if (states == null) states = new LinkedList<NodeState>();
         
-        this.logs = new HashMap<String, Pair<String,Long>>();
-        this.monitoreable = MonitorModule.getModuleListener(node.getXmlrpcClient());
+        logs = new HashMap<String, Pair<String,Long>>();
+        monitoreable = MonitorModule.getModuleListener(node.getXmlrpcClient());
 
+        logSize = Config.getConfig("clustering.properties").getInt("clustering.monitor.logs.size");
         addLogs(logNames);
     }
 
@@ -126,7 +130,7 @@ public class MonitorNodeDescriptor extends ModuleNodeDescriptor {
      */
     public void updateLog(String logName) throws NodeException {
     	try {
-            String log = monitoreable.getLog(logName, 512*1024); //retrieve only 500k
+            String log = monitoreable.getLog(logName, logSize);
             getNodeDescriptor().setReachable(true);
             logs.put(logName, new Pair<String, Long>(log, System.currentTimeMillis()));
         } catch (Throwable t) {
@@ -139,9 +143,13 @@ public class MonitorNodeDescriptor extends ModuleNodeDescriptor {
 		
     	NodeState state = null; 
 		try {
-			state = retrieveCurrentState();
-	        state.updateSanity(checker, this);
-	        updateLogs();
+		    Map<String, Object> properties = retrieveProperties();
+		    SystemProperties systemProperties = retrieveSystemProperties(); 
+			
+            state = new NodeState(properties, systemProperties);
+            state.updateSanity(checker, this);
+
+            updateLogs();
 		} catch (NodeUnreachableException e) {
             state = NodeState.createUnreachableState();
             throw e;
@@ -149,7 +157,10 @@ public class MonitorNodeDescriptor extends ModuleNodeDescriptor {
             logger.error("remote code exception", e.getCause());
             state = NodeState.createErrorState(e.getCause());
             throw e;
-		} finally {
+		} catch (Throwable t) {
+		    logger.error("unexpected throwable",t);
+		    state = NodeState.createErrorState(t);
+        } finally {
 			synchronized (states) {
 		        states.add(state);
 		         
@@ -208,10 +219,6 @@ public class MonitorNodeDescriptor extends ModuleNodeDescriptor {
         
     }
 
-    private NodeState retrieveCurrentState() throws NodeException {
-        return new NodeState(retrieveProperties(), retrieveSystemProperties());
-    }
-    
     private Map<String, Object> retrieveProperties() throws NodeException {
     	try {
             Map<String, Object> properties = monitoreable.getProperties();
