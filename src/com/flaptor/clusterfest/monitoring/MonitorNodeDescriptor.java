@@ -35,7 +35,6 @@ import com.flaptor.clusterfest.exceptions.NodeUnreachableException;
 import com.flaptor.clusterfest.monitoring.node.Monitoreable;
 import com.flaptor.util.Config;
 import com.flaptor.util.DateUtil;
-import com.flaptor.util.Execute;
 import com.flaptor.util.Execution;
 import com.flaptor.util.FileSerializer;
 import com.flaptor.util.Pair;
@@ -155,11 +154,11 @@ public class MonitorNodeDescriptor extends ModuleNodeDescriptor {
             throw e;
         } catch (NodeException e) {
             logger.error("remote code exception", e.getCause());
-            state = NodeState.createErrorState(e.getCause());
+            state = NodeState.createNodeErrorState(e.getCause());
             throw e;
 		} catch (Throwable t) {
 		    logger.error("unexpected throwable",t);
-		    state = NodeState.createErrorState(t);
+		    state = NodeState.createClusterManagerErrorState(t);
         } finally {
 			synchronized (states) {
 		        states.add(state);
