@@ -7,6 +7,7 @@ clustering.monitor.checker=com.flaptor.clusterfest.monitoring.DefaultChecker
 
 clustering.monitor.statesDir=states
 clustering.monitor.logs.defaults=
+clustering.monitor.logs.size=50000
 
 clustering.web.login.enabled=false
 clustering.web.login.user=clusteruser
