@@ -5,6 +5,7 @@ clustering.checkNodesInterval=60
 clustering.monitor.formatter=com.flaptor.clusterfest.monitoring.DefaultPropertyFormatter
 clustering.monitor.checker=com.flaptor.clusterfest.monitoring.DefaultChecker
 
+clustering.monitor.enableSavedStates=true
 clustering.monitor.statesDir=states
 clustering.monitor.logs.defaults=
 clustering.monitor.logs.size=50000
