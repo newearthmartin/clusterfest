@@ -62,7 +62,9 @@ public class MonitorNodeDescriptor extends ModuleNodeDescriptor {
     	
         stateFileSerializer = new FileSerializer(new File(statesDir, node.getHost()+"."+node.getPort()+".states"));
 
-        states = (LinkedList<NodeState>)stateFileSerializer.deserialize();
+        if (Config.getConfig("clustering.properties").getBoolean("clustering.monitor.enableSavedStates")) {
+            states = (LinkedList<NodeState>)stateFileSerializer.deserialize();
+        }
         if (states == null) states = new LinkedList<NodeState>();
         
         logs = new HashMap<String, Pair<String,Long>>();
@@ -164,16 +166,19 @@ public class MonitorNodeDescriptor extends ModuleNodeDescriptor {
 		        states.add(state);
 		         
 		        cleanupStateList();
-		        ClusterManager.getMultiExecutor().addExecution(
-		            new Execution(new Callable(){
-                        public Object call() throws Exception {
-                                synchronized (states) {
-                                    stateFileSerializer.serialize(states);
-                                    return null;
-                                }
-                            }
-		            })
-		        );
+
+		        if (Config.getConfig("clustering.properties").getBoolean("clustering.monitor.enableSavedStates")) {
+			        ClusterManager.getMultiExecutor().addExecution(
+			            new Execution(new Callable(){
+	                        public Object call() throws Exception {
+	                                synchronized (states) {
+	                                    stateFileSerializer.serialize(states);
+	                                    return null;
+	                                }
+	                            }
+			            })
+			        );
+		        }
 			}
 		}
     }
