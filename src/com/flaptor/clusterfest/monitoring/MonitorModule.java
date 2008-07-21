@@ -66,7 +66,7 @@ public class MonitorModule extends AbstractModule<MonitorNodeDescriptor> impleme
         Config cfg = Config.getConfig("clustering.properties");
         try {
             statesDir = FileUtil.createOrGetDir(
-                    new File(cfg.getString("clustering.monitor.statesDir")).getAbsolutePath(),
+                    new File(cfg.getString("clustering.monitor.states.saving.dir")).getAbsolutePath(),
                     true, true);
         } catch (IOException e) {
             throw new RuntimeException(e);
