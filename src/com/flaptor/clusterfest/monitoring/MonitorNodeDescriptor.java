@@ -48,14 +48,14 @@ public class MonitorNodeDescriptor extends ModuleNodeDescriptor {
 
 	private static final Logger logger = Logger.getLogger(com.flaptor.util.Execute.whoAmI());
 	
-	private LinkedList<NodeState> states;
+	private List<NodeState> states;
 	private Map<String, Pair<String, Long>> logs;
     private NodeChecker checker;
     private Monitoreable monitoreable;
     private int logSize;
 	
     FileSerializer stateFileSerializer;
-
+    
     @SuppressWarnings("unchecked")
     public MonitorNodeDescriptor(NodeDescriptor node, File statesDir, List<String> logNames) {
     	super(node);
@@ -63,9 +63,9 @@ public class MonitorNodeDescriptor extends ModuleNodeDescriptor {
         stateFileSerializer = new FileSerializer(new File(statesDir, node.getHost()+"."+node.getPort()+".states"));
 
         if (Config.getConfig("clustering.properties").getBoolean("clustering.monitor.states.saving.enable")) {
-            states = (LinkedList<NodeState>)stateFileSerializer.deserialize();
+            states = (List<NodeState>)stateFileSerializer.deserialize(true);
         }
-        if (states == null) states = new LinkedList<NodeState>();
+        if (states == null) states = new ArrayList<NodeState>();
         
         logs = new HashMap<String, Pair<String,Long>>();
         monitoreable = MonitorModule.getModuleListener(node.getXmlrpcClient());
@@ -75,15 +75,21 @@ public class MonitorNodeDescriptor extends ModuleNodeDescriptor {
     }
 
     public List<NodeState> getStates() {
-        return Collections.unmodifiableList(states);
+        synchronized (states) {
+            return Collections.unmodifiableList(states);
+        }
     }
 
     public NodeState getLastState() {
-        return states.size() > 0 ? states.getLast() : null;
+        synchronized (states) {
+            return states.size() > 0 ? states.get(states.size()-1) : null;
+        }
     }
     public NodeState getNodeState(int stateNumber) {
-        if (states.size() > stateNumber) return states.get(stateNumber);
-        else return null;
+        synchronized (states) {
+            if (states.size() > stateNumber) return states.get(stateNumber);
+            else return null;
+        }
     }
     
     public void addLogs(List<String> logNames) {
@@ -171,11 +177,11 @@ public class MonitorNodeDescriptor extends ModuleNodeDescriptor {
 			        ClusterManager.getMultiExecutor().addExecution(
 			            new Execution(new Callable(){
 	                        public Object call() throws Exception {
-	                                synchronized (states) {
-	                                    stateFileSerializer.serialize(states);
-	                                    return null;
-	                                }
-	                            }
+                                synchronized (states) {
+                                    stateFileSerializer.serialize(states, true);
+                                    return null;
+                                }
+                            }
 			            })
 			        );
 		        }
@@ -184,16 +190,23 @@ public class MonitorNodeDescriptor extends ModuleNodeDescriptor {
     }
     
     private void cleanupStateList() {
-        long now = System.currentTimeMillis();
-        List<NodeState> statesToRemove = new ArrayList<NodeState>();
-        NodeState lastState = null;
-        for (NodeState state: states) {
-            if (lastState == null || now - state.getTimestamp() < DateUtil.MILLIS_IN_HOUR || states.indexOf(state) == states.size() -1) {
-                lastState = state;
-                continue;
-            }
+        synchronized (states) {
             
-            if (state.getSanity().getSanity() == lastState.getSanity().getSanity()) {
+            long now = System.currentTimeMillis();
+            List<NodeState> statesToRemove = new ArrayList<NodeState>();
+            NodeState lastState = null;
+            for (NodeState state: states) {
+                //keep all states of the last hour
+                //keep the first & last state
+                //keep states with different sanity
+                if (    lastState == null || 
+                        now - state.getTimestamp() < DateUtil.MILLIS_IN_HOUR || 
+                        states.indexOf(state) == states.size() -1 || 
+                        state.getSanity().getSanity() != lastState.getSanity().getSanity()) {
+                    lastState = state;
+                    continue;
+                }
+                
                 if (now - state.getTimestamp() >  7 * DateUtil.MILLIS_IN_DAY) {
                     if (state.getTimestamp() - lastState.getTimestamp() < DateUtil.MILLIS_IN_DAY) {
                         statesToRemove.add(state);
@@ -215,12 +228,19 @@ public class MonitorNodeDescriptor extends ModuleNodeDescriptor {
                         continue;
                     }
                 }
+                lastState = state;
             }
-            lastState = state;
+            states.removeAll(statesToRemove);
+
+            //finally trim the list to keep it under 100 states
+            int MAX_SIZE = 100;
+            int size = states.size();
+            if (size > MAX_SIZE) {
+                List tempList = new ArrayList<NodeState>(states.subList(size - MAX_SIZE, size));
+                states.clear();
+                states.addAll(tempList);
+            }
         }
-        
-        states.removeAll(statesToRemove);
-        
     }
 
     private Map<String, Object> retrieveProperties() throws NodeException {
