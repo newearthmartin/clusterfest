@@ -19,9 +19,12 @@ package com.flaptor.clusterfest;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import org.apache.log4j.Logger;
+
 import com.flaptor.clusterfest.exceptions.NodeCodeException;
 import com.flaptor.clusterfest.exceptions.NodeException;
 import com.flaptor.clusterfest.exceptions.NodeUnreachableException;
+import com.flaptor.util.Execute;
 import com.flaptor.util.remote.RemoteHostCodeException;
 import com.flaptor.util.remote.RpcConnectionException;
 import com.flaptor.util.remote.XmlrpcClient;
@@ -35,6 +38,8 @@ import com.flaptor.util.remote.XmlrpcClient;
  * @author Martin Massera
  */
 public class NodeDescriptor {
+
+    private static final Logger logger = Logger.getLogger(com.flaptor.util.Execute.whoAmI());
 
 	private String host;
 	private int port;
@@ -94,7 +99,7 @@ public class NodeDescriptor {
             type = clusterableStub.getNodeType();
             reachable = true;
         } catch (Throwable t) {
-            checkAndThrow(t);
+            checkAndThrow(t, logger);
         }
     }
     public String toString() {
@@ -107,10 +112,11 @@ public class NodeDescriptor {
      * @param t
      * @throws NodeException
      */
-    public void checkAndThrow(Throwable t) throws NodeException {
+    public void checkAndThrow(Throwable t, Logger logger) throws NodeException {
+        if (logger != null) logger.error(t, t);
+        
         if (t instanceof RpcConnectionException) throw new NodeUnreachableException(this, t);
         else if (t instanceof RemoteHostCodeException) throw new NodeCodeException(this, t);
-        else if (t instanceof RuntimeException) throw (RuntimeException)t;
-        else throw new RuntimeException("unexpected exception", t);
+        else Execute.runtimeOrError(t, logger);
     }
 }

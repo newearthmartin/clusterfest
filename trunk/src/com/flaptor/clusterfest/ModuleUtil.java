@@ -5,6 +5,8 @@ import java.util.concurrent.Callable;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.log4j.Logger;
+
 import com.flaptor.clusterfest.exceptions.NodeException;
 import com.flaptor.util.CallableWithId;
 import com.flaptor.util.Pair;
@@ -18,6 +20,7 @@ import com.flaptor.util.remote.XmlrpcClient;
  */
 public class ModuleUtil {
     
+    private static final Logger logger = Logger.getLogger(com.flaptor.util.Execute.whoAmI());
     /**
      * determines if the node belongs to the module
      * the node must implement the Pingable interface in the module context
@@ -35,7 +38,7 @@ public class ModuleUtil {
         } catch (NoSuchRpcMethodException e) {
             return false;
         } catch (Throwable t) {
-            node.checkAndThrow(t);
+            node.checkAndThrow(t, logger);
             return false; //never called
         }
     }
