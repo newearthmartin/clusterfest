@@ -61,7 +61,7 @@ public class MonitorNodeDescriptor extends ModuleNodeDescriptor {
     	super(node);
     	
         stateFileSerializer = new FileSerializer(new File(statesDir, node.getHost()+"."+node.getPort()+".states"));
-
+        
         if (Config.getConfig("clustering.properties").getBoolean("clustering.monitor.states.saving.enable")) {
             states = (List<NodeState>)stateFileSerializer.deserialize(true);
         }
@@ -192,9 +192,11 @@ public class MonitorNodeDescriptor extends ModuleNodeDescriptor {
     private void cleanupStateList() {
         synchronized (states) {
             
+            
             long now = System.currentTimeMillis();
             List<NodeState> statesToRemove = new ArrayList<NodeState>();
             NodeState lastState = null;
+            
             for (NodeState state: states) {
                 //keep all states of the last hour
                 //keep the first & last state
@@ -207,23 +209,13 @@ public class MonitorNodeDescriptor extends ModuleNodeDescriptor {
                     continue;
                 }
                 
-                if (now - state.getTimestamp() >  7 * DateUtil.MILLIS_IN_DAY) {
+                if (now - state.getTimestamp() >  DateUtil.MILLIS_IN_DAY) {
                     if (state.getTimestamp() - lastState.getTimestamp() < DateUtil.MILLIS_IN_DAY) {
                         statesToRemove.add(state);
                         continue;
                     }
-                } else if (now - state.getTimestamp() >  DateUtil.MILLIS_IN_DAY) {
-                    if (state.getTimestamp() - lastState.getTimestamp() < DateUtil.MILLIS_IN_HOUR) {
-                        statesToRemove.add(state);
-                        continue;
-                    }
-                } else if (now - state.getTimestamp() >  DateUtil.MILLIS_IN_HOUR * 12) {
-                    if (state.getTimestamp() - lastState.getTimestamp() < 30 * DateUtil.MILLIS_IN_MINUTE) {
-                        statesToRemove.add(state);
-                        continue;
-                    }
                 } else {
-                    if (state.getTimestamp() - lastState.getTimestamp() < 10 * DateUtil.MILLIS_IN_MINUTE) {
+                    if (state.getTimestamp() - lastState.getTimestamp() < DateUtil.MILLIS_IN_HOUR) {
                         statesToRemove.add(state);
                         continue;
                     }
@@ -232,11 +224,11 @@ public class MonitorNodeDescriptor extends ModuleNodeDescriptor {
             }
             states.removeAll(statesToRemove);
 
-            //finally trim the list to keep it under 100 states
-            int MAX_SIZE = 100;
+            //finally trim the list to keep it the max count
+            int MAX_SIZE = Config.getConfig("clustering.properties").getInt("clustering.monitor.states.maxcount");
             int size = states.size();
             if (size > MAX_SIZE) {
-                List tempList = new ArrayList<NodeState>(states.subList(size - MAX_SIZE, size));
+                List<NodeState> tempList = new ArrayList<NodeState>(states.subList(size - MAX_SIZE, size));
                 states.clear();
                 states.addAll(tempList);
             }
