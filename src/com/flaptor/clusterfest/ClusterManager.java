@@ -85,7 +85,11 @@ public class ClusterManager {
     	updateNodes();
     	int interval = config.getInt("clustering.checkNodesInterval");
     	scheduler.scheduleWithFixedDelay(new Runnable() {
-            public void run() {updateNodes();}
+            public void run() {
+                try {
+                    updateNodes();
+                } catch (Throwable t) {logger.fatal("EXCEPTION IN NODE UPDATER THREAD", t);}
+            }
     	}, interval, interval, TimeUnit.SECONDS);
     }
     
