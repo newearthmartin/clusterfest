@@ -83,7 +83,7 @@ public class ClusterManager {
             registerWithoutUpdating(hostName, port, installDir, type);
         }
     	updateNodes();
-    	int interval = config.getInt("clustering.checkNodesInterval");
+    	int interval = config.getInt("clustering.checkNodesInterval.seconds");
     	scheduler.scheduleWithFixedDelay(new Runnable() {
             public void run() {
                 try {
