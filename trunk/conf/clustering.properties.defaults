@@ -1,7 +1,7 @@
 clustering.nodes=
 clustering.modules=
 
-clustering.checkNodesInterval=60
+clustering.checkNodesInterval.seconds=600
 clustering.monitor.formatter=com.flaptor.clusterfest.monitoring.DefaultPropertyFormatter
 clustering.monitor.checker=com.flaptor.clusterfest.monitoring.DefaultChecker
 
