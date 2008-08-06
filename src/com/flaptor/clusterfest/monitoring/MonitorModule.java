@@ -277,9 +277,9 @@ public class MonitorModule extends AbstractModule<MonitorNodeDescriptor> impleme
             }
             if (monitorNode != null) {
                 NodeState nodeState = null;
-                String stateNum = request.getParameter("stateNum");
-                if (stateNum != null) {
-                    nodeState = monitorNode.getNodeState(Integer.parseInt(stateNum));
+                String stateID = request.getParameter("stateId");
+                if (stateID != null) {
+                    nodeState = monitorNode.getNodeState(Integer.parseInt(stateID));
                 } else {
                     nodeState = monitorNode.getLastState();
                 }
