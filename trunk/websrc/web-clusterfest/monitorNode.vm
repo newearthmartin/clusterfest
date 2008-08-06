@@ -59,7 +59,7 @@ limitations under the License.
                     #set ($state = $monitorNode.getStates().get($num))
                     <tr><td>
                      	$state.getSanity().getSanity() at
-                    	<a href="monitorNode.do?idx=$idx&stateNum=$num">$dateUtil.toDate($state.getTimestamp())</a>
+                    	<a href="monitorNode.do?idx=$idx&stateId=$state.getStateId()">$dateUtil.toDate($state.getTimestamp())</a>
                     </td></tr>
                 #end
             </table>

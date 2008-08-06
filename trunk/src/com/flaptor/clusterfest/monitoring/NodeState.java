@@ -21,6 +21,8 @@ import java.io.Serializable;
 import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * The state of a node in the monitoring module
@@ -38,6 +40,7 @@ public class NodeState implements Serializable{
     private Map<String, Object> properties;
     private SystemProperties systemProperties;
     private long timestamp;
+    private long stateId;
 
     public static NodeState createUncheckedState() {
         NodeState state = new NodeState(null, null);
@@ -69,9 +72,8 @@ public class NodeState implements Serializable{
         state.sanity = new NodeChecker.Result(NodeChecker.Sanity.ERROR, Arrays.asList(new String[]{"CLUSTER MANAGER throwing exception", t.getMessage(), getStack(t)}));
         return state;
     }
-    
+        
     public NodeState(Map<String, Object> properties, SystemProperties systemProperties) {
-        super();
         // should be updated later by a NodeChecker
         this.sanity = UNCHECKED_RESULT; 
         
@@ -99,5 +101,13 @@ public class NodeState implements Serializable{
         } else {
             this.sanity = UNCHECKED_RESULT;
         }
+    }
+
+    public long getStateId() {
+        return stateId;
+    }
+
+    public void setStateId(long stateId) {
+        this.stateId = stateId;
     }
 }

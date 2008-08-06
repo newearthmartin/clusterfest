@@ -24,6 +24,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.log4j.Logger;
 
@@ -53,7 +54,10 @@ public class MonitorNodeDescriptor extends ModuleNodeDescriptor {
     private NodeChecker checker;
     private Monitoreable monitoreable;
     private int logSize;
-	
+
+    private static Object stateIdLock = new Object();
+    private static long maxStateId = 0;
+
     FileSerializer stateFileSerializer;
     
     @SuppressWarnings("unchecked")
@@ -66,6 +70,12 @@ public class MonitorNodeDescriptor extends ModuleNodeDescriptor {
             states = (List<NodeState>)stateFileSerializer.deserialize(true);
         }
         if (states == null) states = new ArrayList<NodeState>();
+        for (NodeState state : states) {
+            synchronized (stateIdLock) {
+                if (state.getStateId() > maxStateId) maxStateId = state.getStateId();  
+            }
+        }
+
         
         logs = new HashMap<String, Pair<String,Long>>();
         monitoreable = MonitorModule.getModuleListener(node.getXmlrpcClient());
@@ -85,11 +95,11 @@ public class MonitorNodeDescriptor extends ModuleNodeDescriptor {
             return states.size() > 0 ? states.get(states.size()-1) : null;
         }
     }
-    public NodeState getNodeState(int stateNumber) {
-        synchronized (states) {
-            if (states.size() > stateNumber) return states.get(stateNumber);
-            else return null;
+    public NodeState getNodeState(long stateId) {
+        for (NodeState state : states) {
+            if (state.getStateId() == stateId) return state;
         }
+        return null;
     }
     
     public void addLogs(List<String> logNames) {
@@ -169,7 +179,11 @@ public class MonitorNodeDescriptor extends ModuleNodeDescriptor {
 		    state = NodeState.createClusterManagerErrorState(t);
         } finally {
 			synchronized (states) {
-		        states.add(state);
+			    synchronized (stateIdLock) {
+			        maxStateId++;
+			        state.setStateId(maxStateId);
+			    }
+			    states.add(state);
 		         
 		        cleanupStateList();
 
