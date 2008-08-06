@@ -26,6 +26,8 @@ import com.flaptor.clusterfest.NodeDescriptor;
  */
 public class NodeUnreachableException extends NodeException {
     
+    private static final long serialVersionUID = 1L;
+
     public NodeUnreachableException(NodeDescriptor node) {
         super(node, "node " + node + " unreachable");
         node.setReachable(false);
