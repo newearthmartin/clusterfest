@@ -48,6 +48,9 @@ public interface NodeChecker {
      * and a list of (human readable) remarks that express what's wrong
      */
     public static class Result implements Serializable{
+        
+        private static final long serialVersionUID = 1L;
+        
         private Sanity sanity;
         private List<String> remarks;
 

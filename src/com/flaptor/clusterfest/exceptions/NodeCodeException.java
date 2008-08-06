@@ -26,6 +26,8 @@ import com.flaptor.clusterfest.NodeDescriptor;
  */
 public class NodeCodeException extends NodeException {
     
+    private static final long serialVersionUID = 1L;
+
     public NodeCodeException(NodeDescriptor node) {
         super(node, "unexpected exception in node code. node: " + node);
     }
