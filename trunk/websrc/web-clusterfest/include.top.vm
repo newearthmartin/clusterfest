@@ -33,6 +33,7 @@ limitations under the License.
 #if ($monitorNode)
     <a href="monitorNode.do?idx=$idx">node status</a>
 #end
+    <a href="info.do">clusterfest info</a>
 #if ($user)
     <a href="logout.do">logout</a>
 #end
