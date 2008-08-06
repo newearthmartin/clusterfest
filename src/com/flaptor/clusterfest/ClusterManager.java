@@ -281,4 +281,8 @@ public class ClusterManager {
         }
         return null;
     }
+
+    public Map<String, Module> getModules() {
+        return modules;
+    }
 }

@@ -1,5 +1,8 @@
 clustering.nodes=
-clustering.modules=
+clustering.modules=\
+    monitor:com.flaptor.clusterfest.monitoring.MonitorModule,\
+    controller:com.flaptor.clusterfest.controlling.ControllerModule,\
+    deploy:com.flaptor.clusterfest.deploy.DeployModule
 
 clustering.checkNodesInterval.seconds=600
 clustering.monitor.formatter=com.flaptor.clusterfest.monitoring.DefaultPropertyFormatter

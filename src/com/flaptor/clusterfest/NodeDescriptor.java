@@ -113,7 +113,10 @@ public class NodeDescriptor {
      * @throws NodeException
      */
     public void checkAndThrow(Throwable t, Logger logger) throws NodeException {
-        if (logger != null) logger.error(t, t);
+        if (logger != null) {
+            if (t instanceof RpcConnectionException) logger.error("connection exception with node " + this + " - "+ t);
+            else logger.error("exception - node " + this, t);
+        }
         
         if (t instanceof RpcConnectionException) throw new NodeUnreachableException(this, t);
         else if (t instanceof RemoteHostCodeException) throw new NodeCodeException(this, t);

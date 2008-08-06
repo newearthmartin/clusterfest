@@ -64,6 +64,8 @@ public class ClusterfestServlet extends MVCServlet {
         String template = null;
         if (uri.contains("/index.do")) {
             template = doStartPage(request, response);
+        } else if (uri.contains("/info.do")) {
+            template = doInfoPage(request, response);
         } else if (uri.contains("/showLoginForm.do")) {
             template = "login.vm";
         } else if (uri.contains("/login.do")) {
@@ -97,7 +99,9 @@ public class ClusterfestServlet extends MVCServlet {
             return "/login.vm";
         }
     }
-    
+    private String doInfoPage(HttpServletRequest request, HttpServletResponse response) {
+        return "info.vm";
+    }
     private String doStartPage(HttpServletRequest request, HttpServletResponse response) {
         String action = request.getParameter("action");
         String message = "";
