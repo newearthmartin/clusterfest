@@ -17,6 +17,8 @@ import com.flaptor.util.Pair;
 import com.flaptor.util.remote.WebServer;
 import com.flaptor.util.timeplot.TimePlotUtils;
 
+import com.google.common.base.Preconditions;
+
 /**
  * Simple (web)module that displays a chart
  * @author Martin Massera
@@ -25,9 +27,10 @@ abstract public class ChartModule implements Module, WebModule{
 
     private static final String[] COLORS = new String[]{"FF2233", "0785A9", "FFBF00", "CC99FF", "440373", "666666", "00CC66", "CC0033", "33FFFF", "FF6666"};
 
-    private String pageName;
+    private final String pageName;
     
     public ChartModule(String pageName) {
+        Preconditions.checkNotNull(pageName, "pageName cannot be null");
         this.pageName = pageName;
     }
     

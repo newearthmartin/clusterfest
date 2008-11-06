@@ -16,7 +16,6 @@ import com.flaptor.util.Execute;
 import com.flaptor.util.web.MVCServlet;
 
 /**
- * Servlet for the clarin webapp
  */
 public class ClusterfestServlet extends MVCServlet {
 
