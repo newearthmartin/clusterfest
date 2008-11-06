@@ -34,18 +34,20 @@ import com.flaptor.util.Execution;
 import com.flaptor.util.MultiExecutor;
 import com.flaptor.util.Pair;
 
+import com.google.common.base.Preconditions;
+
 /**
  * Manages a cluster. Contains the representation of a cluster as a list of nodes. 
  * Here you can register nodes and all the different modules of the framework (monitoring, control, etc) 
  * will get access to them. Also contains the list of modules that access the nodes.  
  *
- * @author Martin Massera
+ * @author Martin Massera, Spike
  */
 public class ClusterManager {
 	
     private static final Logger logger = Logger.getLogger(com.flaptor.util.Execute.whoAmI());
 	
-    static MultiExecutor multiExecutor = new MultiExecutor(40, "clusterfest");
+    static MultiExecutor multiExecutor = new MultiExecutor(40, "clusterfest-nodeUpdater");
     ScheduledThreadPoolExecutor scheduler = new ScheduledThreadPoolExecutor(1);
     
     private static class InitializiationOnDemandHolder {
@@ -88,7 +90,10 @@ public class ClusterManager {
             public void run() {
                 try {
                     updateNodes();
-                } catch (Throwable t) {logger.fatal("EXCEPTION IN NODE UPDATER THREAD", t);}
+                } catch (Throwable t) {
+                    logger.fatal("EXCEPTION IN NODE UPDATER THREAD", t);
+                    System.exit(-1);
+                }
             }
     	}, interval, interval, TimeUnit.SECONDS);
     }
@@ -188,10 +193,11 @@ public class ClusterManager {
 		}
 		multiExecutor.addExecution(execution);
 		try {
-            execution.waitFor(60000);
+            execution.waitFor(30000);
         } catch (InterruptedException e) {
-            logger.error("nodes took too long to update");
+            logger.error("One or more nodes took too long to update");
         }
+        execution.forget();
 	}
 
 	/**
@@ -268,8 +274,14 @@ public class ClusterManager {
         return null;
     }
     public WebModule getModuleForPage(String page) {
+        Preconditions.checkNotNull(page, "page cannot be null");
         for (WebModule wm : webModules) {
-            if (wm.getPages().contains(page)) return wm;
+            List<String> pages = wm.getPages();
+            if (null == pages) {
+                logger.error("getModuleForPage: page is null. webModule is " + wm);
+            } else {
+                if (pages.contains(page)) return wm;
+            }
         }
         return null;
     }

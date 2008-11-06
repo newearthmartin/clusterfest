@@ -61,8 +61,7 @@ public interface WebModule {
 	
 	/**
 	 * @return a list of pages that this server attends, these pages will have .do suffix appended:
-	 * 
-	 * "foo", "bar" --> "foo.do" "bar.do"
+	 * "foo", "bar" --> "foo.do" "bar.do". Must not return null, return an empty list instead.
 	 */
 	List<String> getPages();
 	
